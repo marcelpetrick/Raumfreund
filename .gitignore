@@ -34,3 +34,6 @@ key.properties
 
 .DS_Store
 test/coverage_imports_test.dart
+
+# Local agent worktrees and settings
+.claude/

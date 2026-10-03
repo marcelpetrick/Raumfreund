@@ -7,3 +7,4 @@ these lines (see docs/releasing.md).
 * v0.0.2 adds tool/bump_version.sh for SemVer + monotonic build numbers with tests
 * v0.0.3 adds localPipeline.sh (format, analyze, shellcheck, tool tests, flutter tests, 95 % coverage gate, debug APK)
 * v0.0.4 adds shared interfaces: monotonic clock, zones/thresholds, platform ports, settings model, app info, channel protocol
+* v0.0.5 untracks local agent worktrees accidentally recorded as gitlink
