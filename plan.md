@@ -28,7 +28,7 @@ rules: [`AGENTS.md`](AGENTS.md).
 - [x] Commit vision and prototype archive
 - [x] AGENTS.md with binding rules
 - [x] plan.md (this file)
-- [ ] Pinned toolchain (`.flutter-version`, `tool/flutter.sh`), Flutter Android project skeleton, GPL-3.0 LICENSE, strict analysis options, version 0.1.0
+- [x] Pinned toolchain (`.flutter-version`, `tool/flutter.sh`), Flutter Android project skeleton, GPL-3.0 LICENSE, strict analysis options, version 0.0.1
 - [ ] `tool/bump_version.sh` (semver + monotonic build number) with tests
 - [ ] `localPipeline.sh` v1: format, analyze, test, coverage gate, debug APK
 - [ ] `tool/install_tools.sh`: pinned shfmt, actionlint, gitleaks, osv-scanner, ktlint, detekt, Python/Node tooling

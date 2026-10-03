@@ -1,1 +1,35 @@
+# Pinned toolchains and tools downloaded by tool/flutter.sh and tool/install_tools.sh
 .toolchain/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+*.iml
+.idea/
+.vscode/
+
+# Python tooling
+.venv/
+__pycache__/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Node tooling
+node_modules/
+
+# Pipeline reports and release output
+/reports/
+/dist/
+
+# Signing material must never be committed
+*.keystore
+*.jks
+key.properties
+
+.DS_Store

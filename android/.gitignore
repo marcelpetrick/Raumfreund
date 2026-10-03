@@ -1,0 +1,11 @@
+/.gradle
+/captures/
+/local.properties
+GeneratedPluginRegistrant.java
+.cxx/
+.kotlin/
+
+# Never commit signing material. See docs/releasing.md.
+key.properties
+**/*.keystore
+**/*.jks
