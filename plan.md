@@ -48,7 +48,7 @@ into `main` as atomic, green, version-bumped commits and ticks the tasks here.
 - [x] `localPipeline.sh` v1: format, analyze, test, coverage gate, debug APK
 - [ ] `tool/install_tools.sh`: pinned shfmt, actionlint, gitleaks, osv-scanner, ktlint, detekt, Python/Node tooling
 - [x] GitHub Actions CI mirroring the local pipeline (SHA-pinned actions, read-only token)
-- [ ] `docs/toolchain.md` with verified versions and sources
+- [x] `docs/toolchain.md` with verified versions and sources
 - [ ] ADR 0001 microphone implementation, ADR 0002 architecture/state handling
 
 ## M1 – Core (parallel packages after interfaces are fixed)
