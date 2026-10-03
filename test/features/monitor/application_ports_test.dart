@@ -6,8 +6,10 @@ import 'package:raumfreund/features/monitor/application/ports.dart';
 
 void main() {
   test('level events carry their session', () {
-    const reading = LevelReading(3, -42.5);
-    const error = LevelError(4, LevelFailure.microphoneBusy);
+    // Built at runtime: const instances do not reliably count for coverage.
+    final session = int.parse('3');
+    final reading = LevelReading(session, -42.5);
+    final error = LevelError(session + 1, LevelFailure.microphoneBusy);
     expect(reading.sessionId, 3);
     expect(reading.dbfs, -42.5);
     expect(error.sessionId, 4);
@@ -16,7 +18,8 @@ void main() {
 
   test('exception describes the failure', () {
     expect(
-      const LevelSourceException(LevelFailure.unavailable).toString(),
+      LevelSourceException(LevelFailure.values.byName('unavailable'))
+          .toString(),
       'LevelSourceException(unavailable)',
     );
   });
