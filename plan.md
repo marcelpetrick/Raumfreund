@@ -23,6 +23,21 @@ rules: [`AGENTS.md`](AGENTS.md).
   the APK over HTTP for easy side-loading (`docker run -p 8080:8080 …`),
   published to GHCR.
 
+## Work packages and agents
+
+| Package | Owner | Status |
+| --- | --- | --- |
+| Coordination, toolchain, pipeline, CI, integration, docs, releases | Coordinator | running |
+| A – Domain (alarm state machine, history, stars) + measurement controller + settings persistence | Sub-agent A | running |
+| B – Glowing UI: theme, kitty "Mia", gauge, heartbeat timeline, pages, l10n, goldens | Sub-agent B | running |
+| C – Native Android: AudioRecord, permission, alarm, lifecycle, Kotlin lint/tests, Dart adapters | Sub-agent C | running |
+| D – Tooling: function-length checker, pinned tool installer, lint configs | Sub-agent D | running |
+| E – Artwork mockups (3, neon/glow, kitty walking out) | Sub-agent E | running |
+| Reviewer – independent review of critical logic after integration | Sub-agent | open |
+
+Sub-agents work in isolated worktrees; the coordinator integrates every package
+into `main` as atomic, green, version-bumped commits and ticks the tasks here.
+
 ## M0 – Foundation
 
 - [x] Commit vision and prototype archive
@@ -62,6 +77,8 @@ rules: [`AGENTS.md`](AGENTS.md).
 - [ ] About page: version/build, author, project URL, license, privacy, licenses page
 - [ ] Responsive layouts: small phone, tablet, landscape, large text
 - [ ] Golden tests (phone, tablet, landscape, large text)
+- [ ] Three artwork mockups (neon/glow; two with Mia walking out of the room) in `docs/mockups/`
+- [ ] "Quiet stars": a star for every full quiet minute, celebration animation
 - [ ] App icon and splash
 
 ## M3 – Quality gates
@@ -84,6 +101,16 @@ rules: [`AGENTS.md`](AGENTS.md).
 - [ ] Version/tag/changelog consistency check
 - [ ] Weekly maintenance workflow (Flutter/dependency update check) + Dependabot
 
+## M4b – Google Play readiness (publication at a late stage)
+
+- [ ] Release AAB with Play App Signing / upload key workflow documented
+- [ ] targetSdk satisfies the current Play target-API deadline (documented with source)
+- [ ] Privacy policy page (public URL, German + English) – required for RECORD_AUDIO
+- [ ] Data safety form answers and Families-policy notes (`docs/play-store.md`)
+- [ ] Store listing metadata (`fastlane/metadata/android/de-DE/`): title, short/full description, changelogs
+- [ ] Store graphics: 512×512 icon, 1024×500 feature graphic, phone/tablet screenshots
+- [ ] Optional Play upload job (internal track) – blocked until the owner provides a service account
+
 ## M5 – Documentation and finish
 
 - [ ] README with badges, setup, testing, pipeline, docker, usage, real screenshot
@@ -101,3 +128,5 @@ rules: [`AGENTS.md`](AGENTS.md).
 - Tests on two real Android devices from different manufacturers (vision §11/§15),
   30-minute endurance run, RC soak of five working days.
 - Backup of the release keystore created for GitHub secrets.
+- Google Play Console account, app creation, service account for uploads,
+  content rating questionnaire and the final production release.

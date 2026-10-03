@@ -8,3 +8,4 @@ these lines (see docs/releasing.md).
 * v0.0.3 adds localPipeline.sh (format, analyze, shellcheck, tool tests, flutter tests, 95 % coverage gate, debug APK)
 * v0.0.4 adds shared interfaces: monotonic clock, zones/thresholds, platform ports, settings model, app info, channel protocol
 * v0.0.5 untracks local agent worktrees accidentally recorded as gitlink
+* v0.0.6 extends plan.md with work packages, mockups and Google Play readiness tasks
