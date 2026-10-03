@@ -38,7 +38,7 @@ rules: [`AGENTS.md`](AGENTS.md).
 
 ## M1 – Core (parallel packages after interfaces are fixed)
 
-- [ ] Shared interfaces: `Clock`, `AudioLevelSource`, `AlarmOutput`, `ScreenAwake`, `SettingsRepository`, `AppInfo`
+- [x] Shared interfaces: `Clock`, `AudioLevelSource`, `AlarmOutput`, `ScreenAwake`, `SettingsRepository`, `AppInfo`
 - [ ] Domain: thresholds/zones value objects + calibration
 - [ ] Domain: alarm state machine (phases, 10 s, gaps, own-alarm suppression) with full edge-case tests
 - [ ] Domain: level history ring buffer (30 min) + display smoothing
