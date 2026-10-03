@@ -13,3 +13,4 @@ these lines (see docs/releasing.md).
 * v0.0.8 documents the verified toolchain (docs/toolchain.md) and the architecture decision (ADR 0002)
 * v0.0.9 fixes nondeterministic coverage of const constructors in CI
 * v0.0.10 verifies the downloaded Flutter archive against a pinned SHA-256
+* v0.0.11 adds three neon artwork mockups with Mia the kitty (happy, walking out when too loud, peeking back in)

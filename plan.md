@@ -32,7 +32,7 @@ rules: [`AGENTS.md`](AGENTS.md).
 | B – Glowing UI: theme, kitty "Mia", gauge, heartbeat timeline, pages, l10n, goldens | Sub-agent B | running |
 | C – Native Android: AudioRecord, permission, alarm, lifecycle, Kotlin lint/tests, Dart adapters | Sub-agent C | running |
 | D – Tooling: function-length checker, pinned tool installer, lint configs | Sub-agent D | running |
-| E – Artwork mockups (3, neon/glow, kitty walking out) | Sub-agent E | running |
+| E – Artwork mockups (3, neon/glow, kitty walking out) | Sub-agent E | done |
 | Reviewer – independent review of critical logic after integration | Sub-agent | open |
 
 Sub-agents work in isolated worktrees; the coordinator integrates every package
@@ -77,7 +77,7 @@ into `main` as atomic, green, version-bumped commits and ticks the tasks here.
 - [ ] About page: version/build, author, project URL, license, privacy, licenses page
 - [ ] Responsive layouts: small phone, tablet, landscape, large text
 - [ ] Golden tests (phone, tablet, landscape, large text)
-- [ ] Three artwork mockups (neon/glow; two with Mia walking out of the room) in `docs/mockups/`
+- [x] Three artwork mockups (neon/glow; two with Mia walking out of the room) in `docs/mockups/`
 - [ ] "Quiet stars": a star for every full quiet minute, celebration animation
 - [ ] App icon and splash
 
