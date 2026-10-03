@@ -33,3 +33,4 @@ node_modules/
 key.properties
 
 .DS_Store
+test/coverage_imports_test.dart

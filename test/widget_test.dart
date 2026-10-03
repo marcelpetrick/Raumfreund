@@ -2,11 +2,12 @@
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:raumfreund/main.dart';
+import 'package:raumfreund/main.dart' as app;
 
 void main() {
-  testWidgets('shows the app name', (tester) async {
-    await tester.pumpWidget(const RaumfreundApp());
+  testWidgets('main() starts the app and shows its name', (tester) async {
+    app.main();
+    await tester.pump();
     expect(find.text('Raumfreund'), findsOneWidget);
   });
 }
