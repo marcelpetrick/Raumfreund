@@ -29,7 +29,7 @@ rules: [`AGENTS.md`](AGENTS.md).
 - [x] AGENTS.md with binding rules
 - [x] plan.md (this file)
 - [x] Pinned toolchain (`.flutter-version`, `tool/flutter.sh`), Flutter Android project skeleton, GPL-3.0 LICENSE, strict analysis options, version 0.0.1
-- [ ] `tool/bump_version.sh` (semver + monotonic build number) with tests
+- [x] `tool/bump_version.sh` (semver + monotonic build number) with tests
 - [ ] `localPipeline.sh` v1: format, analyze, test, coverage gate, debug APK
 - [ ] `tool/install_tools.sh`: pinned shfmt, actionlint, gitleaks, osv-scanner, ktlint, detekt, Python/Node tooling
 - [ ] GitHub Actions CI mirroring the local pipeline (SHA-pinned actions, read-only token)
