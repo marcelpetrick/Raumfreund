@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+#
+# Shared job setup: pinned JDK, cached pinned Flutter SDK (.flutter-version),
+# pub cache (pubspec.lock) and Gradle caches (wrapper + lock/build files).
+name: Setup Raumfreund toolchain
+description: JDK, cached Flutter SDK, pub and Gradle caches
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+      with:
+        distribution: temurin
+        java-version: "21"
+    - name: Cache pinned Flutter SDK
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .toolchain/flutter
+        key: flutter-${{ runner.os }}-${{ hashFiles('.flutter-version') }}
+    - name: Cache pub packages
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.pub-cache
+        key: pub-${{ runner.os }}-${{ hashFiles('.flutter-version', '**/pubspec.lock') }}
+    - name: Cache Gradle
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: gradle-${{ runner.os }}-${{ hashFiles('.flutter-version', 'android/gradle/wrapper/gradle-wrapper.properties', 'android/**/*.gradle.kts', 'pubspec.lock') }}

@@ -1,0 +1,83 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+#
+# CI mirrors ./localPipeline.sh: every job only selects pipeline steps with
+# --only. Change the gate in localPipeline.sh, never the command lists here.
+# Actions are pinned to full commit SHAs (version in the trailing comment).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  static:
+    name: Format, lint, static checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - name: Static checks
+        run: ./localPipeline.sh --only toolchain,deps,format,analyze,shell,tooltests
+      - name: Upload pipeline logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: static-logs
+          path: reports/pipeline
+          retention-days: 14
+          if-no-files-found: ignore
+
+  test:
+    name: Unit, widget and golden tests with coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - name: Tests and coverage gate
+        run: ./localPipeline.sh --only toolchain,deps,test,coverage
+      - name: Upload coverage and logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: test-reports
+          path: |
+            reports/pipeline
+            coverage/lcov.info
+          retention-days: 14
+          if-no-files-found: ignore
+
+  android:
+    name: Android debug build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - name: Build debug APK
+        run: ./localPipeline.sh --only toolchain,deps,apk
+      - name: Upload debug APK
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: raumfreund-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
+      - name: Upload pipeline logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-logs
+          path: reports/pipeline
+          retention-days: 14
+          if-no-files-found: ignore

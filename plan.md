@@ -47,7 +47,7 @@ into `main` as atomic, green, version-bumped commits and ticks the tasks here.
 - [x] `tool/bump_version.sh` (semver + monotonic build number) with tests
 - [x] `localPipeline.sh` v1: format, analyze, test, coverage gate, debug APK
 - [ ] `tool/install_tools.sh`: pinned shfmt, actionlint, gitleaks, osv-scanner, ktlint, detekt, Python/Node tooling
-- [ ] GitHub Actions CI mirroring the local pipeline (SHA-pinned actions, read-only token)
+- [x] GitHub Actions CI mirroring the local pipeline (SHA-pinned actions, read-only token)
 - [ ] `docs/toolchain.md` with verified versions and sources
 - [ ] ADR 0001 microphone implementation, ADR 0002 architecture/state handling
 
