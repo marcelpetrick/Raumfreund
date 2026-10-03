@@ -12,3 +12,4 @@ these lines (see docs/releasing.md).
 * v0.0.7 adds GitHub Actions CI mirroring localPipeline.sh (static, tests+coverage, Android build) with SHA-pinned actions
 * v0.0.8 documents the verified toolchain (docs/toolchain.md) and the architecture decision (ADR 0002)
 * v0.0.9 fixes nondeterministic coverage of const constructors in CI
+* v0.0.10 verifies the downloaded Flutter archive against a pinned SHA-256

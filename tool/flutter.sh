@@ -9,7 +9,8 @@
 #
 # Reads the exact stable version from .flutter-version, downloads the official
 # Linux release archive into .toolchain/flutter on first use (or when the pin
-# changes) and then executes it. The global Flutter installation is never used
+# changes), verifies it against the SHA-256 pinned in .flutter-sha256 (value
+# from Flutter's official releases_linux.json) and then executes it. The global Flutter installation is never used
 # or modified. Set RAUMFREUND_FLUTTER_ROOT to use an existing SDK of exactly
 # the pinned version instead (e.g. in Docker or CI).
 #
@@ -18,6 +19,7 @@ set -euo pipefail
 
 root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 pinned="$(tr -d '[:space:]' <"${root_dir}/.flutter-version")"
+pinned_sha256="$(tr -d '[:space:]' <"${root_dir}/.flutter-sha256")"
 sdk_dir="${RAUMFREUND_FLUTTER_ROOT:-${root_dir}/.toolchain/flutter}"
 base_url="https://storage.googleapis.com/flutter_infra_release/releases/stable/linux"
 
@@ -36,10 +38,18 @@ install_sdk() {
 		exit 2
 	fi
 	echo "Installing Flutter ${pinned} into ${sdk_dir} …" >&2
+	local archive
+	archive="$(mktemp)"
+	curl -sSfL -o "${archive}" "${base_url}/flutter_linux_${pinned}-stable.tar.xz" || exit 2
+	if ! echo "${pinned_sha256}  ${archive}" | sha256sum --check --quiet; then
+		echo "Checksum mismatch for Flutter ${pinned} archive" >&2
+		rm -f "${archive}"
+		exit 2
+	fi
 	rm -rf "${sdk_dir}"
 	mkdir -p "$(dirname "${sdk_dir}")"
-	curl -sSfL "${base_url}/flutter_linux_${pinned}-stable.tar.xz" |
-		tar -xJ -C "$(dirname "${sdk_dir}")" || exit 2
+	tar -xJf "${archive}" -C "$(dirname "${sdk_dir}")" || exit 2
+	rm -f "${archive}"
 	"${sdk_dir}/bin/flutter" --version --suppress-analytics >/dev/null
 	"${sdk_dir}/bin/flutter" config --no-analytics >/dev/null
 }
