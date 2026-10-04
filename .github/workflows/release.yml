@@ -1,0 +1,115 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+#
+# Release pipeline: tag vX.Y.Z → consistency checks → full local pipeline on
+# the exact tagged commit → signed APK + AAB, checksums, SBOM, provenance →
+# GitHub Release (through the protected "release" environment).
+# Missing signing secrets fail the build job (release blocker).
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify tag, version and changelog
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      notes: ${{ steps.check.outputs.notes }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Check release consistency
+        id: check
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          previous="$(git describe --tags --abbrev=0 --match 'v*' "${TAG}^" 2>/dev/null || true)"
+          if [ -n "${previous}" ]; then
+            line="$(tool/check_release_version.sh "${TAG}" "${previous}")"
+          else
+            line="$(tool/check_release_version.sh "${TAG}")"
+          fi
+          echo "notes=${line}" >> "${GITHUB_OUTPUT}"
+
+  build:
+    name: Gates and signed artifacts
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - name: Full local pipeline on the tagged commit
+        run: ./localPipeline.sh --skip docker
+      - name: Write signing config
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: tool/write_signing_config.sh
+      - name: Build signed APK and AAB
+        run: tool/build_apk.sh --aab --commit "${GITHUB_SHA::12}"
+      - name: Remove signing material
+        if: always()
+        run: tool/write_signing_config.sh --remove
+      - name: SBOM (SPDX)
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          path: .
+          format: spdx-json
+          output-file: dist/raumfreund-sbom.spdx.json
+          upload-artifact: false
+      - name: License inventory and checksums
+        run: |
+          cp LICENSE dist/LICENSE.txt
+          if [ -f assets/licenses/THIRD_PARTY_LICENSES.md ]; then cp assets/licenses/THIRD_PARTY_LICENSES.md dist/; fi
+          (cd dist && rm -f SHA256SUMS VERSION && sha256sum -- * > SHA256SUMS)
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            dist/*.apk
+            dist/*.aab
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-dist
+          path: dist
+          retention-days: 30
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: [verify, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-dist
+          path: dist
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          NOTES: ${{ needs.verify.outputs.notes }}
+        run: tool/write_release_notes.sh "${TAG}" "${NOTES}" dist > release-notes.md && tool/publish_release.sh "${TAG}" release-notes.md dist

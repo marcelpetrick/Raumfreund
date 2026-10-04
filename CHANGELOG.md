@@ -14,3 +14,4 @@ these lines (see docs/releasing.md).
 * v0.0.9 fixes nondeterministic coverage of const constructors in CI
 * v0.0.10 verifies the downloaded Flutter archive against a pinned SHA-256
 * v0.0.11 adds three neon artwork mockups with Mia the kitty (happy, walking out when too loud, peeking back in)
+* v0.1.0 ships the offline Android monitor, Mia UI, Settings/About, native audio, tests, CI, Docker and signed-release automation

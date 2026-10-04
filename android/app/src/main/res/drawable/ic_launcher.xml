@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only
+     Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it> -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#171129"
+        android:pathData="M54,4A50,50 0,1 1,54 104A50,50 0,1 1,54 4" />
+    <path
+        android:fillColor="#6EF5B2"
+        android:pathData="M54,8A46,46 0,1 1,54 100A46,46 0,1 1,54 8M54,12A42,42 0,1 0,54 96A42,42 0,1 0,54 12" />
+    <path
+        android:fillColor="#B49BFF"
+        android:pathData="M29,48L25,25L44,36C47,34 50,33 54,33C58,33 61,34 64,36L83,25L79,48C82,53 83,59 82,65C80,79 69,87 54,87C39,87 28,79 26,65C25,59 26,53 29,48" />
+    <path
+        android:fillColor="#6EF5B2"
+        android:pathData="M36,55A5,6 0,1 1,46 55A5,6 0,1 1,36 55M62,55A5,6 0,1 1,72 55A5,6 0,1 1,62 55" />
+    <path
+        android:fillColor="#171129"
+        android:pathData="M40,55A2,4 0,1 1,44 55A2,4 0,1 1,40 55M66,55A2,4 0,1 1,70 55A2,4 0,1 1,66 55M49,67L54,64L59,67L54,71Z" />
+    <path
+        android:fillColor="#171129"
+        android:fillAlpha="0"
+        android:pathData="M43,73C48,78 60,78 65,73"
+        android:strokeColor="#171129"
+        android:strokeLineCap="round"
+        android:strokeWidth="3" />
+</vector>

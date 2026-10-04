@@ -42,7 +42,9 @@ Each event is a map:
 | Reading | `{"sessionId": int, "dbfs": double}` – RMS of one ~100 ms window, `<= 0` |
 | Failure | `{"sessionId": int, "error": "microphoneBusy" \| "recordingAborted" \| "unavailable"}` – the native session has ended |
 
-The native side stops recording on its own when the activity is stopped
-(real background) or destroyed, and then emits `recordingAborted` for the
-running session. Events of an old session may still arrive after a new one has
-started; the Dart side discards them by `sessionId`.
+The native side stops recording silently when the activity is stopped (real
+background) or destroyed, because the Dart lifecycle observes the same
+expected transition. Unexpected read failures emit `recordingAborted`; an
+unexpectedly closed event stream is handled the same way. Events of an old
+session may still arrive after a new one has started; the Dart side discards
+them by `sessionId`.

@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+#
+# Configuration for the Python tooling below tool/ (ruff, mypy, pytest,
+# coverage). Tool versions are pinned in requirements-dev.in/.txt.
+# Run from the repository root, e.g.:
+#   .toolchain/venv/bin/ruff check tool
+#   .toolchain/venv/bin/mypy --config-file tool/pyproject.toml tool/function_length
+#   .toolchain/venv/bin/pytest -c tool/pyproject.toml
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+# A curated set instead of "ALL": pyflakes/pycodestyle basics plus bug,
+# naming, typing-annotation, security, pathlib, pytest and simplification
+# rules. Conflicting formatter rules (e.g. COM812) are not selected.
+select = [
+  "ANN", "B", "C4", "E", "F", "I", "N", "PL", "PT", "PTH", "RET", "RUF",
+  "S", "SIM", "UP", "W",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["fixtures", "fnlen"]
+
+[tool.ruff.lint.per-file-ignores]
+# pytest's idiom is the bare assert statement (bandit S101 targets
+# production code that may run with -O) and tests use literal expected values.
+"function_length/tests/*.py" = ["S101", "PLR2004"]
+
+[tool.mypy]
+strict = true
+python_version = "3.13"
+mypy_path = "$MYPY_CONFIG_FILE_DIR/function_length"
+warn_unreachable = true
+
+[tool.pytest.ini_options]
+testpaths = ["function_length/tests"]
+pythonpath = ["function_length"]
+addopts = [
+  "--strict-markers",
+  "--cov=fnlen",
+  "--cov-report=term-missing",
+  "--cov-fail-under=95",
+]

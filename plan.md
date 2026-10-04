@@ -1,132 +1,258 @@
-# Raumfreund – Work plan
+<!--
+SPDX-License-Identifier: GPL-3.0-only
+Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+-->
 
-Living task list. **Every commit ticks off (at least) one task** so work can be
-resumed immediately after a crash: pick the first unchecked box, read the
-referenced files, continue. Specification: [`Raumfreund-VISION.md`](Raumfreund-VISION.md),
-rules: [`AGENTS.md`](AGENTS.md).
+# Raumfreund – execution plan
 
-## Product decisions (made by the coordinator, see `docs/adr/`)
+This is the restart-safe implementation plan for the complete Android app.
+The product specification is [`Raumfreund-VISION.md`](Raumfreund-VISION.md),
+and the binding workflow is [`AGENTS.md`](AGENTS.md). Every completed package
+must be integrated as an atomic Conventional Commit, versioned with
+`tool/bump_version.sh`, and pass `./localPipeline.sh` before it is committed.
 
-- **Character "Mia" the kitty** replaces the plain face: green = happy, purring,
-  tail swaying; yellow = ears flat, sad; red = crying and walking out of the
-  picture (comes back when it is quiet again). Status is always also shown as
-  text and face expression – never colour alone.
-- **Heartbeat timeline**: last 30 minutes of levels drawn live like a heart-rate
-  monitor (glowing trace, zone bands, threshold lines). Values only, RAM only,
-  cleared on app exit – no audio, no persistence.
-- **Glowing, "poppy" UI**: dark night-sky gradient, neon glow gauge, soft
-  particles; honours "reduce animations" and large text.
-- Measurement via **own small Kotlin module** (AudioRecord, no third-party mic
-  plugin); settings via `shared_preferences`.
-- Application id `it.marcelpetrick.raumfreund`; author Marcel Petrick.
-- Docker image: reproducible build of the signed/debug APK, final image serves
-  the APK over HTTP for easy side-loading (`docker run -p 8080:8080 …`),
-  published to GHCR.
+## Product direction
 
-## Work packages and agents
+- Raumfreund is one offline Flutter/Dart Android app for phones and tablets.
+- It processes microphone samples in RAM and never stores or transmits audio.
+- The main character is **Mia the kitty**: happy in green, sad in yellow,
+  crying/walking away in red, and returning only after the room is quiet.
+- State is never communicated by colour alone; expression, icon and German
+  text always accompany the green/yellow/red presentation.
+- The main view contains an estimated 0–130 dB gauge, start/stop controls,
+  alarm countdown/status, a 30-minute in-memory heartbeat timeline and quiet
+  stars. It follows reduced-motion, large-text and TalkBack settings.
+- The app bar has two always-visible actions: **Settings** and **About**.
+  Opening either stops an active measurement and never auto-restarts it.
+- Settings provide validated yellow/red thresholds, calibration, tone,
+  vibration, Save, Cancel and Restore Defaults.
+- About shows name, version/build/commit, author, project link, privacy and
+  open-source licences.
+- Native microphone measurement uses a small Kotlin `AudioRecord` module;
+  settings use `shared_preferences`.
+- Distribution includes a downloadable APK, optional AAB, a reproducible
+  Docker APK server, GitHub Releases and an optional GHCR image.
 
-| Package | Owner | Status |
-| --- | --- | --- |
-| Coordination, toolchain, pipeline, CI, integration, docs, releases | Coordinator | running |
-| A – Domain (alarm state machine, history, stars) + measurement controller + settings persistence | Sub-agent A | running |
-| B – Glowing UI: theme, kitty "Mia", gauge, heartbeat timeline, pages, l10n, goldens | Sub-agent B | running |
-| C – Native Android: AudioRecord, permission, alarm, lifecycle, Kotlin lint/tests, Dart adapters | Sub-agent C | running |
-| D – Tooling: function-length checker, pinned tool installer, lint configs | Sub-agent D | running |
-| E – Artwork mockups (3, neon/glow, kitty walking out) | Sub-agent E | done |
-| Reviewer – independent review of critical logic after integration | Sub-agent | open |
+## Verified baseline (2026-10-03)
 
-Sub-agents work in isolated worktrees; the coordinator integrates every package
-into `main` as atomic, green, version-bumped commits and ticks the tasks here.
+- [x] Read every Markdown file and audit the repository and dirty Git state.
+- [x] Verify the official stable pin: Flutter 3.47.6, bundled Dart 3.13.5,
+  official Linux archive SHA-256, JDK 21, Gradle 9.3.1 and Android API 36.
+- [x] Confirm committed `main` is a foundation, not a working product:
+  value objects/ports exist, but the screen is still a static placeholder.
+- [x] Confirm the pinned baseline passes Flutter analysis, 17 tests, the
+  current 95% coverage gate (64/64 measured lines) and debug APK build.
+- [x] Inventory the unfinished staged/untracked tooling, Docker and release
+  changes without discarding them.
+- [x] Inventory recoverable agent worktrees containing domain/controller,
+  theme/localization, monitor presentation and native Android work.
+- [ ] Make the expanded local pipeline fully green. Current failures are a
+  parser crash, one YAML lint error, an over-broad secret scan and one npm
+  vulnerability finding.
+- [ ] Run and pass the Docker image verification after its scripts are fixed.
 
-## M0 – Foundation
+## Integration status (2026-10-04)
 
-- [x] Commit vision and prototype archive
-- [x] AGENTS.md with binding rules
-- [x] plan.md (this file)
-- [x] Pinned toolchain (`.flutter-version`, `tool/flutter.sh`), Flutter Android project skeleton, GPL-3.0 LICENSE, strict analysis options, version 0.0.1
-- [x] `tool/bump_version.sh` (semver + monotonic build number) with tests
-- [x] `localPipeline.sh` v1: format, analyze, test, coverage gate, debug APK
-- [ ] `tool/install_tools.sh`: pinned shfmt, actionlint, gitleaks, osv-scanner, ktlint, detekt, Python/Node tooling
-- [x] GitHub Actions CI mirroring the local pipeline (SHA-pinned actions, read-only token)
-- [x] `docs/toolchain.md` with verified versions and sources
-- [ ] ADR 0001 microphone implementation, ADR 0002 architecture/state handling
+P0 through P4 and the repository-owned parts of P6/P7 are integrated: the
+expanded pipeline, domain/controller, native recorder, channel adapters,
+localized phone/tablet UI, Settings and About views, documentation, badges,
+CI, Docker and signed-release automation are present. Automated Dart coverage
+is 97.07%; the 218-test and Android native/lint gates pass locally.
 
-## M1 – Core (parallel packages after interfaces are fixed)
+Remaining acceptance is deliberately external: two-manufacturer device tests,
+the five-day release-candidate soak, owner-created signing secrets and Play
+Console work. A local `-debugsigned` APK can be produced without those secrets;
+a public production release cannot truthfully be created until they exist.
 
-- [x] Shared interfaces: `Clock`, `AudioLevelSource`, `AlarmOutput`, `ScreenAwake`, `SettingsRepository`, `AppInfo`
-- [ ] Domain: thresholds/zones value objects + calibration
-- [ ] Domain: alarm state machine (phases, 10 s, gaps, own-alarm suppression) with full edge-case tests
-- [ ] Domain: level history ring buffer (30 min) + display smoothing
-- [ ] Application: measurement session controller (states, session ids, lifecycle, permission)
-- [ ] Settings: model, validation, versioned persistence + migration
-- [ ] Native: AudioRecord level recorder, RMS calculator (JVM tests)
-- [ ] Native: permission handler (denied/permanently denied/settings intent)
-- [ ] Native: alarm player (tone + optional vibration), keep-screen-on, app info
-- [ ] Native: microphone busy/silenced detection, background safety stop
-- [ ] Platform adapters in Dart (method/event channels) + tests with mocked channels
-- [ ] Vertical slice: mic → controller → UI working on emulator
+## Integration rules for recovered work
 
-## M2 – Experience
+- Treat parked worktree code as untrusted until reviewed, rebased onto current
+  `main`, formatted, tested and checked against the vision.
+- Integrate in dependency order: tooling → architecture/domain → Android and
+  Dart infrastructure → UI/composition → integration tests → distribution.
+- Do not merge old worktree version numbers. The coordinator performs one new
+  monotonic version bump for every integrated atomic commit.
+- Do not discard the current dirty work. Turn it into coherent green packages.
+- Critical alarm, permission and session-lifecycle logic receives independent
+  review after integration and again before release.
 
-- [ ] Theme: glowing night palette, Material 3, typography, l10n (German ARB)
-- [ ] Kitty character widget (3 moods, walk-away animation, reduced-motion variant)
-- [ ] Glow level gauge 0–130 dB with zone bands + estimated value
-- [ ] Heartbeat timeline (30 min, live, zone bands, semantics summary)
-- [ ] Monitor page: start/stop, status text, countdown, errors with actions
-- [ ] Settings page: thresholds, calibration, sound/vibration, save/cancel/defaults
-- [ ] About page: version/build, author, project URL, license, privacy, licenses page
-- [ ] Responsive layouts: small phone, tablet, landscape, large text
-- [ ] Golden tests (phone, tablet, landscape, large text)
-- [x] Three artwork mockups (neon/glow; two with Mia walking out of the room) in `docs/mockups/`
-- [ ] "Quiet stars": a star for every full quiet minute, celebration animation
-- [ ] App icon and splash
+## P0 – Stabilise the repository and single pipeline
 
-## M3 – Quality gates
+- [ ] Fix the Kotlin/Bash/Python function-length checker crash and retain
+  parser-based 99/100/101-line plus nested-function tests.
+- [ ] Make both checkers reject parse/setup errors cleanly without segfaults or
+  silent exclusions, including Kotlin Gradle scripts.
+- [ ] Fix YAML/action lint failures and cover all workflow/action files.
+- [ ] Restrict the working-tree secret scan to repository sources; exclude
+  `.git`, SDKs, caches, builds, reports and agent worktrees while still
+  scanning history and staged/untracked source files.
+- [ ] Resolve or narrowly document the `braces` npm dev-only OSV finding;
+  never suppress unrelated vulnerabilities.
+- [ ] Ensure `tools` runs before every step that consumes pinned tools.
+- [ ] Make CI run every non-Docker local gate and add Kotlin format/static
+  analysis plus Android lint when native code is integrated.
+- [ ] Keep logs/artifacts redacted, bounded, useful and ignored by Git.
+- [ ] Run `./localPipeline.sh --skip docker`, then the Docker step, and record
+  only results actually observed.
+- [ ] Commit the green tooling package with a patch/build bump and changelog.
 
-- [ ] Parser-based 100-line function checker (Dart via analyzer, Kotlin/Bash/Python via tree-sitter) with 99/100/101 + nesting tests
-- [ ] Kotlin: ktlint, detekt, Android Lint in pipeline
-- [ ] Shell (shellcheck, shfmt), Python (ruff, mypy, pytest), Markdown, YAML, actionlint
-- [ ] Security: gitleaks, osv-scanner, license inventory + SBOM
-- [ ] Coverage gate ≥ 95 % in pipeline
-- [ ] Integration tests (integration_test) on emulator incl. permission grant/deny
-- [ ] Native instrumented tests (UiAutomator permission dialogs, lifecycle)
-- [ ] Emulator e2e job in local pipeline and GitHub Actions
+## P1 – Architecture and pure domain
 
-## M4 – Distribution
+- [ ] Add `docs/architecture.md`, already required by `AGENTS.md`.
+- [ ] Add ADR 0001 for native `AudioRecord` and why no mic plugin is used.
+- [ ] Add an alarm/lifecycle ADR resolving self-alarm interruption, expected
+  versus unexpected stops, operation tokens and concurrency.
+- [ ] Document dBFS conversion, RMS window, smoothing, calibration, device
+  effects and non-professional measurement accuracy.
+- [ ] Integrate/review calibration with finite-value validation and clamping.
+- [ ] Integrate display smoothing, the 30-minute RAM ring buffer and quiet
+  stars with explicit reset/pause semantics.
+- [ ] Integrate the pure alarm phase state machine using monotonic timestamps.
+- [ ] Test exact thresholds, NaN/infinity, 9.9/10/10.1 seconds, first-sample
+  start, green reset, yellow↔red reset, >1-second gaps, one alarm per phase and
+  self-alarm quarantine/restart.
+- [ ] Keep domain code independent of Flutter, platform channels and wall time.
+- [ ] Commit the domain package with a minor/build bump and changelog.
 
-- [ ] Release signing config (keystore from env/secrets, never committed)
-- [ ] Dockerfile (pinned toolchain, build stage, APK-serving final stage) + local docker check
-- [ ] GitHub Actions: docker build + publish to GHCR
-- [ ] Release workflow: tag `vX.Y.Z` → gates → signed APK/AAB, checksums, SBOM, licenses, provenance, GitHub Release
-- [ ] Version/tag/changelog consistency check
-- [ ] Weekly maintenance workflow (Flutter/dependency update check) + Dependabot
+## P2 – Application controllers and persistence
 
-## M4b – Google Play readiness (publication at a late stage)
+- [ ] Integrate immutable states: stopped, permission pending, starting,
+  measuring, alarming, stopping and error.
+- [ ] Serialize rapid start/stop/navigation/lifecycle operations.
+- [ ] Use increasing session IDs plus operation generations; discard stale
+  samples, errors and async completions.
+- [ ] Distinguish permission-dialog lifecycle changes from real backgrounding;
+  start after grant only while foregrounded.
+- [ ] Make cleanup idempotent: cancel subscription, stop native recording,
+  release keep-screen-on and reset alarm continuity exactly once.
+- [ ] Guard alarm completion so stop/background cannot restart or mutate a
+  newer measurement session.
+- [ ] Integrate Settings controller Save/Cancel/Defaults semantics.
+- [ ] Integrate schema-versioned `shared_preferences` persistence with
+  migration and per-field fallback for corrupt/invalid data.
+- [ ] Add controller/persistence tests for races, failures and migrations.
+- [ ] Commit controllers/persistence with a minor/build bump and changelog.
 
-- [ ] Release AAB with Play App Signing / upload key workflow documented
-- [ ] targetSdk satisfies the current Play target-API deadline (documented with source)
-- [ ] Privacy policy page (public URL, German + English) – required for RECORD_AUDIO
-- [ ] Data safety form answers and Families-policy notes (`docs/play-store.md`)
-- [ ] Store listing metadata (`fastlane/metadata/android/de-DE/`): title, short/full description, changelogs
-- [ ] Store graphics: 512×512 icon, 1024×500 feature graphic, phone/tablet screenshots
-- [ ] Optional Play upload job (internal track) – blocked until the owner provides a service account
+## P3 – Native Android and platform adapters
 
-## M5 – Documentation and finish
+- [ ] Recover/review the parked Kotlin implementation; keep recorder, RMS,
+  permission, session, alarm, app-info and bridge responsibilities separate.
+- [ ] Add only required release permissions (`RECORD_AUDIO`, optional
+  vibration); keep `INTERNET` out of the release manifest.
+- [ ] Record ~100 ms PCM windows, compute RMS/dBFS, emit numeric levels and
+  discard buffers immediately.
+- [ ] Detect unavailable/busy/silenced/aborted recording paths and map them to
+  the documented protocol.
+- [ ] Make start/stop synchronized and idempotent; suppress expected-stop late
+  `recordingAborted` events.
+- [ ] Stop on real background/destruction and clean recorder/thread/channels.
+- [ ] Implement tone/optional vibration, keep-screen-on, settings intent and
+  app version/build information.
+- [ ] Add JVM tests for RMS, sessions, permissions, channel validation,
+  silence policy and alarm duration.
+- [ ] Implement defensive Dart channel adapters with finite payload checks,
+  typed errors and mocked-channel contract tests.
+- [ ] Verify both sides against `docs/platform-channels.md` in one commit.
+- [ ] Commit native/platform infrastructure with minor/build bump/changelog.
 
-- [ ] README with badges, setup, testing, pipeline, docker, usage, real screenshot
-- [ ] docs/{architecture,measurement,privacy,testing,releasing}.md
-- [ ] CONTRIBUTING, SECURITY, CHANGELOG, issue/PR templates, `tool/README.md`
-- [ ] GitHub milestones/issues/labels as described in vision §13
-- [ ] Independent review of critical logic (sub-agent) + fixes
-- [ ] `/reviewBranch`, fix findings
-- [ ] `/githubAbout`
-- [ ] First release `v0.x` via pipeline with downloadable APK
-- [ ] Final check against every vision item, pipeline green, Actions green, Docker image works, tree clean
+## P4 – Product UI, Settings and About
 
-## Open points needing the owner (cannot be done by an agent)
+- [ ] Integrate German localization; all visible strings live in ARB files.
+- [ ] Integrate Material 3 night theme and reusable glow widgets without
+  making animation/glow necessary to understand state.
+- [ ] Build the monitor page with Mia, estimated gauge, status text/icon,
+  countdown, heartbeat timeline, quiet stars and large start/stop action.
+- [ ] Add a Settings button to the app bar and a complete Settings view with
+  threshold validation, calibration explanation, alarm toggles, Save, Cancel
+  and Restore Defaults.
+- [ ] Add an About button to the app bar and a complete About view with
+  app/build/commit, Marcel Petrick, project URL, privacy, GPL-3.0-only and the
+  Flutter/open-source licence page.
+- [ ] Stop measurement before opening Settings/About; returning stays stopped.
+- [ ] Compose real ports/controllers/repositories in `lib/app/`; replace the
+  placeholder `main.dart`.
+- [ ] Add app icon/splash consistent with approved Mia mockups.
+- [ ] Add semantics, focus order, 48 dp targets, accessible contrast, reduced
+  motion and no colour-only information.
+- [ ] Test small phone, tablet, landscape and large text without clipping.
+- [ ] Add widget/golden tests for zones, permissions/errors, countdown,
+  navigation, Settings and About.
+- [ ] Commit UI/composition with a minor/build bump and changelog.
 
-- Tests on two real Android devices from different manufacturers (vision §11/§15),
-  30-minute endurance run, RC soak of five working days.
-- Backup of the release keystore created for GitHub secrets.
-- Google Play Console account, app creation, service account for uploads,
-  content rating questionnaire and the final production release.
+## P5 – Integration and device-quality evidence
+
+- [ ] Add emulator tests for grant/deny/permanent deny, settings redirect,
+  dialog lifecycle, background start/measure, rapid start/stop, stale events,
+  stream failures, persistence and no-vibrator behavior.
+- [ ] Add native instrumented/UiAutomator coverage where Flutter tests cannot
+  prove Android permission/lifecycle behavior.
+- [ ] Test occupied/silenced microphone and interrupted recording.
+- [ ] Prove alarm output cannot recursively retrigger from its own sound.
+- [ ] Prove no audio files/logs, analytics, network permission or personal
+  data are produced.
+- [ ] Run a 30-minute emulator soak and inspect crashes/resource cleanup.
+- [ ] Keep two-manufacturer real-device and thermal/endurance tests open until
+  the owner executes them; emulators are not replacements.
+
+## P6 – Documentation, badges and repository presentation
+
+- [ ] Expand README with status, screenshot/mockup, install/use/build,
+  privacy/accuracy caveats, pipeline and release instructions.
+- [ ] Add badges in the Cullendula/myLastFmPlayer style: CI, Docker, latest
+  release, GPL-3.0-only, Flutter/Dart/Android and measured coverage. They must
+  point to real Raumfreund workflows or checked-in configuration.
+- [ ] Add `docs/measurement.md`, `privacy.md`, `testing.md`, `building.md`,
+  `releasing.md` and `play-store.md`.
+- [ ] Add CONTRIBUTING, SECURITY, issue/PR templates and update templates.
+- [ ] Add dependency/native licence inventory and ensure the in-app licence
+  view covers Flutter/transitive dependencies.
+- [ ] Keep changelog, behavior, docs and version synchronized.
+- [ ] Run Markdown/link/YAML checks and a fresh-checkout build rehearsal.
+- [ ] Optionally apply a proven GitHub About description/topics after owner
+  review and authenticated access.
+
+## P7 – Docker, signing and release automation
+
+- [ ] Fix Gradle release signing to read `android/key.properties`; never label
+  or publish a debug-signed artifact as a signed release.
+- [ ] Test signing config create/remove without printing secrets and fail
+  release builds when secrets are missing.
+- [ ] Implement/test the release-note and publish scripts currently referenced
+  but missing from the untracked workflow.
+- [ ] Support SemVer prerelease tags (`alpha`, `beta`, `rc`) and test
+  tag/version/changelog/build-number consistency.
+- [ ] Build APK/AAB from the exact verified tag with checksums, licences,
+  SPDX SBOM and provenance.
+- [ ] Make Docker serve one verified APK/download page/checksum/health endpoint
+  and pass `tool/docker_check.sh` end to end.
+- [ ] Keep PR Docker verification read-only; package/provenance writes exist
+  only in guarded publish jobs, and publish the exact verified image.
+- [ ] Add weekly maintenance/Dependabot workflows with reviewed updates.
+- [ ] Add Play metadata, privacy content and store artwork; keep upload disabled
+  until owner credentials exist.
+
+## P8 – Final independent acceptance
+
+- [ ] Independently review alarm timing, lifecycle, permissions, native
+  concurrency, privacy and signing; resolve every critical/high finding.
+- [ ] Run the complete local pipeline including Docker.
+- [ ] Confirm GitHub Actions green on the exact commit and inspect artifacts.
+- [ ] Confirm supported Android/API/ABI matrix and limitations in docs.
+- [ ] Produce an RC only after automated gates, signing, licences and owner
+  device evidence are complete; soak it five working days before `v1.0.0`.
+
+## Owner/external blockers
+
+These cannot be truthfully completed by repository automation alone:
+
+- two physical Android devices from different manufacturers;
+- real-device microphone/thermal/endurance testing and five-day RC soak;
+- creation/backup of the release keystore and GitHub signing secrets;
+- GitHub environment/branch protection configuration if API access is absent;
+- Play Console app, developer verification, service account, questionnaires,
+  content rating and final production approval;
+- public privacy-policy URL and the final decision to publish through Play.
+
+Until those are supplied, the repository may be code-complete and produce a
+verified debug-signed internal artifact, but it must not claim a public signed
+release or completed device certification.

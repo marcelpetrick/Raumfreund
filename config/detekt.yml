@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+#
+# detekt 1.23.8 configuration for the Kotlin host code (android/app/src).
+# Used with --build-upon-default-config: only deviations from the detekt
+# defaults are listed here, each with its reason. Run via tool/kotlin_lint.sh.
+
+build:
+  # Every finding fails the check; there is no tolerated debt.
+  maxIssues: 0
+
+complexity:
+  LongMethod:
+    # Mirrors the repository rule of max. 100 physical lines per function
+    # (AGENTS.md section 5); the parser-based checker enforces it repo-wide.
+    active: true
+    threshold: 100
+  TooManyFunctions:
+    # Test classes legitimately have one function per case.
+    excludes: ['**/test/**', '**/androidTest/**']
+
+style:
+  ReturnCount:
+    # Early returns for invalid input/state (guard clauses) keep functions
+    # flat; only the remaining returns are limited.
+    max: 2
+    excludeGuardClauses: true
+  MagicNumber:
+    # Tests use literal expected values (dBFS levels, session ids).
+    excludes: ['**/test/**', '**/androidTest/**']
+  MaxLineLength:
+    # Same limit as ktlint (ktlint_official code style), so both agree.
+    maxLineLength: 140

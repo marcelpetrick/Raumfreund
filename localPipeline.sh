@@ -10,14 +10,24 @@
 #
 # Steps (in order, names usable with --only/--skip):
 #   toolchain   ensure the pinned Flutter SDK (tool/flutter.sh)
-#   deps        flutter pub get --enforce-lockfile
+#   tools       install/verify pinned lint and security tools (tool/install_tools.sh)
+#   deps        flutter pub get --enforce-lockfile (app and tool packages)
 #   format      dart format check (no changes allowed)
 #   analyze     flutter analyze --fatal-infos --fatal-warnings
-#   shell       shellcheck for all shell scripts
-#   tooltests   tests of the repository scripts in tool/tests
+#   fnlen       100-physical-line limit per function (parser based)
+#   shell       shellcheck + shfmt for all shell scripts
+#   python      ruff lint/format, mypy --strict, pytest (tooling code)
+#   tooltests   tests of the repository scripts and the Dart checker
+#   docs        markdownlint for all Markdown files
+#   yaml        yamllint (strict) + actionlint for GitHub workflows
+#   kotlin      ktlint + detekt for native Android sources
+#   native      JVM unit tests + Android lint
+#   secrets     gitleaks secret scan of the git history and working tree
+#   vulns       osv-scanner on all lockfiles
 #   test        flutter test with coverage
 #   coverage    line coverage gate (>= 95 %) on own Dart code
 #   apk         flutter build apk --debug
+#   docker      build the Docker image and verify it (tool/docker_check.sh)
 #
 # Usage:
 #   ./localPipeline.sh                 run all steps
@@ -34,8 +44,11 @@ set -uo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPORT_DIR="${ROOT_DIR}/reports/pipeline"
 FLUTTER="${ROOT_DIR}/tool/flutter.sh"
+TOOLS="${ROOT_DIR}/.toolchain/bin"
+VENV="${ROOT_DIR}/.toolchain/venv/bin"
+CHECKER_DIR="${ROOT_DIR}/tool/function_length/dart"
 COVERAGE_MIN_LINE_PERCENT="95.0"
-ALL_STEPS=(toolchain deps format analyze shell tooltests test coverage apk)
+ALL_STEPS=(toolchain tools deps format analyze fnlen shell python tooltests docs yaml secrets vulns kotlin native test coverage apk docker)
 VERBOSE=0
 ONLY=""
 SKIP=""
@@ -64,10 +77,10 @@ run_logged() {
 	local step="$1" log="${REPORT_DIR}/$1.log"
 	shift
 	if [[ ${VERBOSE} -eq 1 ]]; then
-		"$@" 2>&1 | tee "${log}"
+		"$@" 2>&1 | tee -a "${log}"
 		return "${PIPESTATUS[0]}"
 	fi
-	if "$@" >"${log}" 2>&1; then
+	if "$@" >>"${log}" 2>&1; then
 		return 0
 	fi
 	error "${step} failed. Captured output (${log}):"
@@ -81,7 +94,48 @@ shell_scripts() {
 }
 
 step_toolchain() { run_logged toolchain "${FLUTTER}" --ensure; }
-step_deps() { run_logged deps "${FLUTTER}" pub get --enforce-lockfile; }
+step_tools() { run_logged tools "${ROOT_DIR}/tool/install_tools.sh"; }
+
+step_deps() {
+	run_logged deps "${FLUTTER}" pub get --enforce-lockfile &&
+		run_logged deps "${FLUTTER}" pub get --enforce-lockfile -C "${CHECKER_DIR}"
+}
+
+step_fnlen() { run_logged fnlen "${ROOT_DIR}/tool/check_function_length.sh"; }
+
+step_python() {
+	run_logged python "${VENV}/ruff" check tool &&
+		run_logged python "${VENV}/ruff" format --check tool &&
+		run_logged python "${VENV}/mypy" --config-file tool/pyproject.toml tool/function_length &&
+		run_logged python "${VENV}/pytest" -q -c tool/pyproject.toml
+}
+
+step_docs() {
+	run_logged docs "${ROOT_DIR}/tool/node/node_modules/.bin/markdownlint" '**/*.md'
+}
+
+step_yaml() {
+	run_logged yaml "${VENV}/yamllint" --strict . &&
+		run_logged yaml "${TOOLS}/actionlint"
+}
+
+step_secrets() {
+	run_logged secrets "${ROOT_DIR}/tool/check_secrets.sh"
+}
+
+step_vulns() {
+	run_logged vulns "${TOOLS}/osv-scanner" scan source --lockfile pubspec.lock \
+		--lockfile tool/function_length/dart/pubspec.lock \
+		--lockfile tool/node/package-lock.json \
+		--lockfile requirements.txt:tool/requirements-dev.txt
+}
+
+step_kotlin() { run_logged kotlin "${ROOT_DIR}/tool/kotlin_lint.sh"; }
+
+step_native() {
+	run_logged native "${ROOT_DIR}/android/gradlew" -p "${ROOT_DIR}/android" \
+		testDebugUnitTest lintDebug
+}
 
 step_format() {
 	local dart_bin dirs=(lib test)
@@ -98,7 +152,8 @@ step_analyze() {
 step_shell() {
 	local scripts=()
 	mapfile -t scripts < <(shell_scripts)
-	run_logged shell shellcheck --external-sources "${scripts[@]}"
+	run_logged shell "${TOOLS}/shellcheck" --external-sources "${scripts[@]}" &&
+		run_logged shell "${TOOLS}/shfmt" -d "${scripts[@]}"
 }
 
 step_tooltests() {
@@ -106,6 +161,7 @@ step_tooltests() {
 	for test_script in "${ROOT_DIR}"/tool/tests/test_*.sh; do
 		run_logged tooltests "${test_script}" || status=1
 	done
+	(cd "${CHECKER_DIR}" && run_logged tooltests "$("${FLUTTER}" --ensure)/bin/dart" test) || status=1
 	return "${status}"
 }
 
@@ -120,20 +176,31 @@ step_coverage() {
 }
 
 step_apk() { run_logged apk "${FLUTTER}" build apk --debug; }
+step_docker() { run_logged docker "${ROOT_DIR}/tool/docker_check.sh"; }
 
 # Explicit dispatch (instead of calling "step_${step}") keeps every call
 # visible to static analysis and makes typos fail loudly.
 dispatch_step() {
 	case "$1" in
 	toolchain) step_toolchain ;;
+	tools) step_tools ;;
 	deps) step_deps ;;
 	format) step_format ;;
 	analyze) step_analyze ;;
+	fnlen) step_fnlen ;;
 	shell) step_shell ;;
+	python) step_python ;;
 	tooltests) step_tooltests ;;
+	docs) step_docs ;;
+	yaml) step_yaml ;;
+	secrets) step_secrets ;;
+	vulns) step_vulns ;;
+	kotlin) step_kotlin ;;
+	native) step_native ;;
 	test) step_test ;;
 	coverage) step_coverage ;;
 	apk) step_apk ;;
+	docker) step_docker ;;
 	*) error "No implementation for step '$1'" && return 1 ;;
 	esac
 }
@@ -178,6 +245,7 @@ run_step() {
 		return
 	fi
 	info "Running ${step} …"
+	: >"${REPORT_DIR}/${step}.log"
 	started=${SECONDS}
 	if dispatch_step "${step}"; then
 		duration=$((SECONDS - started))
@@ -192,6 +260,7 @@ step_details() {
 	case "$1" in
 	coverage) printf ' – %s' "$(tail -1 "${REPORT_DIR}/coverage.log")" ;;
 	test) printf ' – %s' "$(grep -Eo '\+[0-9]+.*All tests passed!' "${REPORT_DIR}/test.log" | tail -1)" ;;
+	docker) printf ' – %s' "$(tail -1 "${REPORT_DIR}/docker.log")" ;;
 	esac
 }
 

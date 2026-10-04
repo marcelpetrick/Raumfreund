@@ -12,6 +12,9 @@ runs:
       with:
         distribution: temurin
         java-version: "21"
+    - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      with:
+        node-version: "24.21.0"
     - name: Cache pinned Flutter SDK
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
@@ -28,4 +31,8 @@ runs:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
-        key: gradle-${{ runner.os }}-${{ hashFiles('.flutter-version', 'android/gradle/wrapper/gradle-wrapper.properties', 'android/**/*.gradle.kts', 'pubspec.lock') }}
+        key: >-
+          gradle-${{ runner.os }}-${{
+            hashFiles('.flutter-version', 'android/gradle/wrapper/gradle-wrapper.properties',
+            'android/**/*.gradle.kts', 'pubspec.lock')
+          }}

@@ -1,8 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only
+     Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it> -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Release has no INTERNET permission: samples never leave the device. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
-        android:label="raumfreund"
+        android:label="Raumfreund"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/full_backup_content"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"

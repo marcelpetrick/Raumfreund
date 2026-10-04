@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+#
+# gen-l10n configuration. German is the template and currently only locale;
+# further languages are added as lib/l10n/app_<locale>.arb.
+arb-dir: lib/l10n
+template-arb-file: app_de.arb
+output-dir: lib/l10n/generated
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+preferred-supported-locales: [de]
+nullable-getter: false
+required-resource-attributes: false

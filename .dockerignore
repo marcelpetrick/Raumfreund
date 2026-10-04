@@ -1,0 +1,16 @@
+.git
+.toolchain
+.dart_tool
+.claude
+build
+coverage
+reports
+dist
+android/.gradle
+android/.kotlin
+android/local.properties
+**/node_modules
+**/.venv
+**/*.jks
+**/*.keystore
+**/key.properties

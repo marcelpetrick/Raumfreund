@@ -1,3 +1,8 @@
+<!--
+SPDX-License-Identifier: GPL-3.0-only
+Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+-->
+
 # ADR 0002 – Architecture and state handling
 
 - Status: accepted

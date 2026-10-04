@@ -37,3 +37,5 @@ test/coverage_imports_test.dart
 
 # Local agent worktrees and settings
 .claude/
+.coverage
+coverage.xml

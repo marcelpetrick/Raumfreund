@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+name: function_length
+description: >-
+  Parser-based checker that enforces the 100-physical-line limit for Dart
+  functions, methods, constructors, accessors, local functions and closures.
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: 3.13.5
+
+# Exact pins (AGENTS.md section 4); pubspec.lock is committed.
+dependencies:
+  analyzer: 14.4.0
+
+dev_dependencies:
+  lints: 6.1.0
+  test: 1.32.0

@@ -19,6 +19,9 @@ analyzer:
     - build/**
     - android/**
     - .toolchain/**
+    # Separate Dart package with its own analysis_options.yaml, analyzed and
+    # tested by the pipeline's tooltests step.
+    - tool/**
     - lib/l10n/generated/**
 
 linter:

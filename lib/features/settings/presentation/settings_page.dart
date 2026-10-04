@@ -1,0 +1,302 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+
+import 'package:flutter/material.dart';
+
+import '../../../app/theme/app_colors.dart';
+import '../../../l10n/generated/app_localizations.dart';
+import '../../../shared/widgets/glow_panel.dart';
+import '../../../shared/widgets/night_sky_background.dart';
+import '../../monitor/domain/thresholds.dart';
+import '../domain/app_settings.dart';
+
+/// Editable settings page.
+///
+/// Save pops with a validated [AppSettings] result. Cancel pops without a
+/// result, so persistence remains the application layer's responsibility.
+class SettingsPage extends StatefulWidget {
+  /// Creates the page with an independent editable draft.
+  const SettingsPage({required this.initialSettings, super.key});
+
+  /// Settings copied into the draft when the page opens.
+  final AppSettings initialSettings;
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  late AppSettings _draft = widget.initialSettings;
+  bool _defaultsApplied = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return NightSkyBackground(
+      child: Scaffold(
+        appBar: AppBar(title: Text(l10n.settingsTitle)),
+        body: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _thresholdsSection(l10n),
+                    const SizedBox(height: 16),
+                    _calibrationSection(l10n),
+                    const SizedBox(height: 16),
+                    _alarmSection(l10n),
+                    const SizedBox(height: 20),
+                    if (_defaultsApplied) _defaultsHint(l10n),
+                    _actions(l10n),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _thresholdsSection(AppLocalizations l10n) => _SettingsSection(
+    title: l10n.settingsThresholdsHeading,
+    icon: Icons.traffic_rounded,
+    color: AppColors.yellow,
+    children: [
+      _ThresholdControl(
+        name: l10n.settingsYellowLabel,
+        value: _draft.thresholds.yellowDb,
+        color: AppColors.yellow,
+        onChanged: _setYellow,
+      ),
+      _ThresholdControl(
+        name: l10n.settingsRedLabel,
+        value: _draft.thresholds.redDb,
+        color: AppColors.red,
+        onChanged: _setRed,
+      ),
+      Text(l10n.settingsThresholdsHint),
+      const SizedBox(height: 12),
+      Text(l10n.settingsTenSecondRule),
+    ],
+  );
+
+  Widget _calibrationSection(AppLocalizations l10n) {
+    final value = _draft.calibrationCorrectionDb;
+    final signed = value > 0 ? '+$value' : '$value';
+    return _SettingsSection(
+      title: l10n.settingsCalibrationHeading,
+      icon: Icons.tune_rounded,
+      color: AppColors.lavender,
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text(l10n.settingsCalibrationLabel)),
+            Text(l10n.settingsCalibrationValue(signed)),
+          ],
+        ),
+        Slider(
+          value: value.toDouble(),
+          min: AppSettings.minCalibrationDb.toDouble(),
+          max: AppSettings.maxCalibrationDb.toDouble(),
+          divisions:
+              AppSettings.maxCalibrationDb - AppSettings.minCalibrationDb,
+          label: l10n.settingsCalibrationValue(signed),
+          onChanged: (next) =>
+              _update(_draft.copyWith(calibrationCorrectionDb: next.round())),
+        ),
+        Text(l10n.settingsCalibrationExplanation),
+      ],
+    );
+  }
+
+  Widget _alarmSection(AppLocalizations l10n) => _SettingsSection(
+    title: l10n.settingsAlarmHeading,
+    icon: Icons.notifications_active_rounded,
+    color: AppColors.green,
+    children: [
+      SwitchListTile.adaptive(
+        contentPadding: EdgeInsets.zero,
+        title: Text(l10n.settingsAlarmSound),
+        subtitle: Text(l10n.settingsAlarmSoundHint),
+        value: _draft.alarmSoundEnabled,
+        onChanged: (value) =>
+            _update(_draft.copyWith(alarmSoundEnabled: value)),
+      ),
+      SwitchListTile.adaptive(
+        contentPadding: EdgeInsets.zero,
+        title: Text(l10n.settingsVibration),
+        subtitle: Text(l10n.settingsVibrationHint),
+        value: _draft.vibrationEnabled,
+        onChanged: (value) => _update(_draft.copyWith(vibrationEnabled: value)),
+      ),
+    ],
+  );
+
+  Widget _defaultsHint(AppLocalizations l10n) => Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: Text(l10n.settingsDefaultsApplied, textAlign: TextAlign.center),
+  );
+
+  Widget _actions(AppLocalizations l10n) => Wrap(
+    alignment: WrapAlignment.center,
+    spacing: 10,
+    runSpacing: 10,
+    children: [
+      TextButton.icon(
+        onPressed: _restoreDefaults,
+        icon: const Icon(Icons.restore_rounded),
+        label: Text(l10n.settingsDefaults),
+      ),
+      OutlinedButton(
+        onPressed: () => Navigator.pop(context),
+        child: Text(l10n.settingsCancel),
+      ),
+      FilledButton.icon(
+        onPressed: () => Navigator.pop(context, _draft),
+        icon: const Icon(Icons.save_rounded),
+        label: Text(l10n.settingsSave),
+      ),
+    ],
+  );
+
+  void _setYellow(int value) {
+    final yellow = value.clamp(Thresholds.minDb, Thresholds.maxDb - 1);
+    final red = yellow >= _draft.thresholds.redDb
+        ? yellow + 1
+        : _draft.thresholds.redDb;
+    _update(
+      _draft.copyWith(
+        thresholds: Thresholds(yellowDb: yellow, redDb: red),
+      ),
+    );
+  }
+
+  void _setRed(int value) {
+    final red = value.clamp(Thresholds.minDb + 1, Thresholds.maxDb);
+    final yellow = red <= _draft.thresholds.yellowDb
+        ? red - 1
+        : _draft.thresholds.yellowDb;
+    _update(
+      _draft.copyWith(
+        thresholds: Thresholds(yellowDb: yellow, redDb: red),
+      ),
+    );
+  }
+
+  void _restoreDefaults() {
+    setState(() {
+      _draft = AppSettings.defaults;
+      _defaultsApplied = true;
+    });
+  }
+
+  void _update(AppSettings settings) {
+    setState(() {
+      _draft = settings;
+      _defaultsApplied = false;
+    });
+  }
+}
+
+class _SettingsSection extends StatelessWidget {
+  const _SettingsSection({
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.children,
+  });
+
+  final String title;
+  final IconData icon;
+  final Color color;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) => GlowPanel(
+    color: color,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: color),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        ...children,
+      ],
+    ),
+  );
+}
+
+class _ThresholdControl extends StatelessWidget {
+  const _ThresholdControl({
+    required this.name,
+    required this.value,
+    required this.color,
+    required this.onChanged,
+  });
+
+  final String name;
+  final int value;
+  final Color color;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(name, style: Theme.of(context).textTheme.titleMedium),
+            ),
+            IconButton(
+              onPressed: value <= Thresholds.minDb
+                  ? null
+                  : () => onChanged(value - 1),
+              tooltip: l10n.settingsDecrease(name),
+              icon: const Icon(Icons.remove_rounded),
+            ),
+            SizedBox(
+              width: 72,
+              child: Text(
+                l10n.settingsDbValue(value),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(color: color),
+              ),
+            ),
+            IconButton(
+              onPressed: value >= Thresholds.maxDb
+                  ? null
+                  : () => onChanged(value + 1),
+              tooltip: l10n.settingsIncrease(name),
+              icon: const Icon(Icons.add_rounded),
+            ),
+          ],
+        ),
+        Slider(
+          value: value.toDouble(),
+          min: Thresholds.minDb.toDouble(),
+          max: Thresholds.maxDb.toDouble(),
+          divisions: Thresholds.maxDb,
+          activeColor: color,
+          label: l10n.settingsDbValue(value),
+          onChanged: (next) => onChanged(next.round()),
+        ),
+      ],
+    );
+  }
+}
