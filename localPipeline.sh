@@ -146,7 +146,10 @@ step_format() {
 }
 
 step_analyze() {
-	run_logged analyze "${FLUTTER}" analyze --fatal-infos --fatal-warnings
+	# The git-ignored coverage import test lists every library below lib/;
+	# regenerate it first so a stale copy cannot reference removed files.
+	"${ROOT_DIR}/tool/generate_coverage_imports.sh" &&
+		run_logged analyze "${FLUTTER}" analyze --fatal-infos --fatal-warnings
 }
 
 step_shell() {
