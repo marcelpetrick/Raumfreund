@@ -18,3 +18,4 @@ these lines (see docs/releasing.md).
 * v0.1.1 closes final review findings in settings persistence, startup/navigation, feedback, charts and release gating
 * v0.1.2 documents verified debug APK prereleases alongside signed production releases
 * v0.1.3 updates pinned CI and Docker build tooling
+* v0.1.4 regroups plan.md around the verified state and current packages; AGENTS.md adds model tiers, worktree toolchain and commit-body rules

@@ -1,5 +1,5 @@
 # Pinned toolchains and tools downloaded by tool/flutter.sh and tool/install_tools.sh
-.toolchain/
+/.toolchain
 
 # Flutter/Dart
 .dart_tool/

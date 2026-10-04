@@ -27,6 +27,15 @@ thing, the stricter rule applies.
 - Sub-agents report: changes, tests, commands run, results, risks, open points.
 - Critical logic (alarm state machine, measurement session lifecycle, permission
   flow) is reviewed independently by another agent.
+- Pick the smallest model tier that can do a package well: Haiku for small,
+  mechanical edits; Sonnet for well-specified UI, tooling and docs work; Opus
+  for critical logic (alarm, lifecycle, permissions, signal processing),
+  cross-cutting design and independent reviews.
+- Agent worktrees do not contain the git-ignored `.toolchain/`; link it with
+  `ln -s <main checkout>/.toolchain .toolchain` instead of downloading again.
+  Agents commit only on their own worktree branch, without version bumps or
+  changelog edits; the coordinator integrates.
+- Track the work packages, their owners and status in `plan.md`.
 - If sub-agents are not available, do the work yourself and state that limitation.
 
 ## 3. Git workflow
@@ -35,6 +44,8 @@ thing, the stricter rule applies.
   isolated worktree; those are merged back promptly.
 - **Atomic commits** with **Conventional Commits** messages
   (`feat:`, `fix:`, `test:`, `docs:`, `ci:`, `build:`, `refactor:`, `chore:`).
+  One logical change per commit. Commit bodies use real line breaks (pass
+  several `-m` options or a message file), never literal `\n` sequences.
 - **Semantic versioning** in `pubspec.yaml` (`X.Y.Z+N`):
   - every commit bumps at least the patch version (`Z`),
   - major features bump the minor version (`Y`, patch reset to 0),
