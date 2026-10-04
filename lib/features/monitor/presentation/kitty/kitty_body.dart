@@ -120,6 +120,8 @@ Rect get kittyHeadRect => _headRect;
 /// Curly striped tail, rotated around its base by [KittyPose.tailAngle].
 void paintTail(Canvas canvas, KittyPose pose, KittyLayer layer) {
   const base = Offset(150, 190);
+  // A frightened cat's tail fur stands up, which reads as a fatter tail.
+  final puff = 10 * pose.tailPuff;
   final path = Path()
     ..moveTo(base.dx, base.dy)
     ..cubicTo(200, 196, 224, 156, 210, 122)
@@ -131,20 +133,20 @@ void paintTail(Canvas canvas, KittyPose pose, KittyLayer layer) {
     ..translate(-base.dx, -base.dy);
   if (layer == KittyLayer.neon) {
     canvas
-      ..drawPath(path, Glow.haloStroke(KittyColors.neon, 30, sigma: 7))
-      ..drawPath(path, Glow.stroke(KittyColors.neon, 22));
+      ..drawPath(path, Glow.haloStroke(KittyColors.neon, 30 + puff, sigma: 7))
+      ..drawPath(path, Glow.stroke(KittyColors.neon, 22 + puff));
   } else {
-    canvas.drawPath(path, Glow.stroke(KittyColors.fur, 16));
-    _tailStripes(canvas, path);
+    canvas.drawPath(path, Glow.stroke(KittyColors.fur, 16 + puff));
+    _tailStripes(canvas, path, 12 + puff * 0.6);
   }
   canvas.restore();
 }
 
-void _tailStripes(Canvas canvas, Path path) {
+void _tailStripes(Canvas canvas, Path path, double width) {
   final stripe = Paint()
     ..color = KittyColors.stripe.withValues(alpha: 0.85)
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 12;
+    ..strokeWidth = width;
   for (final metric in path.computeMetrics()) {
     for (var d = 24.0; d < metric.length - 6; d += 16) {
       canvas.drawPath(metric.extractPath(d, d + 5), stripe);

@@ -104,9 +104,9 @@
   "@kittyHappy": {"description": "Kitty mood happy (screen reader)."},
   "kittyUneasy": "Mia ist unruhig, es wird ihr zu laut",
   "@kittyUneasy": {"description": "Kitty mood uneasy (screen reader)."},
-  "kittyCrying": "Mia weint, es ist viel zu laut",
-  "@kittyCrying": {"description": "Kitty mood crying (screen reader)."},
-  "kittyAwaySign": "Zu laut – Mia ist weggegangen",
+  "kittyScared": "Mia hat Angst – es ist viel zu laut",
+  "@kittyScared": {"description": "Kitty mood scared (screen reader)."},
+  "kittyAwaySign": "Zu laut – Mia hat sich versteckt",
   "@kittyAwaySign": {"description": "Sign shown when the kitty walked away."},
 
   "starsCount": "{count, plural, =0{Noch keine Sterne} =1{1 Stern} other{{count} Sterne}}",

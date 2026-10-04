@@ -158,7 +158,7 @@ class MonitorPage extends StatelessWidget {
   KittyMood get _kittyMood => switch (data.zone) {
     Zone.green => KittyMood.happy,
     Zone.yellow => KittyMood.uneasy,
-    Zone.red => KittyMood.crying,
+    Zone.red => KittyMood.scared,
     null => KittyMood.idle,
   };
 }

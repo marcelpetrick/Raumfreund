@@ -316,16 +316,16 @@ abstract class AppLocalizations {
   /// **'Mia ist unruhig, es wird ihr zu laut'**
   String get kittyUneasy;
 
-  /// Kitty mood crying (screen reader).
+  /// Kitty mood scared (screen reader).
   ///
   /// In de, this message translates to:
-  /// **'Mia weint, es ist viel zu laut'**
-  String get kittyCrying;
+  /// **'Mia hat Angst – es ist viel zu laut'**
+  String get kittyScared;
 
   /// Sign shown when the kitty walked away.
   ///
   /// In de, this message translates to:
-  /// **'Zu laut – Mia ist weggegangen'**
+  /// **'Zu laut – Mia hat sich versteckt'**
   String get kittyAwaySign;
 
   /// Number of stars earned for quiet minutes.

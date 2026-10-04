@@ -25,6 +25,7 @@ class KittyPainter extends CustomPainter {
     required this.mood,
     required this.phase,
     required this.walk,
+    this.running = false,
   });
 
   /// Mood to draw.
@@ -35,6 +36,12 @@ class KittyPainter extends CustomPainter {
 
   /// Walk-away progress (0 on stage, 1 gone).
   final double walk;
+
+  /// Whether the walk is a scared run away (false: calm walk back).
+  final bool running;
+
+  /// Fleeing Mia is scared whatever the current zone says.
+  KittyMood get _shown => running ? KittyMood.scared : mood;
 
   /// Horizontal walk offset in design units for a canvas of [size].
   static double walkOffset(Size size, double walk) {
@@ -51,7 +58,7 @@ class KittyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final scale = _scaleFor(size);
     if (scale <= 0) return;
-    final pose = KittyPose.of(mood, phase, walk);
+    final pose = KittyPose.of(mood, phase, walk, running: running);
     final walkDx = walkOffset(size, walk);
     canvas
       ..save()
@@ -60,7 +67,7 @@ class KittyPainter extends CustomPainter {
         size.height - kKittyDesignSize.height * scale,
       )
       ..scale(scale);
-    paintStage(canvas, mood.glowColor);
+    paintStage(canvas, _shown.glowColor);
     if (walk > 0) paintPawPrints(canvas, walkDx);
     canvas
       ..save()
@@ -80,18 +87,18 @@ class KittyPainter extends CustomPainter {
       paintHead(canvas, pose, layer);
     }
     canvas.save();
-    // While walking, the face is shifted towards the walking direction so
-    // that Mia appears to turn her head.
+    // While walking, the face is shifted sideways so that Mia appears to
+    // turn her head: ahead when walking, back over her shoulder when running.
     if (pose.walking) canvas.translate(pose.lookDx, 0);
-    paintFace(canvas, mood, pose);
+    paintFace(canvas, _shown, pose);
     canvas.restore();
-    switch (mood) {
+    switch (_shown) {
       case KittyMood.happy:
         paintPurr(canvas, phase);
       case KittyMood.uneasy:
         paintSweat(canvas, phase);
-      case KittyMood.crying:
-        paintTears(canvas, phase);
+      case KittyMood.scared:
+        paintWhimper(canvas, phase);
       case KittyMood.idle:
         break;
     }
@@ -99,7 +106,7 @@ class KittyPainter extends CustomPainter {
 
   void _paintAura(Canvas canvas) {
     final aura = Paint()
-      ..color = mood.glowColor.withValues(alpha: 0.18)
+      ..color = _shown.glowColor.withValues(alpha: 0.18)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 24);
     canvas.drawOval(const Rect.fromLTWH(34, 20, 172, 190), aura);
   }
@@ -108,5 +115,6 @@ class KittyPainter extends CustomPainter {
   bool shouldRepaint(KittyPainter oldDelegate) =>
       oldDelegate.mood != mood ||
       oldDelegate.phase != phase ||
-      oldDelegate.walk != walk;
+      oldDelegate.walk != walk ||
+      oldDelegate.running != running;
 }

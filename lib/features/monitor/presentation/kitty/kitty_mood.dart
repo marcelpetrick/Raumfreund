@@ -17,15 +17,16 @@ enum KittyMood {
   /// Yellow zone: flat ears, worried brows and a sweat drop.
   uneasy,
 
-  /// Red zone: big tears and sobbing.
-  crying;
+  /// Red zone: frightened by the noise – wide eyes, flat ears, trembling,
+  /// puffed tail and a few whimper tears.
+  scared;
 
   /// Glow colour that surrounds Mia in this mood.
   Color get glowColor => switch (this) {
     KittyMood.idle => AppColors.lavender,
     KittyMood.happy => AppColors.green,
     KittyMood.uneasy => AppColors.yellow,
-    KittyMood.crying => AppColors.red,
+    KittyMood.scared => AppColors.red,
   };
 
   /// Screen-reader description of the mood.
@@ -33,6 +34,6 @@ enum KittyMood {
     KittyMood.idle => l10n.kittyIdle,
     KittyMood.happy => l10n.kittyHappy,
     KittyMood.uneasy => l10n.kittyUneasy,
-    KittyMood.crying => l10n.kittyCrying,
+    KittyMood.scared => l10n.kittyScared,
   };
 }

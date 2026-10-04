@@ -60,44 +60,66 @@ void _poseTests() {
     test('ears droop with discomfort', () {
       expect(KittyPose.of(KittyMood.happy, 0, 0).earDroop, 0);
       expect(KittyPose.of(KittyMood.uneasy, 0, 0).earDroop, 0.75);
-      expect(KittyPose.of(KittyMood.crying, 0, 0).earDroop, 1);
+      expect(KittyPose.of(KittyMood.scared, 0, 0).earDroop, 1);
     });
 
-    test('happy tail sways, crying sobs', () {
+    test('happy tail sways, scared trembles fast with a puffed tail', () {
       expect(
         KittyPose.of(KittyMood.happy, 0.125, 0).tailAngle,
         closeTo(0.22, 1e-9),
       );
-      expect(
-        KittyPose.of(KittyMood.crying, 1 / 32, 0).shakeDx,
-        closeTo(1.8, 1e-9),
-      );
+      final scared = KittyPose.of(KittyMood.scared, 1 / 128, 0);
+      expect(scared.shakeDx, closeTo(1, 1e-9));
+      expect(scared.tailPuff, 1);
+      expect(scared.tailAngle, closeTo(0.79, 1e-9));
+      expect(scared.eyeOpen, 1);
+      expect(KittyPose.of(KittyMood.happy, 1 / 128, 0).tailPuff, 0);
+      expect(KittyPose.of(KittyMood.happy, 1 / 128, 0).shakeDx, 0);
       expect(KittyPose.of(KittyMood.uneasy, 0, 0).lookDx, -3);
     });
 
     test('walk cycle lifts paws alternately and only while walking', () {
       const step = 1 / (kKittyWalkSteps * 4);
-      final a = KittyPose.of(KittyMood.crying, 0, step);
-      final b = KittyPose.of(KittyMood.crying, 0, step * 3);
+      final a = KittyPose.of(KittyMood.scared, 0, step);
+      final b = KittyPose.of(KittyMood.scared, 0, step * 3);
       expect(a.walking, isTrue);
       expect(a.leftPawLift, closeTo(8, 1e-9));
       expect(a.rightPawLift, 0);
       expect(b.rightPawLift, closeTo(8, 1e-9));
       expect(a.shakeDx, 0);
-      expect(KittyPose.of(KittyMood.crying, 0, 1).walking, isFalse);
-      expect(KittyPose.of(KittyMood.crying, 0, 0).leftPawLift, 0);
+      expect(KittyPose.of(KittyMood.scared, 0, 1).walking, isFalse);
+      expect(KittyPose.of(KittyMood.scared, 0, 0).leftPawLift, 0);
+    });
+  });
+
+  group('KittyPose running', () {
+    test('flees scared whatever the mood, looking back', () {
+      const step = 1 / (kKittyRunSteps * 4);
+      final run = KittyPose.of(KittyMood.happy, 0, step, running: true);
+      expect(run.walking, isTrue);
+      expect(run.earDroop, 1);
+      expect(run.tailPuff, 1);
+      expect(run.lookDx, -6);
+      expect(run.leftPawLift, closeTo(8, 1e-9));
+      expect(run.shakeDx, 0);
+      expect(run.bobDy, closeTo(-4, 1e-9));
+      final walk = KittyPose.of(KittyMood.happy, 0, 1 / (kKittyWalkSteps * 4));
+      expect(walk.lookDx, 6);
+      expect(walk.earDroop, 0);
+      expect(walk.tailPuff, 0);
+      expect(walk.bobDy, closeTo(-3, 1e-9));
     });
   });
 
   test('KittyMood maps to glow colours and German descriptions', () {
     expect(KittyMood.happy.glowColor, AppColors.green);
     expect(KittyMood.uneasy.glowColor, AppColors.yellow);
-    expect(KittyMood.crying.glowColor, AppColors.red);
+    expect(KittyMood.scared.glowColor, AppColors.red);
     expect(KittyMood.idle.glowColor, AppColors.lavender);
     expect(KittyMood.happy.describe(l10nDe), 'Mia ist fröhlich und schnurrt');
     expect(KittyMood.idle.describe(l10nDe), l10nDe.kittyIdle);
     expect(KittyMood.uneasy.describe(l10nDe), l10nDe.kittyUneasy);
-    expect(KittyMood.crying.describe(l10nDe), l10nDe.kittyCrying);
+    expect(KittyMood.scared.describe(l10nDe), l10nDe.kittyScared);
   });
 }
 
@@ -157,6 +179,20 @@ void _painterTests() {
       expect(KittyPainter.walkOffset(size, 0), 0);
       expect(KittyPainter.walkOffset(size, 1), greaterThan(240));
     });
+
+    test('running repaints and paints the fleeing frame', () {
+      const calm = KittyPainter(mood: KittyMood.happy, phase: 0, walk: 0.3);
+      const fleeing = KittyPainter(
+        mood: KittyMood.happy,
+        phase: 0,
+        walk: 0.3,
+        running: true,
+      );
+      expect(calm.shouldRepaint(fleeing), isTrue);
+      final recorder = ui.PictureRecorder();
+      fleeing.paint(Canvas(recorder), const Size(240, 224));
+      recorder.endRecording().dispose();
+    });
   });
 }
 
@@ -179,10 +215,29 @@ void _characterTests() {
       handle.dispose();
     });
 
-    testWidgets('walks away, shows the sign and walks back', (tester) async {
-      await _pump(tester, mood: KittyMood.crying);
+    testWidgets('runs away faster than she walks back', (tester) async {
+      expect(KittyCharacter.runDuration, lessThan(KittyCharacter.walkDuration));
+      expect(
+        KittyCharacter.runDuration.inMilliseconds,
+        inInclusiveRange(1200, 1600),
+      );
+      await _pump(tester, mood: KittyMood.scared);
+      await _pump(tester, mood: KittyMood.scared, walkedAway: true);
+      await tester.pump(KittyCharacter.runDuration);
+      expect(find.byType(AwaySign), findsOneWidget);
+      expect(tester.hasRunningAnimations, isTrue); // only the idle loop
+      // _pump already advances 500 ms: she is still on her way back.
+      await _pump(tester, mood: KittyMood.happy);
+      expect(find.byType(AwaySign), findsOneWidget);
+      await tester.pump(KittyCharacter.walkDuration);
+      await tester.pump(KittyCharacter.fadeDuration);
       expect(find.byType(AwaySign), findsNothing);
-      await _pump(tester, mood: KittyMood.crying, walkedAway: true);
+    });
+
+    testWidgets('walks away, shows the sign and walks back', (tester) async {
+      await _pump(tester, mood: KittyMood.scared);
+      expect(find.byType(AwaySign), findsNothing);
+      await _pump(tester, mood: KittyMood.scared, walkedAway: true);
       await tester.pump(KittyCharacter.walkDuration);
       expect(find.text(l10nDe.kittyAwaySign), findsOneWidget);
       expect(find.bySemanticsLabel(l10nDe.kittyAwaySign), findsOneWidget);
@@ -200,18 +255,28 @@ void _characterTests() {
       expect(tester.hasRunningAnimations, isFalse);
       await _pump(
         tester,
-        mood: KittyMood.crying,
+        mood: KittyMood.scared,
         walkedAway: true,
         reduceMotion: true,
       );
       await tester.pump(KittyCharacter.fadeDuration);
       expect(find.byType(AwaySign), findsOneWidget);
       expect(tester.hasRunningAnimations, isFalse);
-      await _pump(tester, mood: KittyMood.crying, walkedAway: true);
+      await _pump(tester, mood: KittyMood.scared, walkedAway: true);
       expect(tester.hasRunningAnimations, isTrue);
       await _pump(tester, mood: KittyMood.idle, reduceMotion: true);
       await tester.pump(KittyCharacter.fadeDuration);
       expect(find.byType(AwaySign), findsNothing);
+    });
+
+    testWidgets('away sign text and label say Mia is hiding', (tester) async {
+      await _pump(tester, mood: KittyMood.scared, walkedAway: true);
+      await tester.pump(KittyCharacter.runDuration);
+      expect(find.text('Zu laut – Mia hat sich versteckt'), findsOneWidget);
+      expect(
+        KittyMood.scared.describe(l10nDe),
+        'Mia hat Angst – es ist viel zu laut',
+      );
     });
   });
 }

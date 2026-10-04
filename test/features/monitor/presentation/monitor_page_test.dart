@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/features/monitor/domain/level_history_point.dart';
 import 'package:raumfreund/features/monitor/domain/thresholds.dart';
 import 'package:raumfreund/features/monitor/domain/zone.dart';
+import 'package:raumfreund/features/monitor/presentation/kitty/kitty_character.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_page.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_view_data.dart';
 
@@ -124,5 +125,25 @@ void main() {
     await _pumpPage(tester, _data(zone: Zone.yellow));
     expect(find.byType(Row), findsWidgets);
     expect(find.text(l10nDe.statusYellow), findsOneWidget);
+  });
+
+  testWidgets('maps zones to Mia and sends her away only when told to', (
+    tester,
+  ) async {
+    const moods = {
+      Zone.green: KittyMood.happy,
+      Zone.yellow: KittyMood.uneasy,
+      Zone.red: KittyMood.scared,
+    };
+    for (final MapEntry(key: zone, value: mood) in moods.entries) {
+      await _pumpPage(tester, _data(zone: zone));
+      final kitty = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
+      expect(kitty.mood, mood);
+      expect(kitty.walkedAway, isFalse);
+    }
+    await _pumpPage(tester, _data(zone: Zone.red, alarmFired: true));
+    final away = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
+    expect(away.mood, KittyMood.scared);
+    expect(away.walkedAway, isTrue);
   });
 }

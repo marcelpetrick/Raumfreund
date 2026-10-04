@@ -14,7 +14,9 @@ export 'kitty_mood.dart';
 /// Mia, the kitty that shows how the room feels.
 ///
 /// Pure presentation: the caller decides [mood] and [walkedAway] (see the
-/// mood mapping of the monitor). With [reduceMotion] there is no walking
+/// mood mapping of the monitor). When [walkedAway] turns true she first
+/// whimpers (scared mood) and then runs off; when it turns false she walks
+/// back calmly. With [reduceMotion] there is no walking
 /// and no looping animation – changes only crossfade.
 class KittyCharacter extends StatefulWidget {
   /// Creates Mia.
@@ -34,10 +36,13 @@ class KittyCharacter extends StatefulWidget {
   /// Disables walking and looping animations.
   final bool reduceMotion;
 
-  /// Duration of the idle loop (blink, tail, purr, sobbing).
+  /// Duration of the idle loop (blink, tail, purr, trembling).
   static const Duration loopDuration = Duration(seconds: 4);
 
-  /// Duration of walking off (or back onto) the stage.
+  /// Duration of the scared run off the stage.
+  static const Duration runDuration = Duration(milliseconds: 1400);
+
+  /// Duration of the calm walk back onto the stage.
   static const Duration walkDuration = Duration(milliseconds: 2400);
 
   /// Duration of crossfades.
@@ -76,7 +81,14 @@ class _KittyCharacterState extends State<KittyCharacter>
         _walk.value = target;
       } else {
         // The returned future completes when the walk ends; nothing waits.
-        _walk.animateTo(target).ignore();
+        _walk
+            .animateTo(
+              target,
+              duration: widget.walkedAway
+                  ? KittyCharacter.runDuration
+                  : KittyCharacter.walkDuration,
+            )
+            .ignore();
       }
     }
   }
@@ -125,6 +137,7 @@ class _KittyCharacterState extends State<KittyCharacter>
       mood: widget.mood,
       phase: 0,
       walk: widget.walkedAway ? 1 : 0,
+      running: false,
       signText: l10n.kittyAwaySign,
     ),
   );
@@ -138,6 +151,7 @@ class _KittyCharacterState extends State<KittyCharacter>
         mood: widget.mood,
         phase: _loop.value,
         walk: Curves.easeInOut.transform(_walk.value),
+        running: widget.walkedAway,
         signText: l10n.kittyAwaySign,
       ),
     ),
@@ -150,6 +164,7 @@ class _KittyScene extends StatelessWidget {
     required this.mood,
     required this.phase,
     required this.walk,
+    required this.running,
     required this.signText,
     super.key,
   });
@@ -157,6 +172,7 @@ class _KittyScene extends StatelessWidget {
   final KittyMood mood;
   final double phase;
   final double walk;
+  final bool running;
   final String signText;
 
   @override
@@ -167,7 +183,12 @@ class _KittyScene extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         CustomPaint(
-          painter: KittyPainter(mood: mood, phase: phase, walk: walk),
+          painter: KittyPainter(
+            mood: mood,
+            phase: phase,
+            walk: walk,
+            running: running,
+          ),
         ),
         if (signOpacity > 0)
           Align(

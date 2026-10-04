@@ -132,10 +132,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get kittyUneasy => 'Mia ist unruhig, es wird ihr zu laut';
 
   @override
-  String get kittyCrying => 'Mia weint, es ist viel zu laut';
+  String get kittyScared => 'Mia hat Angst – es ist viel zu laut';
 
   @override
-  String get kittyAwaySign => 'Zu laut – Mia ist weggegangen';
+  String get kittyAwaySign => 'Zu laut – Mia hat sich versteckt';
 
   @override
   String starsCount(int count) {

@@ -72,9 +72,9 @@ void paintFace(Canvas canvas, KittyMood mood, KittyPose pose) {
     case KittyMood.happy:
       _happyEye(canvas, kLeftEye);
       _happyEye(canvas, kRightEye);
-    case KittyMood.crying:
-      _squeezedEye(canvas, kLeftEye, mirrored: false);
-      _squeezedEye(canvas, kRightEye, mirrored: true);
+    case KittyMood.scared:
+      _scaredEye(canvas, kLeftEye, pose);
+      _scaredEye(canvas, kRightEye, pose);
       _brows(canvas);
     case KittyMood.idle || KittyMood.uneasy:
       _openEye(canvas, kLeftEye, pose);
@@ -90,7 +90,7 @@ void _cheeks(Canvas canvas, KittyMood mood) {
     KittyMood.happy => 0.7,
     KittyMood.idle => 0.45,
     KittyMood.uneasy => 0.25,
-    KittyMood.crying => 0.6,
+    KittyMood.scared => 0.3,
   };
   final paint = Paint()
     ..color = KittyColors.blush.withValues(alpha: alpha)
@@ -144,13 +144,18 @@ void _happyEye(Canvas canvas, Offset c) {
   canvas.drawPath(path, Glow.stroke(KittyColors.ink, 5));
 }
 
-void _squeezedEye(Canvas canvas, Offset c, {required bool mirrored}) {
-  final d = mirrored ? -1.0 : 1.0;
-  final path = Path()
-    ..moveTo(c.dx - 10 * d, c.dy - 9)
-    ..lineTo(c.dx + 9 * d, c.dy)
-    ..lineTo(c.dx - 10 * d, c.dy + 9);
-  canvas.drawPath(path, Glow.stroke(KittyColors.ink, 5));
+/// Wide round eye with a tiny pupil: the classic "frightened" look.
+void _scaredEye(Canvas canvas, Offset c, KittyPose pose) {
+  final white = Paint()..color = const Color(0xFFFFFFFF);
+  canvas
+    ..drawCircle(c, _eyeRadius + 3, white)
+    ..drawCircle(c, _eyeRadius + 3, Glow.stroke(KittyColors.ink, 3))
+    ..drawCircle(
+      c.translate(pose.lookDx * 0.5, 1),
+      4.5,
+      Paint()..color = KittyColors.ink,
+    )
+    ..drawCircle(c.translate(pose.lookDx * 0.5 + 1.5, -0.5), 1.4, white);
 }
 
 void _brows(Canvas canvas) {
@@ -173,7 +178,7 @@ void _nose(Canvas canvas) {
     ..drawCircle(const Offset(118, 114), 1.6, Paint()..color = _shine);
 }
 
-/// Mouth shape per mood: "ω" with tongue, wavy line or wailing mouth.
+/// Mouth shape per mood: "ω" with tongue, wavy line or small gasping mouth.
 void paintMouth(Canvas canvas, KittyMood mood) {
   final line = Glow.stroke(KittyColors.ink, 3);
   if (mood == KittyMood.uneasy) {
@@ -184,18 +189,15 @@ void paintMouth(Canvas canvas, KittyMood mood) {
     canvas.drawPath(wave, line);
     return;
   }
-  if (mood == KittyMood.crying) {
+  if (mood == KittyMood.scared) {
+    // Small, round, open mouth: she gasps and whimpers instead of wailing.
     final mouth = Rect.fromCenter(
-      center: const Offset(120, 133),
-      width: 24,
-      height: 20,
+      center: const Offset(120, 131),
+      width: 14,
+      height: 17,
     );
     canvas
       ..drawOval(mouth, Paint()..color = KittyColors.mouth)
-      ..drawOval(
-        Rect.fromCenter(center: const Offset(120, 139), width: 14, height: 7),
-        Paint()..color = KittyColors.tongue,
-      )
       ..drawOval(mouth, line);
     return;
   }

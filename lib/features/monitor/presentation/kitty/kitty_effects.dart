@@ -67,18 +67,32 @@ void paintSweat(Canvas canvas, double phase) {
   _drop(canvas, Offset(178, 58 + dy), 7, AppColors.tear);
 }
 
-/// Tear streams and falling tear drops below both eyes.
-void paintTears(Canvas canvas, double phase) {
-  final stream = Glow.stroke(AppColors.tear.withValues(alpha: 0.75), 6);
+/// One small whimper tear per eye plus little fright marks above the ears.
+///
+/// Deliberately less than the former sobbing: Mia is frightened, not sad.
+void paintWhimper(Canvas canvas, double phase) {
   for (final eye in const [kLeftEye, kRightEye]) {
     final side = eye.dx < 120 ? -1.0 : 1.0;
-    final start = eye.translate(side * 6, 10);
-    canvas.drawLine(start, start.translate(side * 5, 30), stream);
-    for (var k = 0; k < 2; k++) {
-      final p = (phase * 2 + k / 2) % 1;
-      final pos = start.translate(side * (6 + p * 14), 32 + p * 52);
-      _drop(canvas, pos, 5.5, AppColors.tear.withValues(alpha: 1 - p * 0.8));
-    }
+    final p = (phase * 2 + (side < 0 ? 0 : 0.5)) % 1;
+    final pos = eye.translate(side * (14 + p * 6), 14 + p * 40);
+    _drop(canvas, pos, 4.5, AppColors.tear.withValues(alpha: 1 - p * 0.8));
+  }
+  _frightMarks(canvas, phase);
+}
+
+/// Short comic-style strokes that flicker above both ears.
+void _frightMarks(Canvas canvas, double phase) {
+  final flicker = 0.55 + 0.45 * math.sin(phase * 16 * math.pi).abs();
+  final paint = Glow.stroke(AppColors.red.withValues(alpha: flicker), 3);
+  const marks = [
+    (Offset(38, 30), Offset(30, 20)),
+    (Offset(30, 42), Offset(18, 38)),
+    (Offset(28, 54), Offset(16, 56)),
+  ];
+  for (final (a, b) in marks) {
+    canvas
+      ..drawLine(a, b, paint)
+      ..drawLine(Offset(240 - a.dx, a.dy), Offset(240 - b.dx, b.dy), paint);
   }
 }
 
