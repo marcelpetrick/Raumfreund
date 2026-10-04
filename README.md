@@ -7,12 +7,12 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 [![CI](https://github.com/marcelpetrick/Raumfreund/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marcelpetrick/Raumfreund/actions/workflows/ci.yml)
 [![Docker](https://github.com/marcelpetrick/Raumfreund/actions/workflows/docker.yml/badge.svg?branch=main)](https://github.com/marcelpetrick/Raumfreund/actions/workflows/docker.yml)
-[![Debug APK: 0.1.2+14](https://img.shields.io/badge/debug%20APK-0.1.2%2B14-brightgreen.svg)](https://github.com/marcelpetrick/Raumfreund/releases/latest)
+[![Debug APK: 0.3.0+25](https://img.shields.io/badge/debug%20APK-0.3.0%2B25-brightgreen.svg)](https://github.com/marcelpetrick/Raumfreund/releases/latest)
 [![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg)](LICENSE)
 [![Flutter 3.47.6](https://img.shields.io/badge/Flutter-3.47.6-02569B.svg)](https://docs.flutter.dev/release/archive)
 [![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2.svg)](https://dart.dev/)
 [![Android 7+](https://img.shields.io/badge/Android-7.0%2B-3DDC84.svg)](docs/toolchain.md)
-[![Coverage: 97.60%](https://img.shields.io/badge/coverage-97.60%25-brightgreen.svg)](docs/testing.md)
+[![Coverage: 97.94%](https://img.shields.io/badge/coverage-97.94%25-brightgreen.svg)](docs/testing.md)
 [![Status: release candidate](https://img.shields.io/badge/status-release%20candidate-blue.svg)](plan.md)
 
 Raumfreund is a child-friendly Android noise traffic light for shared rooms.
@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.3.0+25` — code-complete release candidate**
+Current version: **`0.3.1+26` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -44,25 +44,40 @@ the enforced minimum. It is not a claim that every platform path or product
 requirement is already covered. Real microphone and lifecycle tests on two
 Android devices remain mandatory before a production release.
 
-![Three designed main-screen states: quiet, too loud and returning](docs/mockups/overview.png)
+![Raumfreund in green, yellow and red, and Mia hiding after the alarm](docs/screenshots/overview.png)
 
-The artwork is a design target, not a screenshot of the current app. Product
-requirements in [`Raumfreund-VISION.md`](Raumfreund-VISION.md) take precedence.
+From left to right: quiet room (screenshot from an Android 16 emulator),
+"please be quieter" with the alarm countdown, too loud with Mia scared, and
+Mia hiding after the alarm. The emulator microphone is silent, so the three
+loud states are rendered from the app's real widgets in a widget test, not
+captured on a device. The earlier design mockups are kept in
+[`docs/mockups/`](docs/mockups/README.md).
+
+**Download:** the newest installable APK is always the
+[latest GitHub release](https://github.com/marcelpetrick/Raumfreund/releases/latest).
+It is a debug-signed build for sideloading (Android 7.0+), not a Google Play
+build.
 
 ## Major features
 
 - Local microphone-level estimation without recording or transmitting audio.
 - Accessible green/yellow/red feedback using text, icons, Mia's expression and
   animation rather than colour alone.
-- Ten-second alarm rule with one alarm per continuous yellow/red phase and
-  protection against retriggering on the app's own sound.
+- Mia is happy in green, uneasy in yellow and scared in red. If it stays too
+  loud until the alarm, she runs off and hides, and comes back only once the
+  room is calm again.
+- Zone hysteresis: peaks switch the light quickly, but it cools down slowly,
+  so the colour does not flicker at a threshold and the text does not jump.
+- Ten-second alarm rule with one alarm per loud yellow/red phase, never
+  before the delay, and protection against retriggering on the app's own
+  sound ([ADR 0004](docs/adr/0004-zone-hysteresis.md)).
 - A 10-minute RAM-only timeline (one smoothed point per 10 s; peaks rise fast
   and cool down slowly) and quiet-minute stars.
 - Configurable thresholds, calibration correction, alarm tone and vibration,
   persisted locally with validated schema migration.
 - Dedicated Settings and About views; navigating away safely stops measurement.
 - German localization, reduced-motion support and responsive phone/tablet UI.
-- Reproducible pinned toolchain, 225 automated tests, 97.60% Dart coverage,
+- Reproducible pinned toolchain, 336 automated tests, 97.94% Dart coverage,
   Android lint, secret/vulnerability scans, Docker packaging and tag releases.
 
 ## Interaction
@@ -141,9 +156,19 @@ certified acoustic measurement. See [`docs/privacy.md`](docs/privacy.md) and
 
 ## Releases
 
-Production releases require a matching version tag, a green pipeline on that
+Debug APK releases are published with one command from a clean, pushed
+`main`:
+
+```sh
+tool/release_debug.sh --dry-run   # build, verify and print the notes only
+tool/release_debug.sh             # tag debug-vX.Y.Z-buildN and publish
+```
+
+The script verifies checksum, version, permissions (no Internet) and the debug
+certificate, and lists every changelog entry since the previous release. It
+builds locally on purpose: all debug releases share this machine's debug
+certificate, so a new release installs over the previous one.
+
+Production releases require a matching `vX.Y.Z` tag, a green pipeline on that
 exact commit, verified release signing, checksums, an SBOM, license inventory
-and release notes. Debug APKs may also be published as clearly labeled GitHub
-releases for direct device testing without a production keystore; they keep the
-`-debugsigned` suffix and are never presented as Play Store builds. See
-[`docs/releasing.md`](docs/releasing.md).
+and release notes. See [`docs/releasing.md`](docs/releasing.md).

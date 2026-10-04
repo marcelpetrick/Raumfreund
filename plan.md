@@ -45,7 +45,15 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   `RECORD_AUDIO` and `VIBRATE`, and it installs and launches without crashes
   on an Android 16 (API 36) emulator.
 - [x] README badges resolve (HTTP 200) and CI/Docker badges show passing.
-- [ ] README shows design mockups instead of real screenshots (package P).
+- [x] README shows real screenshots (`docs/screenshots/`); green is an
+  emulator capture, the loud states are rendered from the real widgets.
+- [x] Debug release `debug-v0.3.0-build25` (commit `fa5ad56`) is published as
+  latest via `tool/release_debug.sh`; checksum verified after download. On an
+  Android 16 emulator it updates over 0.2.x in place, starts a measurement and
+  shows the confirmed green zone. The emulator process itself crashed
+  (SIGSEGV) twice around microphone start/stop, once with `-no-audio` and
+  once with audio; a guest app cannot do that, so it is treated as an
+  emulator audio-backend defect. Real-device microphone tests remain open.
 - [ ] Five parked agent worktrees under `.claude/worktrees/` hold superseded
   pre-integration work; remove them after owner confirmation.
 
@@ -63,10 +71,10 @@ integrates, bumps the version, runs the full pipeline and commits.
 | T | 10-minute timeline, 10 s buckets, attack/release envelope, calmer gauge | Opus | done, `1e54efa` (reviewed) |
 | B | Scared Mia in red, runs away after the alarm, walks back when green | Sonnet | done, `9338322` |
 | A | Zone hysteresis (fast attack, slow release), "Mia away" latch, ADR 0004 | Opus | done in `0.3.0`, four independent review rounds, judged releasable |
-| S | Configurable alarm delay in Settings (minimum 3 s, needs A) | Opus | not started |
+| S | Configurable alarm delay in Settings (3–60 s, default 10 s) | Opus | in progress |
 | R | Independent review of A (4 rounds) and T | Opus | done; no blocking findings |
-| P | README with real screenshots, vision/docs sync | Coordinator | open |
-| Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | open |
+| P | README with real screenshots, vision/docs sync | Coordinator | done in `0.3.1` |
+| Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.3.0-build25`; next one after S |
 | — | Run `/reviewBranch` over all changes since `c40ec1a` and fix findings | Coordinator | open |
 
 ### Hysteresis decisions (package A)
