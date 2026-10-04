@@ -123,3 +123,7 @@ thing, the stricter rule applies.
   debug certificate and are not Google Play or production builds. They may be
   the repository's latest GitHub release, but must never be described as a
   production release.
+- Trigger a debug release only with `tool/release_debug.sh` (preview with
+  `--dry-run`). It builds locally on purpose: every debug release must carry
+  the same debug certificate, otherwise Android refuses to update an
+  installed earlier release.

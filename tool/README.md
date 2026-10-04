@@ -20,6 +20,7 @@ globally. Supported platform for downloads: **Linux x86_64** only.
 | `check_secrets.sh` | Scans Git history and the source worktree with gitleaks without copying ignored SDK/build caches. | gitleaks status; 2 if the pinned tool is absent |
 | `kotlin_lint.sh` | Runs pinned ktlint and detekt over the Android Kotlin sources. | tool status; 2 if a tool is absent |
 | `build_apk.sh` | Builds named release-mode APK/AAB artifacts, checksums and version metadata in `dist/`; unsigned local builds are explicitly `-debugsigned`. | 0 success; 1 build failure; 2 usage |
+| `release_debug.sh` | One-command public debug APK release: preconditions, local build with this machine's debug keystore (CI keystores differ per run and could not update installs), verification, notes, tag and `gh release create --latest`; `--dry-run` skips tag/push/publish. | 0 success; 1 precondition/build/verification failure; 2 usage/tool missing |
 | `write_signing_config.sh` | Materializes/removes ignored Android signing files from CI secrets. | 0 success; 1 missing/invalid secret |
 | `check_release_version.sh` | Checks tag, pubspec, changelog and monotonic build consistency. | 0 valid; 1 inconsistent; 2 usage |
 | `write_release_notes.sh` | Renders concise notes for a verified artifact directory. | 0 success; 1 missing artifacts; 2 usage |

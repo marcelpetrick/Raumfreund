@@ -29,16 +29,40 @@ debug-signed artifact as a production release.
 
 A debug release follows the AndroidCatEars precedent and needs no production
 keystore. It is an installable APK for sideloading and testing, not a Play Store
-artifact:
+artifact. One command does the whole flow:
 
-1. Start from a clean `main` commit for which `./localPipeline.sh` passed.
-2. Build with `tool/build_apk.sh --commit "$(git rev-parse --short=12 HEAD)"`.
-3. Verify `dist/SHA256SUMS`, the package/version with `aapt`, and the APK debug
-   certificate with `apksigner`.
-4. Publish a GitHub release using a non-production tag such as
-   `debug-vX.Y.Z-buildN`. Upload the `-debugsigned.apk` and `SHA256SUMS` files.
-5. State the source commit, minimum Android version, checksum, debug-certificate
-   status and sideloading purpose in the release notes.
+```sh
+tool/release_debug.sh --dry-run   # checks, build, verification, prints the notes
+tool/release_debug.sh             # same, then tags debug-vX.Y.Z-buildN and publishes
+```
+
+1. Start from a `main` commit for which `./localPipeline.sh` passed, bumped
+   with `tool/bump_version.sh`, committed and pushed.
+2. The script refuses to continue unless it is on `main`, the tree is clean,
+   `HEAD` equals `origin/main`, `gh` is authenticated, the tag
+   `debug-vX.Y.Z-buildN` exists neither locally nor on `origin`, and
+   `android/key.properties` is absent (that would be a production-signed build).
+3. It builds with `tool/build_apk.sh --commit <12-char sha>`, then verifies
+   `SHA256SUMS`, the package name, `versionName`/`versionCode` against
+   `pubspec.yaml`, the absence of `android.permission.INTERNET` (`aapt2`) and the
+   `CN=Android Debug` signature (`apksigner`). The tools come from
+   `$ANDROID_HOME`, `$ANDROID_SDK_ROOT` or `~/Android/Sdk/build-tools/<newest>`.
+4. It renders release notes (debug warning, installation, commit, version,
+   API levels, certificate and APK SHA-256, permissions, the `CHANGELOG.md`
+   entry), creates and pushes the annotated tag and runs `gh release create
+   --latest` with the APK, `SHA256SUMS` and `VERSION`. The release is not a
+   prerelease because the README download badge follows `/releases/latest`.
+
+### Why debug releases are built locally
+
+Android only installs an update over an existing app when the signing
+certificate matches. GitHub runners generate a fresh debug keystore for every
+run, so a CI-built debug APK could never update an earlier one. Debug releases
+are therefore signed with this machine's `~/.android/debug.keystore`
+(certificate SHA-256 `C5:55:29:41:…:4F:49`); the digest is printed in every
+release's notes. **Risk:** if that keystore is lost, testers must uninstall
+Raumfreund once before they can install a new debug release. Back it up like a
+key, but never commit it.
 
 The tag must not match the production `v*` trigger. The title, artifact name and
 notes must say **debug**; the release must not be presented as Google Play or
