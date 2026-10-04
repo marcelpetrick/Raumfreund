@@ -65,7 +65,7 @@ setup_sdk_stubs() {
 	write_stub "${sdk}/aapt2" <<'EOF'
 cat <<'OUT'
 package: name='it.marcelpetrick.raumfreund' versionCode='45' versionName='1.2.3'
-sdkVersion:'24'
+minSdkVersion:'24'
 targetSdkVersion:'36'
 uses-permission: name='android.permission.RECORD_AUDIO'
 uses-permission: name='android.permission.VIBRATE'

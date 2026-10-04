@@ -172,7 +172,7 @@ certificate (see the certificate digest below).
 
 - Source commit: \`${commit}\`
 - Version: \`${version%+*}\` (\`versionCode\` ${version#*+})
-- Minimum Android: API $(badging_value sdkVersion)
+- Minimum Android: API $(badging_value minSdkVersion)
 - Target Android API: $(badging_value targetSdkVersion)
 - APK signature: valid, \`CN=Android Debug\`
 - Signing certificate SHA-256: \`${cert_digest}\`
