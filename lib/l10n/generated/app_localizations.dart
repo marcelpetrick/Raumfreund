@@ -259,20 +259,20 @@ abstract class AppLocalizations {
   /// Title of the heartbeat timeline.
   ///
   /// In de, this message translates to:
-  /// **'Verlauf der letzten 30 Minuten'**
+  /// **'Verlauf der letzten 10 Minuten'**
   String get timelineTitle;
 
   /// Left x-axis label.
   ///
   /// In de, this message translates to:
-  /// **'−30 min'**
-  String get timelineMinus30;
+  /// **'−10 min'**
+  String get timelineMinus10;
 
   /// Middle x-axis label.
   ///
   /// In de, this message translates to:
-  /// **'−15 min'**
-  String get timelineMinus15;
+  /// **'−5 min'**
+  String get timelineMinus5;
 
   /// Right x-axis label.
   ///
@@ -280,10 +280,10 @@ abstract class AppLocalizations {
   /// **'jetzt'**
   String get timelineNow;
 
-  /// Screen-reader summary of the timeline.
+  /// Screen-reader summary of the timeline chart points (smoothed 10-second means, not the alarm zone).
   ///
   /// In de, this message translates to:
-  /// **'Höchstwert {max} dB, Durchschnitt {average} dB, {greenPercent} % im grünen Bereich'**
+  /// **'Diagrammpunkte aus 10-Sekunden-Mittelwerten: höchster {max} dB, Durchschnitt {average} dB, {greenPercent} % der Punkte im grünen Bereich'**
   String timelineSummary(int max, int average, int greenPercent);
 
   /// Timeline summary without points.

@@ -56,7 +56,8 @@ void readingTests() {
     });
 
     test('stop clears live values but keeps the history', () async {
-      h.readings(greenDbfs, 15);
+      // 10.5 s of readings span two 10 s history buckets.
+      h.readings(greenDbfs, 105);
       await h.controller.stop();
       expect(h.state.alarmLevelDb, isNull);
       expect(h.state.displayLevelDb, isNull);

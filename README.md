@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.1.8+20` — code-complete release candidate**
+Current version: **`0.2.0+21` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -56,7 +56,8 @@ requirements in [`Raumfreund-VISION.md`](Raumfreund-VISION.md) take precedence.
   animation rather than colour alone.
 - Ten-second alarm rule with one alarm per continuous yellow/red phase and
   protection against retriggering on the app's own sound.
-- A 30-minute RAM-only timeline and quiet-minute stars.
+- A 10-minute RAM-only timeline (one smoothed point per 10 s; peaks rise fast
+  and cool down slowly) and quiet-minute stars.
 - Configurable thresholds, calibration correction, alarm tone and vibration,
   persisted locally with validated schema migration.
 - Dedicated Settings and About views; navigating away safely stops measurement.
@@ -67,7 +68,7 @@ requirements in [`Raumfreund-VISION.md`](Raumfreund-VISION.md) take precedence.
 ## Interaction
 
 The main view provides one large start/stop action, an estimated 0–130 dB
-gauge, German status text, Mia's matching expression, a 30-minute heartbeat
+gauge, German status text, Mia's matching expression, a 10-minute heartbeat
 timeline and quiet-minute stars. Colour is never the only state indicator.
 Opening another page always stops an active measurement safely; returning does
 not restart it automatically.

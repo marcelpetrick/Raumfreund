@@ -99,20 +99,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gaugeSemanticsNoValue => 'kein Messwert';
 
   @override
-  String get timelineTitle => 'Verlauf der letzten 30 Minuten';
+  String get timelineTitle => 'Verlauf der letzten 10 Minuten';
 
   @override
-  String get timelineMinus30 => '−30 min';
+  String get timelineMinus10 => '−10 min';
 
   @override
-  String get timelineMinus15 => '−15 min';
+  String get timelineMinus5 => '−5 min';
 
   @override
   String get timelineNow => 'jetzt';
 
   @override
   String timelineSummary(int max, int average, int greenPercent) {
-    return 'Höchstwert $max dB, Durchschnitt $average dB, $greenPercent % im grünen Bereich';
+    return 'Diagrammpunkte aus 10-Sekunden-Mittelwerten: höchster $max dB, Durchschnitt $average dB, $greenPercent % der Punkte im grünen Bereich';
   }
 
   @override

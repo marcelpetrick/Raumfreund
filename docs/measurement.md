@@ -22,5 +22,11 @@ yellow or red phase must remain continuous for ten seconds. Green, a zone
 change, a gap over one second, session stop or the app's own alarm starts a new
 phase. Each phase alarms at most once.
 
-The 30-minute timeline stores only timestamp/number pairs in RAM. Quiet stars
-are session-local encouragement and are not an acoustic record.
+The timeline covers the last 10 minutes and stores only timestamp/number pairs
+in RAM. Every raw level feeds a peak envelope with instant attack and a 4 s
+exponential release, so peaks show at once and cool down slowly. The chart
+keeps one point per 10 s bucket (the mean of the envelope, at most 60 points);
+the open bucket is shown as a live point refreshed at most once per second.
+The gauge uses the same idea with a 100 ms attack and a 1 s release. Chart
+colour shares describe these smoothed points, not the alarm's confirmed zone.
+Quiet stars are session-local encouragement and are not an acoustic record.

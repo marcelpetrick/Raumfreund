@@ -13,7 +13,10 @@ import '../domain/level_history.dart';
 import '../domain/level_history_point.dart';
 import '../domain/thresholds.dart';
 
-/// Thirty-minute, RAM-only level history styled like a heartbeat monitor.
+/// Ten-minute, RAM-only level history styled like a heartbeat monitor.
+///
+/// Shows one point per 10-second bucket of the peak envelope (see
+/// [LevelHistory]); the last point is the live, still-open bucket.
 class LevelTimeline extends StatelessWidget {
   /// Creates the timeline.
   const LevelTimeline({
@@ -67,6 +70,8 @@ class LevelTimeline extends StatelessWidget {
     );
   }
 
+  /// Describes the chart points (smoothed 10 s means); deliberately not
+  /// the alarm zone, which the status panel announces.
   String _summary(AppLocalizations l10n) {
     if (points.isEmpty) return l10n.timelineEmpty;
     final levels = points.map((point) => point.levelDb);
@@ -92,8 +97,8 @@ class _TimelineAxis extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Text(l10n.timelineMinus30),
-      Text(l10n.timelineMinus15),
+      Text(l10n.timelineMinus10),
+      Text(l10n.timelineMinus5),
       Text(l10n.timelineNow),
     ],
   );
@@ -110,7 +115,7 @@ class LevelTimelinePainter extends CustomPainter {
   /// Zone boundaries.
   final Thresholds thresholds;
 
-  static const Duration _window = Duration(minutes: 30);
+  static const Duration _window = LevelHistory.defaultWindow;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -165,27 +170,36 @@ class LevelTimelinePainter extends CustomPainter {
   void _drawTrace(Canvas canvas, Rect bounds) {
     final latest = points.last.timestamp;
     final oldest = latest - _window;
-    final path = Path();
     final segments = splitTimelinePoints(points, oldest: oldest);
-    for (final segment in segments) {
-      for (var index = 0; index < segment.length; index++) {
-        final point = segment[index];
-        final elapsed = point.timestamp - oldest;
-        final x =
-            bounds.width * elapsed.inMicroseconds / _window.inMicroseconds;
-        final offset = Offset(
-          x.clamp(0, bounds.width),
-          _y(bounds, point.levelDb),
-        );
-        index == 0
-            ? path.moveTo(offset.dx, offset.dy)
-            : path.lineTo(offset.dx, offset.dy);
-      }
-    }
     if (segments.isEmpty) return;
+    final path = Path();
+    final dots = <Offset>[];
+    for (final segment in segments) {
+      final offsets = [
+        for (final point in segment) _offset(bounds, oldest, point),
+      ];
+      // A lone bucket (just after a start or gap) has no line to draw.
+      if (offsets.length == 1) dots.add(offsets.single);
+      addSmoothTimelinePath(path, offsets);
+    }
+    // The live point always gets a dot; skip it if it already has one as
+    // a lone bucket, so it is not drawn twice.
+    final live = _offset(bounds, oldest, points.last);
+    if (dots.isEmpty || dots.last != live) dots.add(live);
     canvas
       ..drawPath(path, Glow.haloStroke(AppColors.green, 7, sigma: 5))
       ..drawPath(path, Glow.stroke(AppColors.green, 2.2));
+    for (final dot in dots) {
+      canvas
+        ..drawCircle(dot, 4, Glow.halo(AppColors.green, sigma: 4))
+        ..drawCircle(dot, 2.4, Paint()..color = AppColors.green);
+    }
+  }
+
+  Offset _offset(Rect bounds, Duration oldest, LevelHistoryPoint point) {
+    final elapsed = point.timestamp - oldest;
+    final x = bounds.width * elapsed.inMicroseconds / _window.inMicroseconds;
+    return Offset(x.clamp(0, bounds.width), _y(bounds, point.levelDb));
   }
 
   double _y(Rect bounds, double level) =>
@@ -215,4 +229,75 @@ List<List<LevelHistoryPoint>> splitTimelinePoints(
   }
   if (current.isNotEmpty) segments.add(List.unmodifiable(current));
   return List.unmodifiable(segments);
+}
+
+/// Appends [offsets] (strictly increasing x) to [path] as a smooth curve.
+///
+/// Uses a monotone cubic Hermite spline (Fritsch–Carlson): the curve passes
+/// through every bucket point and never overshoots between two of them, so
+/// a red bucket is drawn exactly at its level and the curve cannot suggest
+/// a peak or dip that was not measured.
+@visibleForTesting
+void addSmoothTimelinePath(Path path, List<Offset> offsets) {
+  if (offsets.isEmpty) return;
+  path.moveTo(offsets.first.dx, offsets.first.dy);
+  final tangents = monotoneTimelineTangents(offsets);
+  for (var i = 0; i < offsets.length - 1; i++) {
+    final a = offsets[i];
+    final b = offsets[i + 1];
+    final third = (b.dx - a.dx) / 3;
+    path.cubicTo(
+      a.dx + third,
+      a.dy + tangents[i] * third,
+      b.dx - third,
+      b.dy - tangents[i + 1] * third,
+      b.dx,
+      b.dy,
+    );
+  }
+}
+
+/// Fritsch–Carlson tangents (dy/dx) for [offsets].
+///
+/// Interior tangents are zero at local extrema (secant slopes change sign)
+/// and otherwise the mean of both secants; afterwards every pair is scaled
+/// so that `alpha² + beta² <= 9`, the sufficient condition for a monotone
+/// cubic on each interval.
+@visibleForTesting
+List<double> monotoneTimelineTangents(List<Offset> offsets) {
+  final n = offsets.length;
+  if (n < 2) return List<double>.filled(n, 0);
+  final secants = [
+    for (var i = 0; i < n - 1; i++) _secant(offsets[i], offsets[i + 1]),
+  ];
+  final tangents = [
+    secants.first,
+    for (var i = 1; i < n - 1; i++)
+      secants[i - 1] * secants[i] <= 0
+          ? 0.0
+          : (secants[i - 1] + secants[i]) / 2,
+    secants.last,
+  ];
+  for (var i = 0; i < n - 1; i++) {
+    final secant = secants[i];
+    if (secant == 0) {
+      tangents[i] = 0;
+      tangents[i + 1] = 0;
+      continue;
+    }
+    final alpha = tangents[i] / secant;
+    final beta = tangents[i + 1] / secant;
+    final norm = alpha * alpha + beta * beta;
+    if (norm <= 9) continue;
+    final scale = 3 / math.sqrt(norm);
+    tangents[i] = scale * alpha * secant;
+    tangents[i + 1] = scale * beta * secant;
+  }
+  return tangents;
+}
+
+double _secant(Offset a, Offset b) {
+  final dx = b.dx - a.dx;
+  // Clamping at the left edge could collapse two points; treat as flat.
+  return dx <= 0 ? 0 : (b.dy - a.dy) / dx;
 }
