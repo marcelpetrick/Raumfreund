@@ -56,6 +56,7 @@ final class MonitorState {
     this.zone,
     this.remainingUntilAlarm,
     this.alarmFiredInPhase = false,
+    this.kittyAway = false,
     this.alarmPlaying = false,
     this.alarmOutputFailed = false,
     this.history = const [],
@@ -81,7 +82,9 @@ final class MonitorState {
   /// Unsmoothed estimated level used for zones and the alarm.
   final double? alarmLevelDb;
 
-  /// Zone of [alarmLevelDb]; null without a sample.
+  /// Confirmed zone (1 s hysteresis, ADR 0004) of the recent
+  /// [alarmLevelDb] samples; null without a sample. A single sample across a
+  /// threshold does not change it.
   final Zone? zone;
 
   /// Countdown of the current yellow/red phase; null otherwise.
@@ -89,6 +92,11 @@ final class MonitorState {
 
   /// Whether the alarm of the current phase has fired.
   final bool alarmFiredInPhase;
+
+  /// Whether Mia has walked away: set when the alarm of a confirmed red
+  /// phase fires, kept (also in yellow) until the confirmed zone is green or
+  /// the measurement stops, resets or fails.
+  final bool kittyAway;
 
   /// Whether the alarm output is playing (measurement paused for alarms).
   final bool alarmPlaying;
@@ -131,6 +139,7 @@ final class MonitorState {
     Duration? remainingUntilAlarm,
     bool clearRemaining = false,
     bool? alarmFiredInPhase,
+    bool? kittyAway,
     bool? alarmPlaying,
     bool? alarmOutputFailed,
     Thresholds? thresholds,
@@ -149,6 +158,7 @@ final class MonitorState {
         ? null
         : remainingUntilAlarm ?? this.remainingUntilAlarm,
     alarmFiredInPhase: alarmFiredInPhase ?? this.alarmFiredInPhase,
+    kittyAway: kittyAway ?? this.kittyAway,
     alarmPlaying: alarmPlaying ?? this.alarmPlaying,
     alarmOutputFailed: alarmOutputFailed ?? this.alarmOutputFailed,
     thresholds: thresholds ?? this.thresholds,

@@ -6,7 +6,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 # ADR 0003 – Alarm and measurement lifecycle semantics
 
 - Status: accepted; implemented; independent review required before release
-- Date: 2026-10-03
+- Date: 2026-10-03 (alarm rules amended 2026-10-04 by ADR 0004)
 
 ## Context
 
@@ -39,20 +39,44 @@ state and id before changing state.
 
 ### Alarm rules
 
-- The phase start is the monotonic timestamp of the first valid yellow or red
-  sample after a reset or zone change.
-- The alarm cannot fire before 10.0 seconds. It fires no later than the next
-  valid sample at or after that boundary.
-- A yellow-to-red or red-to-yellow transition creates a new phase and timer.
-- Green, stop, background, error or a sample gap greater than one second resets
-  the phase. Time with no valid samples is never accumulated.
+- Phases follow the *confirmed* zone, not the raw per-sample zone: fast
+  attack (a zone is entered when it covers 50 % of the last second), slow
+  release (it is left when it covers less than 15 % of the last three
+  seconds) ([ADR 0004](0004-zone-hysteresis.md)). The first sample after
+  start, reset or a gap is adopted immediately and held for one second.
+- The phase start is the monotonic timestamp of the first sample of the
+  contiguous loud run that led to the confirmation (after a reset or gap:
+  the adopted sample). No sample between phase start and confirmation is
+  below the phase's zone.
+- The phase time is measured from the phase start to the latest sample whose
+  raw zone is at least the phase's zone: dips between such samples count, a
+  quiet tail after the last one does not. The alarm fires only on such a
+  sample, once the phase time reaches 10.0 seconds, and only while the
+  release window is at least half covered; otherwise with the next such
+  sample. While the zone holds, pauses and dips do not reset the phase.
+- Samples that stay too sparse to fill the release window (e.g. one per
+  second) for more than three seconds are treated like a gap.
+- The alarm delay must not be shorter than the hysteresis window (1 s); the
+  machine rejects such a configuration.
+- A confirmed yellow-to-red or red-to-yellow transition creates a new phase
+  and timer.
+- Confirmed green, stop, background, error or a sample gap greater than one
+  second resets the phase. Pauses while the zone holds do not. Time with no valid samples is
+  never accumulated.
 - Exactly one alarm is allowed per uninterrupted phase.
-- While the alarm output future is active, incoming readings may update a
-  clearly marked display but cannot advance or trigger the alarm state machine.
+- While the alarm output future is active, incoming readings are ignored:
+  they neither advance the alarm state machine nor reach the gauge, the
+  timeline or the quiet stars (the microphone hears the own tone).
   When output completes, continuity is reset. The next valid sample starts a
   new phase at zero.
 
-The pure alarm machine receives timestamps and zone decisions; it never reads a
+Mia (the kitty) walks away when the alarm of a confirmed red phase fires.
+The controller latches this as `MonitorState.kittyAway`: it survives the
+reset after the alarm tone and a drop to yellow, and clears on *settled*
+green (a confirmed change, or an adopted green backed by a full window),
+stop, reset or error.
+
+The pure alarm machine receives timestamps and levels; it never reads a
 real clock, widget state or native API. The controller invokes the alarm port
 and applies the asynchronous completion rule.
 

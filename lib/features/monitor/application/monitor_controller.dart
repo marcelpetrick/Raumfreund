@@ -13,6 +13,7 @@ import '../domain/calibration.dart';
 import '../domain/display_smoother.dart';
 import '../domain/level_history.dart';
 import '../domain/quiet_stars.dart';
+import '../domain/zone.dart';
 import 'monitor_state.dart';
 import 'ports.dart';
 
@@ -191,6 +192,7 @@ final class MonitorController extends ChangeNotifier {
         clearLevels: true,
         clearRemaining: true,
         alarmFiredInPhase: false,
+        kittyAway: false,
         alarmPlaying: false,
         alarmOutputFailed: false,
         thresholds: _settings.thresholds,
@@ -273,10 +275,15 @@ final class MonitorController extends ChangeNotifier {
     if (level == null) return;
     final now = _clock.now;
     final snapshot = _alarm.onSample(timestamp: now, levelDb: level);
+    // While the own alarm tone plays the microphone hears it: the machine
+    // ignores these samples, and gauge, chart and stars must not show it.
+    if (snapshot.suppressed) return;
     final display = _smoother.add(timestamp: now, levelDb: level);
-    final zone = _alarm.thresholds.classify(level);
+    // The confirmed (debounced) zone drives UI and stars, so they never
+    // flicker differently from the alarm phase (ADR 0004).
+    final zone = snapshot.zone;
     _history.add(timestamp: now, levelDb: level);
-    _stars.onSample(timestamp: now, zone: zone);
+    if (zone != null) _stars.onSample(timestamp: now, zone: zone);
     _emit(
       _state.copyWith(
         displayLevelDb: display,
@@ -285,6 +292,7 @@ final class MonitorController extends ChangeNotifier {
         remainingUntilAlarm: snapshot.remainingUntilAlarm,
         clearRemaining: snapshot.remainingUntilAlarm == null,
         alarmFiredInPhase: snapshot.alarmFiredInPhase,
+        kittyAway: _kittyAway(snapshot),
         history: _history.points,
         historyNow: now,
         stars: _stars.stars,
@@ -294,6 +302,18 @@ final class MonitorController extends ChangeNotifier {
     );
     if (snapshot.shouldFireAlarm) unawaited(_playAlarm(session));
   }
+
+  /// "Mia is away" latch: she leaves when the alarm of a confirmed red
+  /// phase fires and stays away (also in yellow, and across the reset after
+  /// the own alarm tone) until green is confirmed *and settled*: after the
+  /// post-tone reset the first sample is adopted immediately, and a single
+  /// green sample must not bring her back. Stop, reset and errors clear the
+  /// latch via [_prepareSession]/[_endSession].
+  bool _kittyAway(AlarmSnapshot snapshot) => switch (snapshot.zone) {
+    Zone.green when snapshot.zoneSettled => false,
+    Zone.red when snapshot.alarmFiredInPhase => true,
+    _ => _state.kittyAway,
+  };
 
   Future<void> _playAlarm(int session) async {
     final sound = _sessionSettings.alarmSoundEnabled;
@@ -332,6 +352,7 @@ final class MonitorController extends ChangeNotifier {
         clearLevels: true,
         clearRemaining: true,
         alarmFiredInPhase: false,
+        kittyAway: false,
         alarmPlaying: false,
         starProgress: 0,
         starJustEarned: false,

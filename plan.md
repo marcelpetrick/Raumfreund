@@ -62,17 +62,17 @@ integrates, bumps the version, runs the full pipeline and commits.
 | D | `tool/release_debug.sh`: one-command debug release with checks | Sonnet | done, `2b726f0` (not yet used for a real release) |
 | T | 10-minute timeline, 10 s buckets, attack/release envelope, calmer gauge | Opus | done, `1e54efa` (reviewed) |
 | B | Scared Mia in red, runs away after the alarm, walks back when green | Sonnet | done, `9338322` |
-| A | Zone hysteresis (fast attack, slow release), "Mia away" latch, ADR 0004 | Opus | revision 4 ready on its worktree branch, waiting for a 4th independent review; **not on `main`** |
+| A | Zone hysteresis (fast attack, slow release), "Mia away" latch, ADR 0004 | Opus | done in `0.3.0`, four independent review rounds, judged releasable |
 | S | Configurable alarm delay in Settings (minimum 3 s, needs A) | Opus | not started |
-| R | Independent review of A (3 rounds so far) and T | Opus | T accepted; A round 4 pending |
+| R | Independent review of A (4 rounds) and T | Opus | done; no blocking findings |
 | P | README with real screenshots, vision/docs sync | Coordinator | open |
 | Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | open |
 | — | Run `/reviewBranch` over all changes since `c40ec1a` and fix findings | Coordinator | open |
 
-### Hysteresis decisions so far (package A)
+### Hysteresis decisions (package A)
 
-Three review rounds with probe tests shaped the rule; details go to ADR 0004
-when A lands:
+Four review rounds with probe tests shaped the rule; details are in
+[ADR 0004](docs/adr/0004-zone-hysteresis.md):
 
 - A zone is entered when at least 50 % of the last 1 s is at or above it, and
   left only when it falls below 15 % of the last 3 s (and below 50 % of the
@@ -87,11 +87,13 @@ when A lands:
 - Readings during the app's own alarm tone are ignored entirely.
 - Mia leaves after the red alarm and returns only on settled green.
 
-### Known behaviour on `main` until A lands
+### Accepted hysteresis behaviour (review round 4)
 
-`main` still decides zones per sample: the traffic light can flicker at a
-threshold, and a flickering red/yellow room may not alarm. Do not publish a
-debug release before A is merged.
+- Readings slower than one per 0.5 s never alarm (stalled recorder; the
+  recorder normally delivers every 100 ms). A "measurement disturbed" hint is
+  a possible follow-up.
+- Pauses of up to about 2.5 s inside a loud phase count towards the delay.
+- The countdown may wait just above zero until the next loud sample.
 
 ## Open: automated quality evidence
 

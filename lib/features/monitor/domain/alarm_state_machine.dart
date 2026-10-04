@@ -11,15 +11,32 @@
 /// * Only *valid* samples (finite, see `Calibration.estimate`) are fed in.
 ///   Time is measured exclusively between samples: the start of a phase is
 ///   the timestamp of its first valid sample, and the elapsed phase time is
-///   `latest sample - first sample`. No time is counted without samples.
+///   `latest sample in the phase's zone - first sample` (raw zone >= the
+///   phase zone). Dips between such samples count; a quiet tail after the
+///   last one does not. No time is counted without samples.
+/// * Phases follow the *confirmed* zone of a [ZoneDebouncer] (ADR 0004),
+///   not the raw per-sample zone: fast attack (a zone is entered when it
+///   covers 50 % of the last [AlarmStateMachine.holdTime], default 1 s),
+///   slow release (it is left when it covers less than 15 % of the last
+///   3 s). Pauses and dips while the zone holds neither change the zone nor
+///   restart the phase.
+/// * The phase of a newly confirmed zone starts at the first sample of the
+///   contiguous loud run that led to the confirmation (never at a sample
+///   below that zone). The alarm therefore never fires before
+///   [AlarmStateMachine.alarmDelay] of such samples; after confirmation,
+///   dips are tolerated by the hysteresis.
 /// * Two consecutive valid samples more than [AlarmStateMachine.maxGap]
-///   (default 1 s) apart break continuity; the later sample starts a new
-///   phase. A gap of exactly `maxGap` is still continuous.
+///   (default 1 s) apart break continuity; the later sample is adopted
+///   immediately as the confirmed zone and starts a new phase. A gap of
+///   exactly `maxGap` is still continuous. The same holds for the first
+///   sample after construction or [AlarmStateMachine.reset].
 /// * The alarm fires once per yellow/red phase when the elapsed phase time
 ///   reaches [AlarmStateMachine.alarmDelay] (default 10 s): never earlier,
-///   and at the latest with the first valid sample at or after 10 s.
-/// * Green resets the phase and the fired flag. A yellow ↔ red change starts
-///   a new phase with a new fired flag.
+///   only on a sample in the phase's zone, and only while the debouncer's
+///   release window is usable ([ZoneDecision.usable]); otherwise with the
+///   first such sample at or after 10 s.
+/// * Confirmed green resets the phase and the fired flag. A confirmed
+///   yellow ↔ red change starts a new phase with a new fired flag.
 ///
 /// Own alarm tone: the tone can reach the microphone and would otherwise keep
 /// the room "loud". Between [AlarmStateMachine.onAlarmOutputStarted] and
@@ -34,6 +51,7 @@ library;
 
 import 'thresholds.dart';
 import 'zone.dart';
+import 'zone_debouncer.dart';
 
 /// Read-only view of the [AlarmStateMachine] after the latest event.
 final class AlarmSnapshot {
@@ -45,6 +63,7 @@ final class AlarmSnapshot {
     required this.alarmFiredInPhase,
     required this.suppressed,
     required this.shouldFireAlarm,
+    this.zoneSettled = false,
   });
 
   /// State before the first sample or after a reset.
@@ -57,7 +76,8 @@ final class AlarmSnapshot {
     shouldFireAlarm: false,
   );
 
-  /// Zone of the current phase; null before the first sample/after reset.
+  /// Confirmed zone of the current phase (see [ZoneDebouncer]); null before
+  /// the first sample/after reset.
   final Zone? zone;
 
   /// Time since the first sample of the current yellow/red phase; zero in
@@ -67,6 +87,10 @@ final class AlarmSnapshot {
   /// Time left until the alarm of this phase; null in green, without a
   /// phase, or after the alarm of this phase has fired.
   final Duration? remainingUntilAlarm;
+
+  /// Whether [zone] is backed by at least the hold time of raw samples (see
+  /// [ZoneDecision.settled]); false right after a reset or gap.
+  final bool zoneSettled;
 
   /// Whether the alarm of the current phase has already fired.
   final bool alarmFiredInPhase;
@@ -84,12 +108,25 @@ final class AlarmSnapshot {
 /// Thresholds are fixed per instance: when they change, create a new machine
 /// or call [reset] (the measurement is stopped anyway).
 final class AlarmStateMachine {
-  /// Creates a machine for [thresholds].
+  /// Creates a machine for [thresholds]. Throws an [ArgumentError] if
+  /// [alarmDelay] is shorter than [holdTime]. (The Settings range for the
+  /// delay starts at 3 s; that is added separately.)
   AlarmStateMachine({
     required this.thresholds,
     this.alarmDelay = defaultAlarmDelay,
     this.maxGap = defaultMaxGap,
-  });
+    this.holdTime = ZoneDebouncer.defaultHoldTime,
+  }) : _debouncer = ZoneDebouncer(holdTime: holdTime, maxGap: maxGap) {
+    // A confirmation can lie up to one hold time after the phase start, so a
+    // shorter delay would fire late (at confirmation) instead of on time.
+    if (alarmDelay < holdTime) {
+      throw ArgumentError.value(
+        alarmDelay,
+        'alarmDelay',
+        'must not be shorter than holdTime ($holdTime)',
+      );
+    }
+  }
 
   /// Continuous yellow/red time that triggers the alarm.
   static const Duration defaultAlarmDelay = Duration(seconds: 10);
@@ -106,10 +143,15 @@ final class AlarmStateMachine {
   /// See [defaultMaxGap].
   final Duration maxGap;
 
+  /// Length of the zone hysteresis window (see [ZoneDebouncer.holdTime]).
+  final Duration holdTime;
+
+  final ZoneDebouncer _debouncer;
   Zone? _zone;
   Duration? _phaseStart;
-  Duration? _lastSample;
+  Duration? _lastLoud;
   bool _fired = false;
+  bool _settled = false;
   bool _suppressed = false;
   AlarmSnapshot _snapshot = AlarmSnapshot.idle;
 
@@ -128,24 +170,31 @@ final class AlarmStateMachine {
     if (_suppressed || !levelDb.isFinite) {
       return _snapshot = _copy(shouldFire: false);
     }
-    final zone = thresholds.classify(levelDb);
-    final continuous = _isContinuous(timestamp);
-    _lastSample = timestamp;
-    if (zone == Zone.green) {
-      _zone = zone;
+    final raw = thresholds.classify(levelDb);
+    final decision = _debouncer.onSample(timestamp: timestamp, zone: raw);
+    _zone = decision.zone;
+    _settled = decision.settled;
+    if (decision.zone == Zone.green) {
       _phaseStart = null;
+      _lastLoud = null;
       _fired = false;
-      return _snapshot = _build(timestamp, shouldFire: false);
+      return _snapshot = _build(shouldFire: false);
     }
-    if (!continuous || zone != _zone || _phaseStart == null) {
-      _zone = zone;
-      _phaseStart = timestamp;
+    if (decision.started || _phaseStart == null) {
+      // Start of the loud run that led to the confirmation.
+      _phaseStart = decision.since;
+      _lastLoud = null;
       _fired = false;
     }
-    final elapsed = timestamp - _phaseStart!;
-    final fireNow = !_fired && elapsed >= alarmDelay;
+    // Only samples in the phase's zone advance it: dips between them count,
+    // a quiet tail after the last of them does not.
+    final inZone = raw.index >= decision.zone.index;
+    if (inZone) _lastLoud = timestamp;
+    final elapsed = _elapsed();
+    final fireNow =
+        !_fired && inZone && decision.usable && elapsed >= alarmDelay;
     if (fireNow) _fired = true;
-    return _snapshot = _build(timestamp, shouldFire: fireNow);
+    return _snapshot = _build(shouldFire: fireNow);
   }
 
   /// Forgets the current phase (stop, background, error, threshold change).
@@ -153,7 +202,9 @@ final class AlarmStateMachine {
   void reset() {
     _zone = null;
     _phaseStart = null;
-    _lastSample = null;
+    _lastLoud = null;
+    _debouncer.reset();
+    _settled = false;
     _fired = false;
     _suppressed = false;
     _snapshot = AlarmSnapshot.idle;
@@ -170,17 +221,22 @@ final class AlarmStateMachine {
   /// samples taken after the tone.
   void onAlarmOutputFinished() => reset();
 
-  bool _isContinuous(Duration timestamp) {
-    final last = _lastSample;
-    if (last == null) return false;
-    final delta = timestamp - last;
-    return delta >= Duration.zero && delta <= maxGap;
+  /// Phase time: from the phase start to the latest sample in the phase's
+  /// zone (zero without a phase).
+  Duration _elapsed() {
+    final start = _phaseStart;
+    if (start == null) return Duration.zero;
+    return (_lastLoud ?? start) - start;
   }
 
-  AlarmSnapshot _build(Duration timestamp, {required bool shouldFire}) {
+  AlarmSnapshot _build({required bool shouldFire}) {
     final start = _phaseStart;
-    final elapsed = start == null ? Duration.zero : timestamp - start;
-    final remaining = start == null || _fired ? null : alarmDelay - elapsed;
+    final elapsed = _elapsed();
+    final left = alarmDelay - elapsed;
+    // Can stay at zero while thin data blocks the alarm decision.
+    final remaining = start == null || _fired
+        ? null
+        : (left.isNegative ? Duration.zero : left);
     return AlarmSnapshot(
       zone: _zone,
       phaseElapsed: elapsed,
@@ -188,6 +244,7 @@ final class AlarmStateMachine {
       alarmFiredInPhase: _fired,
       suppressed: _suppressed,
       shouldFireAlarm: shouldFire,
+      zoneSettled: _settled,
     );
   }
 
@@ -198,5 +255,6 @@ final class AlarmStateMachine {
     alarmFiredInPhase: _snapshot.alarmFiredInPhase,
     suppressed: _suppressed,
     shouldFireAlarm: shouldFire,
+    zoneSettled: _snapshot.zoneSettled,
   );
 }

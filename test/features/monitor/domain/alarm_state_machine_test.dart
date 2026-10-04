@@ -55,19 +55,13 @@ void initialStateTests() {
     });
 
     test('exact limits belong to the higher zone', () {
-      expect(
-        machine.onSample(timestamp: ms(0), levelDb: 59.999).zone,
-        Zone.green,
-      );
-      expect(
-        machine.onSample(timestamp: ms(100), levelDb: 60).zone,
-        Zone.yellow,
-      );
-      expect(
-        machine.onSample(timestamp: ms(200), levelDb: 79.999).zone,
-        Zone.yellow,
-      );
-      expect(machine.onSample(timestamp: ms(300), levelDb: 80).zone, Zone.red);
+      // Fresh machines: the first sample is adopted without hysteresis.
+      Zone? first(double level) =>
+          defaultMachine().onSample(timestamp: ms(0), levelDb: level).zone;
+      expect(first(59.999), Zone.green);
+      expect(first(60), Zone.yellow);
+      expect(first(79.999), Zone.yellow);
+      expect(first(80), Zone.red);
     });
 
     test('green never fires and has no countdown', () {
@@ -78,15 +72,20 @@ void initialStateTests() {
       expect(snapshots.last.phaseElapsed, Duration.zero);
     });
 
-    test('entering yellow starts the timer at zero', () {
+    test('entering yellow is confirmed at 0.5 s, timer from first sample', () {
       feed(machine, green, fromMs: 0, toMs: 1000);
       final first = machine.onSample(timestamp: ms(1100), levelDb: yellow);
-      expect(first.zone, Zone.yellow);
+      expect(first.zone, Zone.green);
       expect(first.phaseElapsed, Duration.zero);
-      expect(first.remainingUntilAlarm, const Duration(seconds: 10));
-      final later = machine.onSample(timestamp: ms(1600), levelDb: yellow);
-      expect(later.phaseElapsed, ms(500));
-      expect(later.remainingUntilAlarm, ms(9500));
+      expect(first.remainingUntilAlarm, isNull);
+      final confirmed = feed(machine, yellow, fromMs: 1200, toMs: 1500).last;
+      expect(confirmed.zone, Zone.yellow);
+      expect(confirmed.phaseElapsed, ms(400));
+      expect(confirmed.remainingUntilAlarm, ms(9600));
+      feed(machine, yellow, fromMs: 1600, toMs: 2100);
+      final later = machine.onSample(timestamp: ms(2600), levelDb: yellow);
+      expect(later.phaseElapsed, ms(1500));
+      expect(later.remainingUntilAlarm, ms(8500));
     });
   });
 }
@@ -112,13 +111,7 @@ void tenSecondRuleTests() {
     }
 
     test('fires with the first sample after 10 s (9.9 s then 10.1 s)', () {
-      machine.onSample(timestamp: ms(0), levelDb: yellow);
-      for (var t = 900; t <= 9900; t += 1000) {
-        expect(
-          machine.onSample(timestamp: ms(t), levelDb: yellow).shouldFireAlarm,
-          isFalse,
-        );
-      }
+      expect(fireCount(feed(machine, yellow, fromMs: 0, toMs: 9900)), 0);
       final at101 = machine.onSample(timestamp: ms(10100), levelDb: yellow);
       expect(at101.shouldFireAlarm, isTrue);
       expect(at101.phaseElapsed, ms(10100));
@@ -156,15 +149,19 @@ void phaseChangeTests() {
     late AlarmStateMachine machine;
     setUp(() => machine = defaultMachine());
 
-    test('yellow to red starts a new phase and timer', () {
-      feed(machine, yellow, fromMs: 0, toMs: 9000);
-      final red0 = machine.onSample(timestamp: ms(9100), levelDb: red);
+    test('yellow to red starts a new, backdated phase and timer', () {
+      feed(machine, yellow, fromMs: 0, toMs: 5000);
+      final pending = feed(machine, red, fromMs: 5100, toMs: 5400);
+      expect(pending.every((s) => s.zone == Zone.yellow), isTrue);
+      final red0 = machine.onSample(timestamp: ms(5500), levelDb: red);
       expect(red0.zone, Zone.red);
-      expect(red0.phaseElapsed, Duration.zero);
-      final snapshots = feed(machine, red, fromMs: 9200, toMs: 19000);
+      expect(red0.phaseElapsed, ms(400));
+      expect(red0.alarmFiredInPhase, isFalse);
+      feed(machine, red, fromMs: 5600, toMs: 6100);
+      final snapshots = feed(machine, red, fromMs: 6200, toMs: 15000);
       expect(fireCount(snapshots), 0);
       expect(
-        machine.onSample(timestamp: ms(19100), levelDb: red).shouldFireAlarm,
+        machine.onSample(timestamp: ms(15100), levelDb: red).shouldFireAlarm,
         isTrue,
       );
     });
@@ -178,22 +175,27 @@ void phaseChangeTests() {
       expect(fireCount(backToYellow), 1);
     });
 
-    test('return to green resets time and fired flag', () {
+    test('confirmed return to green resets time and fired flag', () {
       feed(machine, yellow, fromMs: 0, toMs: 10000);
-      final greenSnap = machine.onSample(timestamp: ms(10100), levelDb: green);
+      final greenSnap = feed(machine, green, fromMs: 10100, toMs: 12600).last;
       expect(greenSnap.zone, Zone.green);
       expect(greenSnap.alarmFiredInPhase, isFalse);
       expect(greenSnap.remainingUntilAlarm, isNull);
-      final again = feed(machine, yellow, fromMs: 10200, toMs: 20200);
+      expect(greenSnap.phaseElapsed, Duration.zero);
+      final again = feed(machine, yellow, fromMs: 12700, toMs: 22700);
       expect(fireCount(again), 1);
+      expect(again.last.shouldFireAlarm, isTrue);
       expect(again.first.phaseElapsed, Duration.zero);
+      expect(again[10].phaseElapsed, ms(1000));
     });
 
-    test('a single green sample interrupts the phase', () {
+    test('a single green sample does not interrupt the phase', () {
       feed(machine, yellow, fromMs: 0, toMs: 9000);
-      machine.onSample(timestamp: ms(9100), levelDb: green);
-      final snapshots = feed(machine, yellow, fromMs: 9200, toMs: 18000);
-      expect(fireCount(snapshots), 0);
+      final blip = machine.onSample(timestamp: ms(9100), levelDb: green);
+      expect(blip.zone, Zone.yellow);
+      final snapshots = feed(machine, yellow, fromMs: 9200, toMs: 10000);
+      expect(fireCount(snapshots), 1);
+      expect(snapshots.last.shouldFireAlarm, isTrue);
     });
   });
 }
@@ -204,15 +206,20 @@ void gapTests() {
     setUp(() => machine = defaultMachine());
 
     test('a gap of exactly 1 s keeps continuity', () {
-      machine.onSample(timestamp: ms(0), levelDb: yellow);
-      var t = 0;
-      AlarmSnapshot? last;
-      while (t < 10000) {
-        t += 1000;
-        last = machine.onSample(timestamp: ms(t), levelDb: yellow);
-      }
-      expect(last!.shouldFireAlarm, isTrue);
-      expect(last.phaseElapsed, const Duration(seconds: 10));
+      feed(machine, yellow, fromMs: 0, toMs: 5000);
+      final kept = machine.onSample(timestamp: ms(6000), levelDb: yellow);
+      expect(kept.phaseElapsed, ms(6000));
+      final rest = feed(machine, yellow, fromMs: 6100, toMs: 10000);
+      expect(rest.last.shouldFireAlarm, isTrue);
+    });
+
+    test('samples only every 1 s are too thin: no alarm, re-adopted', () {
+      final run = [
+        for (var t = 0; t <= 30000; t += 1000)
+          machine.onSample(timestamp: ms(t), levelDb: yellow),
+      ];
+      expect(fireCount(run), 0);
+      expect(run.last.phaseElapsed, lessThan(const Duration(seconds: 5)));
     });
 
     test('a gap of 1.001 s starts a new phase with the later sample', () {

@@ -11,7 +11,6 @@ import '../features/about/infrastructure/platform_app_info.dart';
 import '../features/about/presentation/about_page.dart';
 import '../features/monitor/application/monitor_controller.dart';
 import '../features/monitor/application/monitor_state.dart';
-import '../features/monitor/domain/zone.dart';
 import '../features/monitor/infrastructure/platform_monitor_ports.dart';
 import '../features/monitor/presentation/monitor_page.dart';
 import '../features/monitor/presentation/monitor_view_data.dart';
@@ -188,7 +187,7 @@ MonitorViewData _viewData(MonitorState state) => MonitorViewData(
   alarmFired: state.alarmFiredInPhase,
   alarmPlaying: state.alarmPlaying,
   alarmOutputFailed: state.alarmOutputFailed,
-  kittyWalkedAway: state.zone == Zone.red && state.alarmFiredInPhase,
+  kittyWalkedAway: state.kittyAway,
   stars: state.stars,
   starProgress: state.starProgress,
   starJustEarned: state.starJustEarned,

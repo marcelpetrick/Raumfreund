@@ -41,7 +41,8 @@ void readingTests() {
         ..reading(greenDbfs)
         ..reading(redDbfs);
       expect(h.state.alarmLevelDb, 90);
-      expect(h.state.zone, Zone.red);
+      // One red sample is only a candidate (1 s hysteresis, ADR 0004).
+      expect(h.state.zone, Zone.green);
       expect(h.state.displayLevelDb, greaterThan(50));
       expect(h.state.displayLevelDb, lessThan(90));
     });

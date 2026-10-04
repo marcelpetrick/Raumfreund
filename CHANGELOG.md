@@ -27,3 +27,4 @@ these lines (see docs/releasing.md).
 * v0.2.1 makes Mia visibly scared in red and lets her run away after the red alarm, walking back calmly when it is quiet again
 * v0.2.2 records the package status, the hysteresis decisions and the open steps in plan.md
 * v0.2.3 fixes the minimum Android API in debug release notes (aapt2 reports minSdkVersion)
+* v0.3.0 adds zone hysteresis (fast attack, slow release) so the light no longer flickers and loud rooms still alarm after the delay; Mia stays away after the red alarm until green is settled (ADR 0004)
