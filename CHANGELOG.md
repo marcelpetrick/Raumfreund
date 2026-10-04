@@ -25,3 +25,4 @@ these lines (see docs/releasing.md).
 * v0.1.8 adds tool/release_debug.sh, a checked one-command debug APK release with notes covering every change since the previous one
 * v0.2.0 shows the last 10 minutes as smoothed 10 s points with fast-attack, slow-release peaks and a calmer gauge
 * v0.2.1 makes Mia visibly scared in red and lets her run away after the red alarm, walking back calmly when it is quiet again
+* v0.2.2 records the package status, the hysteresis decisions and the open steps in plan.md

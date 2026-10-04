@@ -45,27 +45,53 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   `RECORD_AUDIO` and `VIBRATE`, and it installs and launches without crashes
   on an Android 16 (API 36) emulator.
 - [x] README badges resolve (HTTP 200) and CI/Docker badges show passing.
-- [ ] README shows design mockups instead of real screenshots (fix below).
+- [ ] README shows design mockups instead of real screenshots (package P).
 - [ ] Five parked agent worktrees under `.claude/worktrees/` hold superseded
   pre-integration work; remove them after owner confirmation.
 
-## Current work packages (2026-10-04)
+## Current work packages (status 2026-10-04 evening, `0.2.1+22`)
 
 Each package has an exclusive file area and its own worktree; the coordinator
 integrates, bumps the version, runs the full pipeline and commits.
 
 | ID | Package | Agent tier | Status |
 | --- | --- | --- | --- |
-| A | 1 s zone hysteresis in the alarm machine, confirmed zone for UI/stars, "Mia away" latch, ADR 0004 | Opus (critical logic) | in progress |
-| B | Scared Mia in red, runs away after the alarm, walks back when green | Sonnet | in progress |
-| C | Stable status-panel height across zones and text scales | Sonnet | in progress |
-| D | `tool/release_debug.sh`: one-command debug release with checks | Sonnet | in progress |
-| E | Author email on the About page | Haiku | in progress |
-| T | 10-minute timeline, 10 s buckets, attack/release envelope, calmer gauge | Opus | in progress |
-| S | Configurable alarm delay in Settings (after A) | Opus | waiting for A |
-| R | Independent review of A, S and T | Opus | waiting |
-| P | README with real screenshots, vision/docs sync, changelog | Coordinator | waiting |
-| Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | waiting |
+| E | Author email on the About page | Haiku | done, `2056f27` |
+| — | Regenerate coverage imports before analysis | Coordinator | done, `0078143` |
+| C | Stable status-panel height across zones and text scales | Sonnet | done, `f674e87` |
+| D | `tool/release_debug.sh`: one-command debug release with checks | Sonnet | done, `2b726f0` (not yet used for a real release) |
+| T | 10-minute timeline, 10 s buckets, attack/release envelope, calmer gauge | Opus | done, `1e54efa` (reviewed) |
+| B | Scared Mia in red, runs away after the alarm, walks back when green | Sonnet | done, `9338322` |
+| A | Zone hysteresis (fast attack, slow release), "Mia away" latch, ADR 0004 | Opus | revision 4 ready on its worktree branch, waiting for a 4th independent review; **not on `main`** |
+| S | Configurable alarm delay in Settings (minimum 3 s, needs A) | Opus | not started |
+| R | Independent review of A (3 rounds so far) and T | Opus | T accepted; A round 4 pending |
+| P | README with real screenshots, vision/docs sync | Coordinator | open |
+| Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | open |
+| — | Run `/reviewBranch` over all changes since `c40ec1a` and fix findings | Coordinator | open |
+
+### Hysteresis decisions so far (package A)
+
+Three review rounds with probe tests shaped the rule; details go to ADR 0004
+when A lands:
+
+- A zone is entered when at least 50 % of the last 1 s is at or above it, and
+  left only when it falls below 15 % of the last 3 s (and below 50 % of the
+  last 1 s): peaks rise fast and cool down slowly.
+- The alarm phase starts at the first sample of the loud run that led to the
+  zone, counts dips inside the phase, but not a quiet tail after the last loud
+  sample; it fires only on a loud sample, never before the delay.
+- Repeated shouts (for example 0.5 s every 3 s) hold red and alarm; sparse
+  clicks of 14 % or less do not.
+- Sample weights are capped at 200 ms; windows covered less than half decide
+  nothing, and a long thin stretch counts as a gap.
+- Readings during the app's own alarm tone are ignored entirely.
+- Mia leaves after the red alarm and returns only on settled green.
+
+### Known behaviour on `main` until A lands
+
+`main` still decides zones per sample: the traffic light can flicker at a
+threshold, and a flickering red/yellow room may not alarm. Do not publish a
+debug release before A is merged.
 
 ## Open: automated quality evidence
 
