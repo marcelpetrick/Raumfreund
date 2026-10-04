@@ -21,3 +21,4 @@ these lines (see docs/releasing.md).
 * v0.1.4 regroups plan.md around the verified state and current packages; AGENTS.md adds model tiers, worktree toolchain and commit-body rules
 * v0.1.5 shows the author email `mail@marcelpetrick.it` on the About page
 * v0.1.6 regenerates the coverage import test before analysis so a stale copy cannot fail the analyze step
+* v0.1.7 keeps the status panel height stable across zone, alarm and star text changes

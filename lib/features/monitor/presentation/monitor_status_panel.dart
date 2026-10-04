@@ -9,6 +9,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/glow_panel.dart';
 import '../domain/zone.dart';
 import 'monitor_view_data.dart';
+import 'stable_text.dart';
 
 /// Status, alarm detail, error recovery and primary measurement action.
 class MonitorStatusPanel extends StatelessWidget {
@@ -47,9 +48,12 @@ class MonitorStatusPanel extends StatelessWidget {
             const SizedBox(height: 12),
             _ErrorBody(error: data.error),
           ],
-          if (_alarmText(l10n) case final alarm?) ...[
+          // The error body and the output warning stay height-variable on
+          // purpose: they only occur in rare states, where a layout change is
+          // expected and a permanently reserved slot would waste space.
+          if (data.phase != MonitorPhase.error) ...[
             const SizedBox(height: 10),
-            Text(alarm, textAlign: TextAlign.center),
+            _alarmSlot(l10n),
           ],
           if (data.alarmOutputFailed) ...[
             const SizedBox(height: 10),
@@ -64,11 +68,20 @@ class MonitorStatusPanel extends StatelessWidget {
     );
   }
 
-  String? _alarmText(AppLocalizations l10n) {
+  /// Always reserved outside the error phase so that the zone change into
+  /// yellow/red does not push the content below down.
+  Widget _alarmSlot(AppLocalizations l10n) => StableText(
+    text: _alarmText(l10n),
+    // 10 is the widest countdown that matters; fewer digits are never wider.
+    variants: [l10n.alarmCountdown(10), l10n.alarmFired, l10n.alarmPlaying],
+    textAlign: TextAlign.center,
+  );
+
+  String _alarmText(AppLocalizations l10n) {
     if (data.alarmPlaying) return l10n.alarmPlaying;
     if (data.alarmFired) return l10n.alarmFired;
     final remaining = data.alarmSecondsRemaining;
-    return remaining == null ? null : l10n.alarmCountdown(remaining);
+    return remaining == null ? '' : l10n.alarmCountdown(remaining);
   }
 
   Widget _action(AppLocalizations l10n) {
@@ -134,10 +147,15 @@ class _QuietStars extends StatelessWidget {
             children: [
               const Icon(Icons.star_rounded, color: AppColors.yellow),
               const SizedBox(width: 6),
-              Text(
-                data.starJustEarned
-                    ? l10n.starsJustEarned
-                    : l10n.starsCount(data.stars),
+              // Flexible so large text scales wrap instead of overflowing.
+              Flexible(
+                child: StableText(
+                  text: data.starJustEarned
+                      ? l10n.starsJustEarned
+                      : l10n.starsCount(data.stars),
+                  variants: [l10n.starsJustEarned, l10n.starsCount(data.stars)],
+                  textAlign: TextAlign.center,
+                ),
               ),
             ],
           ),
@@ -169,8 +187,17 @@ class _StatusHeadline extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Text(
-            _status(l10n),
+          child: StableText(
+            text: _status(l10n),
+            variants: [
+              l10n.statusIdle,
+              l10n.statusStarting,
+              l10n.statusStopping,
+              l10n.statusGreen,
+              l10n.statusYellow,
+              l10n.statusRed,
+              l10n.statusError,
+            ],
             style: Theme.of(context).textTheme.titleLarge,
           ),
         ),
