@@ -101,6 +101,14 @@ thing, the stricter rule applies.
   behaviour.
 - Scripts are small, reusable and documented (header comment with purpose,
   usage and exit codes; overview in `tool/README.md`).
-- Public releases only from a verified commit with a matching `vX.Y.Z` tag,
-  artifacts and release notes. Missing access rights or signing secrets are
-  named as blockers, never simulated.
+- Production releases only come from a verified commit with a matching
+  `vX.Y.Z` tag, release-signed APK/AAB artifacts, checksums and release notes.
+  Missing access rights or production-signing secrets are named as blockers,
+  never simulated.
+- Debug APKs may be published as GitHub releases for direct device testing
+  without a production keystore. They use a non-production tag such as
+  `debug-vX.Y.Z-buildN`, retain the `-debugsigned.apk` suffix, include a SHA-256
+  checksum and source commit, and state prominently that they use Android's
+  debug certificate and are not Google Play or production builds. They may be
+  the repository's latest GitHub release, but must never be described as a
+  production release.

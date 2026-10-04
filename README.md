@@ -7,8 +7,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 [![CI](https://github.com/marcelpetrick/Raumfreund/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marcelpetrick/Raumfreund/actions/workflows/ci.yml)
 [![Docker](https://github.com/marcelpetrick/Raumfreund/actions/workflows/docker.yml/badge.svg?branch=main)](https://github.com/marcelpetrick/Raumfreund/actions/workflows/docker.yml)
-[![Release](https://github.com/marcelpetrick/Raumfreund/actions/workflows/release.yml/badge.svg)](https://github.com/marcelpetrick/Raumfreund/actions/workflows/release.yml)
-[![Latest Release](https://img.shields.io/github/v/release/marcelpetrick/Raumfreund?sort=semver)](https://github.com/marcelpetrick/Raumfreund/releases/latest)
+[![Debug APK: 0.1.2+14](https://img.shields.io/badge/debug%20APK-0.1.2%2B14-brightgreen.svg)](https://github.com/marcelpetrick/Raumfreund/releases/latest)
 [![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg)](LICENSE)
 [![Flutter 3.47.6](https://img.shields.io/badge/Flutter-3.47.6-02569B.svg)](https://docs.flutter.dev/release/archive)
 [![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2.svg)](https://dart.dev/)
@@ -31,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.1.1+13` — code-complete release candidate**
+Current version: **`0.1.2+14` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -141,9 +140,9 @@ certified acoustic measurement. See [`docs/privacy.md`](docs/privacy.md) and
 
 ## Releases
 
-Public releases require a
-matching version tag, a green pipeline on that exact commit, verified release
-signing, checksums, an SBOM, license inventory and release notes. Missing
-keystore or account access is a blocker, never replaced with a simulated
-release. Debug-signed APKs are clearly named `-debugsigned` and are suitable
-only for direct testing. See [`docs/releasing.md`](docs/releasing.md).
+Production releases require a matching version tag, a green pipeline on that
+exact commit, verified release signing, checksums, an SBOM, license inventory
+and release notes. Debug APKs may also be published as clearly labeled GitHub
+releases for direct device testing without a production keystore; they keep the
+`-debugsigned` suffix and are never presented as Play Store builds. See
+[`docs/releasing.md`](docs/releasing.md).
