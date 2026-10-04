@@ -19,3 +19,4 @@ these lines (see docs/releasing.md).
 * v0.1.2 documents verified debug APK prereleases alongside signed production releases
 * v0.1.3 updates pinned CI and Docker build tooling
 * v0.1.4 regroups plan.md around the verified state and current packages; AGENTS.md adds model tiers, worktree toolchain and commit-body rules
+* v0.1.5 shows the author email `mail@marcelpetrick.it` on the About page

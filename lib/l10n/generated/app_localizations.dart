@@ -607,6 +607,12 @@ abstract class AppLocalizations {
   /// Label.
   ///
   /// In de, this message translates to:
+  /// **'E-Mail'**
+  String get aboutEmail;
+
+  /// Label.
+  ///
+  /// In de, this message translates to:
   /// **'Projekt'**
   String get aboutProject;
 

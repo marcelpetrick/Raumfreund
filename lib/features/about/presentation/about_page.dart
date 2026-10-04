@@ -76,6 +76,7 @@ class AboutPage extends StatelessWidget {
           l10n.aboutBuildValue(info.buildNumber, info.gitCommit),
         ),
         _row(l10n.aboutAuthor, 'Marcel Petrick'),
+        _row(l10n.aboutEmail, 'mail@marcelpetrick.it'),
         _row(l10n.aboutProject, 'github.com/marcelpetrick/Raumfreund'),
         _row(l10n.aboutLicense, l10n.aboutLicenseValue),
       ],

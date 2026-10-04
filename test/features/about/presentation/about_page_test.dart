@@ -25,6 +25,7 @@ void main() {
     expect(find.text('1.2.3'), findsOneWidget);
     expect(find.text(l10nDe.aboutBuildValue(42, 'abc1234')), findsOneWidget);
     expect(find.text('Marcel Petrick'), findsOneWidget);
+    expect(find.text('mail@marcelpetrick.it'), findsOneWidget);
     expect(find.text('github.com/marcelpetrick/Raumfreund'), findsOneWidget);
     expect(find.text(l10nDe.aboutPrivacyBody), findsOneWidget);
     expect(find.text(l10nDe.aboutMeasurementBody), findsOneWidget);

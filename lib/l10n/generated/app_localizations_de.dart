@@ -308,6 +308,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aboutAuthor => 'Autor';
 
   @override
+  String get aboutEmail => 'E-Mail';
+
+  @override
   String get aboutProject => 'Projekt';
 
   @override

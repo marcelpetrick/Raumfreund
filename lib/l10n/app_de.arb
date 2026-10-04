@@ -225,6 +225,8 @@
   },
   "aboutAuthor": "Autor",
   "@aboutAuthor": {"description": "Label."},
+  "aboutEmail": "E-Mail",
+  "@aboutEmail": {"description": "Label."},
   "aboutProject": "Projekt",
   "@aboutProject": {"description": "Label."},
   "aboutLicense": "Lizenz",
