@@ -292,6 +292,12 @@ abstract class AppLocalizations {
   /// **'Noch keine Messwerte'**
   String get timelineEmpty;
 
+  /// Non-fatal warning after alarm output fails.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Alarmton konnte nicht wiedergegeben werden. Die Messung läuft weiter.'**
+  String get alarmOutputFailed;
+
   /// Kitty mood idle (screen reader).
   ///
   /// In de, this message translates to:
@@ -531,6 +537,18 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Speichern'**
   String get settingsSave;
+
+  /// Retries a failed settings save.
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut speichern'**
+  String get settingsRetrySave;
+
+  /// Retryable error after settings persistence failed.
+  ///
+  /// In de, this message translates to:
+  /// **'Speichern fehlgeschlagen. Deine Änderungen sind noch da – versuche es bitte erneut.'**
+  String get settingsSaveError;
 
   /// Cancel button (discards changes).
   ///

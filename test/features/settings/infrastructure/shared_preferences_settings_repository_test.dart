@@ -200,26 +200,31 @@ void versionTests() {
 
 void saveTests() {
   group('save', () {
-    test('writes all keys and the version', () async {
+    test('writes one complete snapshot and loads it', () async {
       final store = FakePreferencesStore();
       final repo = Repo(openStore: () async => store);
       await repo.save(validSettings);
-      expect(store.values, validData());
+      expect(store.values.keys, [Repo.snapshotKey]);
+      expect(store.values[Repo.snapshotKey], isA<String>());
       expect(await repo.load(), validSettings);
     });
 
-    test('a rejected write throws and keeps the old version marker', () async {
-      final store = FakePreferencesStore()..rejectedKeys.add(Repo.redKey);
+    test('a rejected snapshot keeps the last complete settings', () async {
+      final store = FakePreferencesStore();
       final repo = Repo(openStore: () async => store);
+      await repo.save(AppSettings.defaults);
+      final oldSnapshot = store.values[Repo.snapshotKey];
+      store.rejectedKeys.add(Repo.snapshotKey);
       await expectLater(
         repo.save(validSettings),
         throwsA(isA<SettingsStorageException>()),
       );
-      expect(store.values.containsKey(Repo.versionKey), isFalse);
+      expect(store.values[Repo.snapshotKey], oldSnapshot);
+      expect(await repo.load(), AppSettings.defaults);
     });
 
     test('a throwing write is wrapped', () async {
-      final store = FakePreferencesStore()..throwingKeys.add(Repo.soundKey);
+      final store = FakePreferencesStore()..throwingKeys.add(Repo.snapshotKey);
       final repo = Repo(openStore: () async => store);
       final error = await repo
           .save(validSettings)
@@ -227,7 +232,14 @@ void saveTests() {
       expect(error, isA<SettingsStorageException>());
       final storageError = error! as SettingsStorageException;
       expect(storageError.cause, isA<FormatException>());
-      expect(storageError.toString(), contains(Repo.soundKey));
+      expect(storageError.toString(), contains(Repo.snapshotKey));
+    });
+
+    test('a malformed snapshot never exposes stale legacy fields', () async {
+      final store = FakePreferencesStore(validData())
+        ..values[Repo.snapshotKey] = '{incomplete';
+      final repo = Repo(openStore: () async => store);
+      expect(await repo.load(), AppSettings.defaults);
     });
 
     test('unavailable storage throws', () async {
@@ -248,8 +260,10 @@ void sharedPreferencesTests() {
       expect(store.read(Repo.yellowKey), 42);
       expect(await store.writeInt(Repo.redKey, 99), isTrue);
       expect(await store.writeBool(Repo.soundKey, value: false), isTrue);
+      expect(await store.writeString(Repo.snapshotKey, '{}'), isTrue);
       expect(store.read(Repo.redKey), 99);
       expect(store.read(Repo.soundKey), isFalse);
+      expect(store.read(Repo.snapshotKey), '{}');
     });
 
     test('default repository persists across instances', () async {

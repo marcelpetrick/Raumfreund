@@ -12,14 +12,21 @@ import '../domain/app_settings.dart';
 
 /// Editable settings page.
 ///
-/// Save pops with a validated [AppSettings] result. Cancel pops without a
-/// result, so persistence remains the application layer's responsibility.
+/// Save awaits application-layer persistence and closes only after success.
+/// Cancel always discards the independent draft.
 class SettingsPage extends StatefulWidget {
   /// Creates the page with an independent editable draft.
-  const SettingsPage({required this.initialSettings, super.key});
+  const SettingsPage({
+    required this.initialSettings,
+    required this.onSave,
+    super.key,
+  });
 
   /// Settings copied into the draft when the page opens.
   final AppSettings initialSettings;
+
+  /// Validates and persists the draft, returning whether it was saved.
+  final Future<bool> Function(AppSettings settings) onSave;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -28,32 +35,41 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   late AppSettings _draft = widget.initialSettings;
   bool _defaultsApplied = false;
+  bool _isSaving = false;
+  bool _saveFailed = false;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return NightSkyBackground(
-      child: Scaffold(
-        appBar: AppBar(title: Text(l10n.settingsTitle)),
-        body: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 760),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _thresholdsSection(l10n),
-                    const SizedBox(height: 16),
-                    _calibrationSection(l10n),
-                    const SizedBox(height: 16),
-                    _alarmSection(l10n),
-                    const SizedBox(height: 20),
-                    if (_defaultsApplied) _defaultsHint(l10n),
-                    _actions(l10n),
-                  ],
+    return PopScope(
+      canPop: !_isSaving,
+      child: NightSkyBackground(
+        child: Scaffold(
+          appBar: AppBar(title: Text(l10n.settingsTitle)),
+          body: SafeArea(
+            top: false,
+            child: AbsorbPointer(
+              absorbing: _isSaving,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 760),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _thresholdsSection(l10n),
+                        const SizedBox(height: 16),
+                        _calibrationSection(l10n),
+                        const SizedBox(height: 16),
+                        _alarmSection(l10n),
+                        const SizedBox(height: 20),
+                        if (_defaultsApplied) _defaultsHint(l10n),
+                        if (_saveFailed) _saveError(l10n),
+                        _actions(l10n),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -143,24 +159,36 @@ class _SettingsPageState extends State<SettingsPage> {
     child: Text(l10n.settingsDefaultsApplied, textAlign: TextAlign.center),
   );
 
+  Widget _saveError(AppLocalizations l10n) => Semantics(
+    liveRegion: true,
+    child: Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        l10n.settingsSaveError,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: AppColors.red),
+      ),
+    ),
+  );
+
   Widget _actions(AppLocalizations l10n) => Wrap(
     alignment: WrapAlignment.center,
     spacing: 10,
     runSpacing: 10,
     children: [
       TextButton.icon(
-        onPressed: _restoreDefaults,
+        onPressed: _isSaving ? null : _restoreDefaults,
         icon: const Icon(Icons.restore_rounded),
         label: Text(l10n.settingsDefaults),
       ),
       OutlinedButton(
-        onPressed: () => Navigator.pop(context),
+        onPressed: _isSaving ? null : () => Navigator.pop(context),
         child: Text(l10n.settingsCancel),
       ),
       FilledButton.icon(
-        onPressed: () => Navigator.pop(context, _draft),
-        icon: const Icon(Icons.save_rounded),
-        label: Text(l10n.settingsSave),
+        onPressed: _isSaving ? null : _save,
+        icon: Icon(_saveFailed ? Icons.refresh_rounded : Icons.save_rounded),
+        label: Text(_saveFailed ? l10n.settingsRetrySave : l10n.settingsSave),
       ),
     ],
   );
@@ -193,6 +221,7 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       _draft = AppSettings.defaults;
       _defaultsApplied = true;
+      _saveFailed = false;
     });
   }
 
@@ -200,6 +229,30 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       _draft = settings;
       _defaultsApplied = false;
+      _saveFailed = false;
+    });
+  }
+
+  Future<void> _save() async {
+    if (_isSaving) return;
+    setState(() {
+      _isSaving = true;
+      _saveFailed = false;
+    });
+    var saved = false;
+    try {
+      saved = await widget.onSave(_draft);
+    } on Exception {
+      saved = false;
+    }
+    if (!mounted) return;
+    if (saved) {
+      Navigator.pop(context, _draft);
+      return;
+    }
+    setState(() {
+      _isSaving = false;
+      _saveFailed = true;
     });
   }
 }

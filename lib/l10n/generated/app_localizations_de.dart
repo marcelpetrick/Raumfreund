@@ -119,6 +119,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get timelineEmpty => 'Noch keine Messwerte';
 
   @override
+  String get alarmOutputFailed =>
+      'Der Alarmton konnte nicht wiedergegeben werden. Die Messung läuft weiter.';
+
+  @override
   String get kittyIdle => 'Mia sitzt gemütlich da und wartet';
 
   @override
@@ -264,6 +268,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsSave => 'Speichern';
+
+  @override
+  String get settingsRetrySave => 'Erneut speichern';
+
+  @override
+  String get settingsSaveError =>
+      'Speichern fehlgeschlagen. Deine Änderungen sind noch da – versuche es bitte erneut.';
 
   @override
   String get settingsCancel => 'Abbrechen';

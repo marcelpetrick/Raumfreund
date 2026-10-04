@@ -57,7 +57,7 @@ P0 through P4 and the repository-owned parts of P6/P7 are integrated: the
 expanded pipeline, domain/controller, native recorder, channel adapters,
 localized phone/tablet UI, Settings and About views, documentation, badges,
 CI, Docker and signed-release automation are present. Automated Dart coverage
-is 97.07%; the 218-test and Android native/lint gates pass locally.
+is 97.60%; the 225-test and Android native/lint gates pass locally.
 
 Remaining acceptance is deliberately external: two-manufacturer device tests,
 the five-day release-candidate soak, owner-created signing secrets and Play

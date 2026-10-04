@@ -28,6 +28,10 @@ final class FakePreferencesStore implements PreferencesStore {
   Future<bool> writeBool(String key, {required bool value}) async =>
       _write(key, value);
 
+  @override
+  Future<bool> writeString(String key, String value) async =>
+      _write(key, value);
+
   bool _write(String key, Object value) {
     if (throwingKeys.contains(key)) {
       throw const FormatException('disk full');

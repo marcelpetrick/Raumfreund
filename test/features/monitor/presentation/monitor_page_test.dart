@@ -33,6 +33,7 @@ MonitorViewData _data({
   MonitorErrorKind? error,
   bool alarmFired = false,
   bool alarmPlaying = false,
+  bool alarmOutputFailed = false,
   int? countdown,
 }) => MonitorViewData(
   phase: phase,
@@ -47,6 +48,7 @@ MonitorViewData _data({
   alarmSecondsRemaining: countdown,
   alarmFired: alarmFired,
   alarmPlaying: alarmPlaying,
+  alarmOutputFailed: alarmOutputFailed,
   kittyWalkedAway: zone == Zone.red && alarmFired,
   stars: 2,
   starProgress: .5,
@@ -92,6 +94,9 @@ void main() {
     await _pumpPage(tester, _data(alarmPlaying: true));
     expect(find.text(l10nDe.alarmPlaying), findsOneWidget);
     expect(find.text(l10nDe.starsJustEarned), findsOneWidget);
+    await _pumpPage(tester, _data(alarmOutputFailed: true));
+    expect(find.text(l10nDe.alarmOutputFailed), findsOneWidget);
+    expect(find.byIcon(Icons.volume_off_rounded), findsOneWidget);
   });
 
   testWidgets('renders transitions and each recoverable error', (tester) async {

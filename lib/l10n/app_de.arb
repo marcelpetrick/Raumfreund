@@ -95,6 +95,9 @@
   "timelineEmpty": "Noch keine Messwerte",
   "@timelineEmpty": {"description": "Timeline summary without points."},
 
+  "alarmOutputFailed": "Der Alarmton konnte nicht wiedergegeben werden. Die Messung läuft weiter.",
+  "@alarmOutputFailed": {"description": "Non-fatal warning after alarm output fails."},
+
   "kittyIdle": "Mia sitzt gemütlich da und wartet",
   "@kittyIdle": {"description": "Kitty mood idle (screen reader)."},
   "kittyHappy": "Mia ist fröhlich und schnurrt",
@@ -196,6 +199,10 @@
   "@settingsVibrationHint": {"description": "Vibration switch subtitle."},
   "settingsSave": "Speichern",
   "@settingsSave": {"description": "Save button."},
+  "settingsRetrySave": "Erneut speichern",
+  "@settingsRetrySave": {"description": "Retries a failed settings save."},
+  "settingsSaveError": "Speichern fehlgeschlagen. Deine Änderungen sind noch da – versuche es bitte erneut.",
+  "@settingsSaveError": {"description": "Retryable error after settings persistence failed."},
   "settingsCancel": "Abbrechen",
   "@settingsCancel": {"description": "Cancel button (discards changes)."},
   "settingsDefaults": "Standardwerte",

@@ -25,7 +25,24 @@ import 'theme/app_theme.dart';
 /// Production composition root of Raumfreund.
 class RaumfreundApp extends StatefulWidget {
   /// Creates the application.
-  const RaumfreundApp({super.key});
+  ///
+  /// Optional controllers are test seams. The app takes ownership and disposes
+  /// every injected dependency just like its production dependencies.
+  const RaumfreundApp({
+    this.settingsController,
+    this.monitorController,
+    this.appInfoPort,
+    super.key,
+  });
+
+  /// Settings controller override used by integration and widget tests.
+  final SettingsController? settingsController;
+
+  /// Monitor controller override used by integration and widget tests.
+  final MonitorController? monitorController;
+
+  /// App-information source override used by integration and widget tests.
+  final AppInfoPort? appInfoPort;
 
   @override
   State<RaumfreundApp> createState() => _RaumfreundAppState();
@@ -42,24 +59,31 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     buildNumber: 0,
     gitCommit: 'unknown',
   );
+  bool _initialSettingsReady = false;
+  bool _navigationInProgress = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     final platform = PlatformMonitorPorts();
-    _settings = SettingsController(SharedPreferencesSettingsRepository());
-    _monitor = MonitorController(
-      permission: platform,
-      levelSource: platform,
-      alarmOutput: platform,
-      screenAwake: platform,
-      clock: StopwatchClock(),
-      settings: AppSettings.defaults,
-    );
-    _appInfoPort = PlatformAppInfoPort();
+    _settings =
+        widget.settingsController ??
+        SettingsController(SharedPreferencesSettingsRepository());
+    _monitor = widget.monitorController ?? _createMonitor(platform);
+    _appInfoPort = widget.appInfoPort ?? PlatformAppInfoPort();
     unawaited(_loadInitialState());
   }
+
+  MonitorController _createMonitor(PlatformMonitorPorts platform) =>
+      MonitorController(
+        permission: platform,
+        levelSource: platform,
+        alarmOutput: platform,
+        screenAwake: platform,
+        clock: StopwatchClock(),
+        settings: AppSettings.defaults,
+      );
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -75,11 +99,15 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: AnimatedBuilder(
-      animation: _monitor,
+      animation: Listenable.merge([_monitor, _settings]),
       builder: (context, _) => MonitorPage(
         data: _viewData(_monitor.state),
-        onToggleMeasurement: () => unawaited(_monitor.toggle()),
-        onRetry: () => unawaited(_monitor.start()),
+        onToggleMeasurement: _initialSettingsReady
+            ? () => unawaited(_monitor.toggle())
+            : null,
+        onRetry: _initialSettingsReady
+            ? () => unawaited(_monitor.start())
+            : null,
         onOpenAndroidSettings: () => unawaited(_monitor.openAppSettings()),
         onOpenSettings: _openSettings,
         onOpenAbout: _openAbout,
@@ -90,6 +118,8 @@ class _RaumfreundAppState extends State<RaumfreundApp>
   Future<void> _loadInitialState() async {
     await _settings.load();
     await _monitor.applySettings(_settings.settings);
+    if (!mounted) return;
+    setState(() => _initialSettingsReady = true);
     try {
       final info = await _appInfoPort.load();
       if (mounted) setState(() => _appInfo = info);
@@ -98,27 +128,45 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     }
   }
 
-  Future<void> _openSettings() async {
-    await _monitor.stop();
-    final navigator = _navigatorKey.currentState;
-    if (navigator == null) return;
-    final edited = await navigator.push<AppSettings>(
+  Future<void> _openSettings() => _navigate((navigator) async {
+    await _settings.load();
+    if (!mounted) return;
+    await navigator.push<void>(
       MaterialPageRoute(
-        builder: (_) => SettingsPage(initialSettings: _settings.settings),
+        builder: (_) => SettingsPage(
+          initialSettings: _settings.settings,
+          onSave: _saveSettings,
+        ),
       ),
     );
-    if (edited == null) return;
-    final saved = await _settings.save(edited);
-    if (saved) await _monitor.applySettings(edited);
-  }
+  });
 
-  Future<void> _openAbout() async {
-    await _monitor.stop();
-    final navigator = _navigatorKey.currentState;
-    if (navigator == null) return;
+  Future<void> _openAbout() => _navigate((navigator) async {
     await navigator.push<void>(
       MaterialPageRoute(builder: (_) => AboutPage(info: _appInfo)),
     );
+  });
+
+  Future<bool> _saveSettings(AppSettings edited) async {
+    final saved = await _settings.save(edited);
+    if (!saved || !mounted) return false;
+    await _monitor.applySettings(edited);
+    return mounted;
+  }
+
+  Future<void> _navigate(
+    Future<void> Function(NavigatorState navigator) open,
+  ) async {
+    if (_navigationInProgress || !mounted) return;
+    _navigationInProgress = true;
+    try {
+      await _monitor.stop();
+      if (!mounted) return;
+      final navigator = _navigatorKey.currentState;
+      if (navigator != null) await open(navigator);
+    } finally {
+      _navigationInProgress = false;
+    }
   }
 
   @override
@@ -139,6 +187,7 @@ MonitorViewData _viewData(MonitorState state) => MonitorViewData(
   alarmSecondsRemaining: _seconds(state.remainingUntilAlarm),
   alarmFired: state.alarmFiredInPhase,
   alarmPlaying: state.alarmPlaying,
+  alarmOutputFailed: state.alarmOutputFailed,
   kittyWalkedAway: state.zone == Zone.red && state.alarmFiredInPhase,
   stars: state.stars,
   starProgress: state.starProgress,

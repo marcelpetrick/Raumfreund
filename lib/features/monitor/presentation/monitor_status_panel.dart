@@ -51,6 +51,10 @@ class MonitorStatusPanel extends StatelessWidget {
             const SizedBox(height: 10),
             Text(alarm, textAlign: TextAlign.center),
           ],
+          if (data.alarmOutputFailed) ...[
+            const SizedBox(height: 10),
+            _AlarmOutputWarning(message: l10n.alarmOutputFailed),
+          ],
           const SizedBox(height: 12),
           _QuietStars(data: data),
           const SizedBox(height: 16),
@@ -92,6 +96,24 @@ class MonitorStatusPanel extends StatelessWidget {
     if (data.isBusy) return l10n.measureBusy;
     return data.isActive ? l10n.measureStop : l10n.measureStart;
   }
+}
+
+class _AlarmOutputWarning extends StatelessWidget {
+  const _AlarmOutputWarning({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    liveRegion: true,
+    child: Row(
+      children: [
+        const Icon(Icons.volume_off_rounded, color: AppColors.yellow),
+        const SizedBox(width: 8),
+        Expanded(child: Text(message)),
+      ],
+    ),
+  );
 }
 
 class _QuietStars extends StatelessWidget {

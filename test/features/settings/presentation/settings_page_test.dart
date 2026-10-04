@@ -10,7 +10,10 @@ import 'package:raumfreund/l10n/generated/app_localizations.dart';
 
 import '../../../shared/widgets/test_app.dart';
 
-Widget _host(ValueChanged<AppSettings?> onResult) => MaterialApp(
+Widget _host(
+  ValueChanged<AppSettings?> onResult, {
+  Future<bool> Function(AppSettings)? onSave,
+}) => MaterialApp(
   theme: buildAppTheme(),
   locale: const Locale('de'),
   localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -22,8 +25,10 @@ Widget _host(ValueChanged<AppSettings?> onResult) => MaterialApp(
           final result = await Navigator.push<AppSettings>(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-                  SettingsPage(initialSettings: AppSettings.defaults),
+              builder: (_) => SettingsPage(
+                initialSettings: AppSettings.defaults,
+                onSave: onSave ?? (_) async => true,
+              ),
             ),
           );
           onResult(result);
@@ -36,9 +41,10 @@ Widget _host(ValueChanged<AppSettings?> onResult) => MaterialApp(
 
 Future<void> _open(
   WidgetTester tester,
-  ValueChanged<AppSettings?> onResult,
-) async {
-  await tester.pumpWidget(_host(onResult));
+  ValueChanged<AppSettings?> onResult, {
+  Future<bool> Function(AppSettings)? onSave,
+}) async {
+  await tester.pumpWidget(_host(onResult, onSave: onSave));
   await tester.tap(find.text('open'));
   await tester.pumpAndSettle();
 }
@@ -115,5 +121,39 @@ void main() {
     await tester.tap(find.text(l10nDe.settingsSave));
     await tester.pumpAndSettle();
     expect(result, AppSettings.defaults);
+  });
+
+  _registerSaveRetryTest();
+}
+
+void _registerSaveRetryTest() {
+  testWidgets('failed save keeps draft open and can be retried', (
+    tester,
+  ) async {
+    AppSettings? result;
+    var attempts = 0;
+    await _open(
+      tester,
+      (value) => result = value,
+      onSave: (settings) async {
+        attempts++;
+        return attempts > 1;
+      },
+    );
+    await tester.tap(find.byTooltip(l10nDe.settingsIncrease('Gelb ab')));
+    await tester.ensureVisible(find.text(l10nDe.settingsSave));
+    await tester.tap(find.text(l10nDe.settingsSave));
+    await tester.pumpAndSettle();
+    expect(find.byType(SettingsPage), findsOneWidget);
+    expect(find.text(l10nDe.settingsSaveError), findsOneWidget);
+    expect(find.text(l10nDe.settingsRetrySave), findsOneWidget);
+    expect(result, isNull);
+
+    await tester.ensureVisible(find.text(l10nDe.settingsRetrySave));
+    await tester.pump();
+    await tester.tap(find.text(l10nDe.settingsRetrySave));
+    await tester.pumpAndSettle();
+    expect(attempts, 2);
+    expect(result?.thresholds.yellowDb, 61);
   });
 }

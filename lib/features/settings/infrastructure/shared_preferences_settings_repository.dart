@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
+import 'dart:convert';
+
 import '../../monitor/domain/thresholds.dart';
 import '../domain/app_settings.dart';
 import '../domain/settings_repository.dart';
@@ -36,6 +38,10 @@ final class SettingsStorageException implements Exception {
 ///
 /// Schema versions:
 ///
+/// New saves use one JSON snapshot so settings become visible atomically. The
+/// individual keys remain readable for migration from releases that predate the
+/// snapshot format.
+///
 /// * [schemaVersion] (1) is the current layout.
 /// * Missing or non-integer version: treated as the current layout (fields
 ///   are validated individually anyway).
@@ -59,6 +65,9 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
 
   /// Storage key of the schema version.
   static const String versionKey = 'settings.schemaVersion';
+
+  /// Storage key of the complete, atomically replaced settings snapshot.
+  static const String snapshotKey = 'settings.snapshot';
 
   /// Storage key of the yellow threshold.
   static const String yellowKey = 'settings.yellowDb';
@@ -90,7 +99,10 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
       // Storage unavailable: the app must still work, with defaults.
       return AppSettings.defaults;
     }
-    final reader = _upgrade(store.read);
+    final snapshot = store.read(snapshotKey);
+    final source = snapshot == null ? store.read : _snapshotReader(snapshot);
+    if (source == null) return AppSettings.defaults;
+    final reader = _upgrade(source);
     return reader == null ? AppSettings.defaults : decode(reader);
   }
 
@@ -102,23 +114,8 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
     } on Exception catch (error) {
       throw SettingsStorageException('storage unavailable', error);
     }
-    final t = settings.thresholds;
-    await _write(yellowKey, () => store.writeInt(yellowKey, t.yellowDb));
-    await _write(redKey, () => store.writeInt(redKey, t.redDb));
-    await _write(
-      calibrationKey,
-      () => store.writeInt(calibrationKey, settings.calibrationCorrectionDb),
-    );
-    await _write(
-      soundKey,
-      () => store.writeBool(soundKey, value: settings.alarmSoundEnabled),
-    );
-    await _write(
-      vibrationKey,
-      () => store.writeBool(vibrationKey, value: settings.vibrationEnabled),
-    );
-    // Written last: a partially failed save keeps the old version marker.
-    await _write(versionKey, () => store.writeInt(versionKey, schemaVersion));
+    final snapshot = jsonEncode(_encode(settings));
+    await _write(snapshotKey, () => store.writeString(snapshotKey, snapshot));
   }
 
   /// Builds validated settings from current-schema data.
@@ -158,6 +155,26 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
     } on Exception {
       _store = null; // allow a retry on the next call
       rethrow;
+    }
+  }
+
+  static Map<String, Object> _encode(AppSettings settings) => {
+    versionKey: schemaVersion,
+    yellowKey: settings.thresholds.yellowDb,
+    redKey: settings.thresholds.redDb,
+    calibrationKey: settings.calibrationCorrectionDb,
+    soundKey: settings.alarmSoundEnabled,
+    vibrationKey: settings.vibrationEnabled,
+  };
+
+  static PreferenceReader? _snapshotReader(Object raw) {
+    if (raw is! String) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) return null;
+      return decoded.containsKey(versionKey) ? (key) => decoded[key] : null;
+    } on FormatException {
+      return null;
     }
   }
 

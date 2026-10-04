@@ -17,6 +17,9 @@ abstract interface class PreferencesStore {
 
   /// Writes a bool; returns false if the platform rejected the write.
   Future<bool> writeBool(String key, {required bool value});
+
+  /// Writes a string; returns false if the platform rejected the write.
+  Future<bool> writeString(String key, String value);
 }
 
 /// [PreferencesStore] backed by Android SharedPreferences.
@@ -40,4 +43,8 @@ final class SharedPreferencesStore implements PreferencesStore {
   @override
   Future<bool> writeBool(String key, {required bool value}) =>
       _preferences.setBool(key, value);
+
+  @override
+  Future<bool> writeString(String key, String value) =>
+      _preferences.setString(key, value);
 }

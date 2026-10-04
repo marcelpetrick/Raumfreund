@@ -9,6 +9,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/glow.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/glow_panel.dart';
+import '../domain/level_history.dart';
 import '../domain/level_history_point.dart';
 import '../domain/thresholds.dart';
 
@@ -164,22 +165,24 @@ class LevelTimelinePainter extends CustomPainter {
   void _drawTrace(Canvas canvas, Rect bounds) {
     final latest = points.last.timestamp;
     final oldest = latest - _window;
-    final visible = points.where((point) => point.timestamp >= oldest);
     final path = Path();
-    var first = true;
-    for (final point in visible) {
-      final elapsed = point.timestamp - oldest;
-      final x = bounds.width * elapsed.inMicroseconds / _window.inMicroseconds;
-      final offset = Offset(
-        x.clamp(0, bounds.width),
-        _y(bounds, point.levelDb),
-      );
-      first
-          ? path.moveTo(offset.dx, offset.dy)
-          : path.lineTo(offset.dx, offset.dy);
-      first = false;
+    final segments = splitTimelinePoints(points, oldest: oldest);
+    for (final segment in segments) {
+      for (var index = 0; index < segment.length; index++) {
+        final point = segment[index];
+        final elapsed = point.timestamp - oldest;
+        final x =
+            bounds.width * elapsed.inMicroseconds / _window.inMicroseconds;
+        final offset = Offset(
+          x.clamp(0, bounds.width),
+          _y(bounds, point.levelDb),
+        );
+        index == 0
+            ? path.moveTo(offset.dx, offset.dy)
+            : path.lineTo(offset.dx, offset.dy);
+      }
     }
-    if (first) return;
+    if (segments.isEmpty) return;
     canvas
       ..drawPath(path, Glow.haloStroke(AppColors.green, 7, sigma: 5))
       ..drawPath(path, Glow.stroke(AppColors.green, 2.2));
@@ -192,4 +195,24 @@ class LevelTimelinePainter extends CustomPainter {
   @override
   bool shouldRepaint(LevelTimelinePainter oldDelegate) =>
       oldDelegate.points != points || oldDelegate.thresholds != thresholds;
+}
+
+/// Splits visible chart points at gaps defined by [LevelHistory].
+@visibleForTesting
+List<List<LevelHistoryPoint>> splitTimelinePoints(
+  List<LevelHistoryPoint> points, {
+  required Duration oldest,
+}) {
+  final segments = <List<LevelHistoryPoint>>[];
+  var current = <LevelHistoryPoint>[];
+  for (final point in points.where((point) => point.timestamp >= oldest)) {
+    if (current.isNotEmpty &&
+        point.timestamp - current.last.timestamp > LevelHistory.breakDistance) {
+      segments.add(List.unmodifiable(current));
+      current = <LevelHistoryPoint>[];
+    }
+    current.add(point);
+  }
+  if (current.isNotEmpty) segments.add(List.unmodifiable(current));
+  return List.unmodifiable(segments);
 }
