@@ -19,6 +19,7 @@ class SettingsPage extends StatefulWidget {
   const SettingsPage({
     required this.initialSettings,
     required this.onSave,
+    this.onResetStars,
     super.key,
   });
 
@@ -27,6 +28,13 @@ class SettingsPage extends StatefulWidget {
 
   /// Validates and persists the draft, returning whether it was saved.
   final Future<bool> Function(AppSettings settings) onSave;
+
+  /// Teacher reset of stars and shop items; returns false if it was not
+  /// possible yet (data still loading). The section is hidden when null.
+  ///
+  /// Deliberately outside the Save/Cancel draft: it acts immediately on
+  /// another store, so Cancel could not undo it.
+  final bool Function()? onResetStars;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -63,6 +71,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         _calibrationSection(l10n),
                         const SizedBox(height: 16),
                         _alarmSection(l10n),
+                        if (widget.onResetStars != null) ...[
+                          const SizedBox(height: 16),
+                          _StarResetSection(onReset: widget.onResetStars!),
+                        ],
                         const SizedBox(height: 20),
                         if (_defaultsApplied) _defaultsHint(l10n),
                         if (_saveFailed) _saveError(l10n),
@@ -302,6 +314,64 @@ class _SettingsSection extends StatelessWidget {
       ],
     ),
   );
+}
+
+/// Teacher reset of the star shop, separated from the editable draft.
+class _StarResetSection extends StatelessWidget {
+  const _StarResetSection({required this.onReset});
+
+  final bool Function() onReset;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return _SettingsSection(
+      title: l10n.settingsResetHeading,
+      icon: Icons.star_outline_rounded,
+      color: AppColors.red,
+      children: [
+        Text(l10n.settingsResetBody),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(minimumSize: const Size(48, 48)),
+          onPressed: () => _confirmAndReset(context),
+          icon: const Icon(Icons.delete_outline_rounded),
+          label: Text(l10n.settingsResetButton),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _confirmAndReset(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.settingsResetConfirmTitle),
+        content: Text(l10n.settingsResetConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.shopConfirmCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.settingsResetConfirm),
+          ),
+        ],
+      ),
+    );
+    if (!(confirmed ?? false)) return;
+    final done = onReset();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          done ? l10n.settingsResetDone : l10n.settingsResetNotReady,
+        ),
+      ),
+    );
+  }
 }
 
 class _ThresholdControl extends StatelessWidget {

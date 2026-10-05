@@ -112,6 +112,12 @@ abstract class AppLocalizations {
   /// **'Über Raumfreund'**
   String get actionAbout;
 
+  /// Tooltip/label of the star shop button.
+  ///
+  /// In de, this message translates to:
+  /// **'Sternenladen'**
+  String get actionShop;
+
   /// Tooltip of a back/close button.
   ///
   /// In de, this message translates to:
@@ -729,6 +735,150 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Open-Source-Lizenzen'**
   String get aboutLicensesButton;
+
+  /// Title of the star shop page.
+  ///
+  /// In de, this message translates to:
+  /// **'Sternenladen'**
+  String get shopTitle;
+
+  /// Star balance in the shop header.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Du hast noch keine Sterne} =1{Du hast 1 Stern} other{Du hast {count} Sterne}}'**
+  String shopBalance(int count);
+
+  /// Shown while the wallet is loading.
+  ///
+  /// In de, this message translates to:
+  /// **'Sterne werden geladen …'**
+  String get shopLoading;
+
+  /// Non-blocking hint when loading the wallet failed.
+  ///
+  /// In de, this message translates to:
+  /// **'Sterne werden gerade nur zwischengespeichert. Kaufen und Anlegen gehen erst, wenn der Speicher wieder antwortet.'**
+  String get shopLoadFailed;
+
+  /// Non-blocking hint when saving the wallet failed.
+  ///
+  /// In de, this message translates to:
+  /// **'Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird bei der nächsten Änderung erneut versucht.'**
+  String get shopSaveFailed;
+
+  /// Hides the save error hint.
+  ///
+  /// In de, this message translates to:
+  /// **'Ausblenden'**
+  String get shopDismiss;
+
+  /// Buy button of a shop item.
+  ///
+  /// In de, this message translates to:
+  /// **'Kaufen'**
+  String get shopBuy;
+
+  /// Puts an owned item on Mia.
+  ///
+  /// In de, this message translates to:
+  /// **'Anlegen'**
+  String get shopEquip;
+
+  /// Takes an item off Mia.
+  ///
+  /// In de, this message translates to:
+  /// **'Ablegen'**
+  String get shopUnequip;
+
+  /// Disabled buy button: stars still missing.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{Noch 1 Stern} other{Noch {count} Sterne}}'**
+  String shopMissing(int count);
+
+  /// State of an equipped item.
+  ///
+  /// In de, this message translates to:
+  /// **'Wird getragen'**
+  String get shopWorn;
+
+  /// State of an owned but not worn item.
+  ///
+  /// In de, this message translates to:
+  /// **'Gekauft'**
+  String get shopOwned;
+
+  /// Price of an item, spoken and shown.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Stern} other{{count} Sterne}}'**
+  String shopPrice(int count);
+
+  /// Purchase confirmation question; price is already formatted.
+  ///
+  /// In de, this message translates to:
+  /// **'{item} für {price} kaufen?'**
+  String shopConfirmTitle(String item, String price);
+
+  /// Confirms a purchase.
+  ///
+  /// In de, this message translates to:
+  /// **'Kaufen'**
+  String get shopConfirmBuy;
+
+  /// Cancels a purchase or reset.
+  ///
+  /// In de, this message translates to:
+  /// **'Abbrechen'**
+  String get shopConfirmCancel;
+
+  /// Heading of the teacher reset section.
+  ///
+  /// In de, this message translates to:
+  /// **'Für Lehrkräfte'**
+  String get settingsResetHeading;
+
+  /// Explains the teacher reset.
+  ///
+  /// In de, this message translates to:
+  /// **'Löscht alle Sterne und gekauften Sachen im Sternenladen. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.'**
+  String get settingsResetBody;
+
+  /// Opens the reset confirmation.
+  ///
+  /// In de, this message translates to:
+  /// **'Sterne zurücksetzen'**
+  String get settingsResetButton;
+
+  /// Reset confirmation question.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Sterne und gekauften Sachen löschen?'**
+  String get settingsResetConfirmTitle;
+
+  /// Reset confirmation detail.
+  ///
+  /// In de, this message translates to:
+  /// **'Das kann nicht rückgängig gemacht werden.'**
+  String get settingsResetConfirmBody;
+
+  /// Confirms the reset.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get settingsResetConfirm;
+
+  /// Snackbar after a reset.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Sterne und gekauften Sachen wurden gelöscht.'**
+  String get settingsResetDone;
+
+  /// Snackbar when the wallet is not loaded.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Sterne werden noch geladen. Bitte versuche es gleich noch einmal.'**
+  String get settingsResetNotReady;
 }
 
 class _AppLocalizationsDelegate

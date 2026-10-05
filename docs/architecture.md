@@ -61,7 +61,7 @@ must never import it.
 | `lib/features/monitor/infrastructure/` | Channel adapters | Implemented with protocol tests |
 | `lib/features/monitor/presentation/` | Main monitor, gauge, Mia and timeline | Implemented for phone/tablet layouts |
 | `lib/features/settings/` | Valid settings, persistence and Settings view | Implemented with schema validation |
-| `lib/features/shop/` | Kitty accessory catalog, star wallet and inventory, persistence and shop controller (logic only so far) | Implemented with schema validation |
+| `lib/features/shop/` | Kitty accessory catalog, star wallet and inventory, persistence, shop controller and shop page | Implemented with schema validation |
 | `lib/features/about/` | App information and About view | Implemented |
 | `lib/l10n/` | All user-visible German strings | Implemented in ARB/generated files |
 | `android/app/src/main/kotlin/` | Recorder, permission, alarm and channel host | Implemented with JVM tests |
@@ -151,12 +151,24 @@ unreadable data loads an empty wallet) and `ShopController`, which applies
 changes immediately, saves them serialized and coalesced, and reports save
 failures in `saveFailed` instead of throwing.
 
-Dependency direction: shop depends on nothing but the shared
-`PreferencesStore` abstraction of settings; the monitor feature does not
-import shop. The monitor reports every earned quiet-minute star through the
+Dependency direction: shop domain, application and infrastructure depend on
+nothing but the shared `PreferencesStore` abstraction of settings. The only
+shop type the monitor feature imports is the `KittyAccessory` contract, which
+its kitty renderer draws; the shop page in turn reuses the kitty widget and
+item names from the monitor presentation. Monitor domain and application
+never import shop. The monitor reports every earned quiet-minute star through the
 `StarEarnedSink` port (default no-op), and the composition root connects it
 to `ShopController.earn(1)`. Stars of a session that run before the wallet
 has loaded are added to it after loading.
+
+`RaumfreundApp` owns the `ShopController` (injectable `shopRepository` and
+`monitorFactory` seams for tests), calls `load()` at startup and maps
+`wallet.equipped` into `MonitorViewData.kittyAccessories`. The monitor's
+third app-bar action opens `ShopPage` through the same `_navigate` helper as
+Settings and About, so measurement is stopped first and never restarted. The
+teacher reset is passed to `SettingsPage` as a plain callback
+(`onResetStars: shop.resetAll`); it acts at once and is deliberately not
+part of the Save/Cancel draft.
 
 ## Composition and test seams
 

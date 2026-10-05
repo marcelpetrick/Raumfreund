@@ -23,6 +23,7 @@ Future<void> _pumpPage(WidgetTester tester, MonitorViewData data) async {
       onOpenAndroidSettings: () {},
       onOpenSettings: () async {},
       onOpenAbout: () async {},
+      onOpenShop: () async {},
     ),
     scaffold: false,
     disableAnimations: true,
@@ -62,10 +63,13 @@ MonitorViewData _data({
 
 void main() {
   _accessoryTest();
-  testWidgets('idle page exposes Settings and About actions', (tester) async {
+  testWidgets('idle page exposes Settings, About and shop actions', (
+    tester,
+  ) async {
     var toggles = 0;
     var settings = 0;
     var about = 0;
+    var shop = 0;
     await pumpTestApp(
       tester,
       MonitorPage(
@@ -73,6 +77,7 @@ void main() {
         onToggleMeasurement: () => toggles++,
         onOpenSettings: () async => settings++,
         onOpenAbout: () async => about++,
+        onOpenShop: () async => shop++,
       ),
       scaffold: false,
       disableAnimations: true,
@@ -82,8 +87,9 @@ void main() {
     await tester.tap(find.text(l10nDe.measureStart));
     await tester.tap(find.byTooltip(l10nDe.actionSettings));
     await tester.tap(find.byTooltip(l10nDe.actionAbout));
+    await tester.tap(find.byTooltip(l10nDe.actionShop));
     await tester.pump();
-    expect((toggles, settings, about), (1, 1, 1));
+    expect((toggles, settings, about, shop), (1, 1, 1, 1));
   });
 
   testWidgets('renders measuring zones, timeline and alarm states', (

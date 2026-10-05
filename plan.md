@@ -132,9 +132,9 @@ the cat". Coordinator defaults, to be confirmed by the owner:
 
 | ID | Package | Agent tier | Status |
 | --- | --- | --- | --- |
-| W | Wallet, inventory, persistence, shop controller, star wiring from the monitor | Sonnet | in progress |
-| K1 | Accessory painter layers for Mia | Sonnet | in progress |
-| K2 | Shop page, Settings reset, app composition (after W and K1) | Sonnet | waiting |
+| W | Wallet, inventory, persistence, shop controller, star wiring from the monitor | Sonnet | done, `9d73eb9` |
+| K1 | Accessory painter layers for Mia | Sonnet | done, `7da90e8` |
+| K2 | Shop page, Settings reset, app composition (after W and K1) | Sonnet | done in `0.5.0` |
 
 ## Open: automated quality evidence
 

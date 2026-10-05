@@ -9,6 +9,8 @@
   "@actionSettings": {"description": "Tooltip/label of the settings button."},
   "actionAbout": "Über Raumfreund",
   "@actionAbout": {"description": "Tooltip/label of the about button."},
+  "actionShop": "Sternenladen",
+  "@actionShop": {"description": "Tooltip/label of the star shop button."},
   "actionBack": "Zurück",
   "@actionBack": {"description": "Tooltip of a back/close button."},
 
@@ -281,5 +283,67 @@
   "aboutMeasurementBody": "Die angezeigten Werte sind Schätzungen aus dem Handy-Mikrofon. Raumfreund ist kein geeichtes Schallpegelmessgerät und nicht für Arbeitsschutz oder Gutachten geeignet.",
   "@aboutMeasurementBody": {"description": "Measurement disclaimer."},
   "aboutLicensesButton": "Open-Source-Lizenzen",
-  "@aboutLicensesButton": {"description": "Opens the license page."}
+  "@aboutLicensesButton": {"description": "Opens the license page."},
+
+  "shopTitle": "Sternenladen",
+  "@shopTitle": {"description": "Title of the star shop page."},
+  "shopBalance": "{count, plural, =0{Du hast noch keine Sterne} =1{Du hast 1 Stern} other{Du hast {count} Sterne}}",
+  "@shopBalance": {
+    "description": "Star balance in the shop header.",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "shopLoading": "Sterne werden geladen …",
+  "@shopLoading": {"description": "Shown while the wallet is loading."},
+  "shopLoadFailed": "Sterne werden gerade nur zwischengespeichert. Kaufen und Anlegen gehen erst, wenn der Speicher wieder antwortet.",
+  "@shopLoadFailed": {"description": "Non-blocking hint when loading the wallet failed."},
+  "shopSaveFailed": "Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird bei der nächsten Änderung erneut versucht.",
+  "@shopSaveFailed": {"description": "Non-blocking hint when saving the wallet failed."},
+  "shopDismiss": "Ausblenden",
+  "@shopDismiss": {"description": "Hides the save error hint."},
+  "shopBuy": "Kaufen",
+  "@shopBuy": {"description": "Buy button of a shop item."},
+  "shopEquip": "Anlegen",
+  "@shopEquip": {"description": "Puts an owned item on Mia."},
+  "shopUnequip": "Ablegen",
+  "@shopUnequip": {"description": "Takes an item off Mia."},
+  "shopMissing": "{count, plural, =1{Noch 1 Stern} other{Noch {count} Sterne}}",
+  "@shopMissing": {
+    "description": "Disabled buy button: stars still missing.",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "shopWorn": "Wird getragen",
+  "@shopWorn": {"description": "State of an equipped item."},
+  "shopOwned": "Gekauft",
+  "@shopOwned": {"description": "State of an owned but not worn item."},
+  "shopPrice": "{count, plural, =1{1 Stern} other{{count} Sterne}}",
+  "@shopPrice": {
+    "description": "Price of an item, spoken and shown.",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "shopConfirmTitle": "{item} für {price} kaufen?",
+  "@shopConfirmTitle": {
+    "description": "Purchase confirmation question; price is already formatted.",
+    "placeholders": {"item": {"type": "String"}, "price": {"type": "String"}}
+  },
+  "shopConfirmBuy": "Kaufen",
+  "@shopConfirmBuy": {"description": "Confirms a purchase."},
+  "shopConfirmCancel": "Abbrechen",
+  "@shopConfirmCancel": {"description": "Cancels a purchase or reset."},
+
+  "settingsResetHeading": "Für Lehrkräfte",
+  "@settingsResetHeading": {"description": "Heading of the teacher reset section."},
+  "settingsResetBody": "Löscht alle Sterne und gekauften Sachen im Sternenladen. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.",
+  "@settingsResetBody": {"description": "Explains the teacher reset."},
+  "settingsResetButton": "Sterne zurücksetzen",
+  "@settingsResetButton": {"description": "Opens the reset confirmation."},
+  "settingsResetConfirmTitle": "Alle Sterne und gekauften Sachen löschen?",
+  "@settingsResetConfirmTitle": {"description": "Reset confirmation question."},
+  "settingsResetConfirmBody": "Das kann nicht rückgängig gemacht werden.",
+  "@settingsResetConfirmBody": {"description": "Reset confirmation detail."},
+  "settingsResetConfirm": "Löschen",
+  "@settingsResetConfirm": {"description": "Confirms the reset."},
+  "settingsResetDone": "Alle Sterne und gekauften Sachen wurden gelöscht.",
+  "@settingsResetDone": {"description": "Snackbar after a reset."},
+  "settingsResetNotReady": "Die Sterne werden noch geladen. Bitte versuche es gleich noch einmal.",
+  "@settingsResetNotReady": {"description": "Snackbar when the wallet is not loaded."}
 }

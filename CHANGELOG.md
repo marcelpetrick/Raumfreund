@@ -41,3 +41,4 @@ these lines (see docs/releasing.md).
 * v0.4.9 adds the KittyAccessory catalog contract and the star-shop plan
 * v0.4.10 draws Mia's shop accessories (bow, scarf, party hat, cushion, toy mouse) in every mood and mentions them to screen readers
 * v0.4.11 adds the persistent star wallet and shop logic: quiet-minute stars are kept on the device, items can be bought once and worn for free, and a failed load never overwrites stored stars
+* v0.5.0 adds the star shop: kids spend quiet-minute stars on a bow, scarf, party hat, cushion or toy mouse for Mia, and teachers can reset all stars in Settings

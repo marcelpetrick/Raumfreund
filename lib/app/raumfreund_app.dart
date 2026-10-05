@@ -11,6 +11,7 @@ import '../features/about/infrastructure/platform_app_info.dart';
 import '../features/about/presentation/about_page.dart';
 import '../features/monitor/application/monitor_controller.dart';
 import '../features/monitor/application/monitor_state.dart';
+import '../features/monitor/application/ports.dart';
 import '../features/monitor/infrastructure/platform_monitor_ports.dart';
 import '../features/monitor/presentation/monitor_page.dart';
 import '../features/monitor/presentation/monitor_view_data.dart';
@@ -18,6 +19,11 @@ import '../features/settings/application/settings_controller.dart';
 import '../features/settings/domain/app_settings.dart';
 import '../features/settings/infrastructure/shared_preferences_settings_repository.dart';
 import '../features/settings/presentation/settings_page.dart';
+import '../features/shop/application/shop_controller.dart';
+import '../features/shop/domain/kitty_accessory.dart';
+import '../features/shop/domain/shop_repository.dart';
+import '../features/shop/infrastructure/shared_preferences_shop_repository.dart';
+import '../features/shop/presentation/shop_page.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'theme/app_theme.dart';
 
@@ -31,6 +37,8 @@ class RaumfreundApp extends StatefulWidget {
     this.settingsController,
     this.monitorController,
     this.appInfoPort,
+    this.shopRepository,
+    this.monitorFactory,
     super.key,
   });
 
@@ -43,6 +51,14 @@ class RaumfreundApp extends StatefulWidget {
   /// App-information source override used by integration and widget tests.
   final AppInfoPort? appInfoPort;
 
+  /// Builds the monitor controller from the app's star sink; lets tests use
+  /// fake ports while the star-to-wallet wiring stays the production one.
+  /// Ignored when [monitorController] is set.
+  final MonitorController Function(StarEarnedSink onStarEarned)? monitorFactory;
+
+  /// Star wallet storage override used by integration and widget tests.
+  final ShopRepository? shopRepository;
+
   @override
   State<RaumfreundApp> createState() => _RaumfreundAppState();
 }
@@ -52,6 +68,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
   final _navigatorKey = GlobalKey<NavigatorState>();
   late final SettingsController _settings;
   late final MonitorController _monitor;
+  late final ShopController _shop;
   late final AppInfoPort _appInfoPort;
   AppInfo _appInfo = const AppInfo(
     versionName: '–',
@@ -69,19 +86,29 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     _settings =
         widget.settingsController ??
         SettingsController(SharedPreferencesSettingsRepository());
-    _monitor = widget.monitorController ?? _createMonitor(platform);
+    _shop = ShopController(
+      widget.shopRepository ?? SharedPreferencesShopRepository(),
+    );
+    _monitor =
+        widget.monitorController ??
+        (widget.monitorFactory ?? _createMonitor(platform))(_onStarEarned);
     _appInfoPort = widget.appInfoPort ?? PlatformAppInfoPort();
     unawaited(_loadInitialState());
   }
 
-  MonitorController _createMonitor(PlatformMonitorPorts platform) =>
-      MonitorController(
+  void _onStarEarned() => _shop.earn(1);
+
+  MonitorController Function(StarEarnedSink) _createMonitor(
+    PlatformMonitorPorts platform,
+  ) =>
+      (onStarEarned) => MonitorController(
         permission: platform,
         levelSource: platform,
         alarmOutput: platform,
         screenAwake: platform,
         clock: StopwatchClock(),
         settings: AppSettings.defaults,
+        onStarEarned: onStarEarned,
       );
 
   @override
@@ -98,9 +125,9 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: AnimatedBuilder(
-      animation: Listenable.merge([_monitor, _settings]),
+      animation: Listenable.merge([_monitor, _settings, _shop]),
       builder: (context, _) => MonitorPage(
-        data: _viewData(_monitor.state),
+        data: _viewData(_monitor.state, _shop.wallet.equipped),
         onToggleMeasurement: _initialSettingsReady
             ? () => unawaited(_monitor.toggle())
             : null,
@@ -110,11 +137,13 @@ class _RaumfreundAppState extends State<RaumfreundApp>
         onOpenAndroidSettings: () => unawaited(_monitor.openAppSettings()),
         onOpenSettings: _openSettings,
         onOpenAbout: _openAbout,
+        onOpenShop: _openShop,
       ),
     ),
   );
 
   Future<void> _loadInitialState() async {
+    unawaited(_shop.load());
     await _settings.load();
     await _monitor.applySettings(_settings.settings);
     if (!mounted) return;
@@ -135,6 +164,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
         builder: (_) => SettingsPage(
           initialSettings: _settings.settings,
           onSave: _saveSettings,
+          onResetStars: _shop.resetAll,
         ),
       ),
     );
@@ -143,6 +173,14 @@ class _RaumfreundAppState extends State<RaumfreundApp>
   Future<void> _openAbout() => _navigate((navigator) async {
     await navigator.push<void>(
       MaterialPageRoute(builder: (_) => AboutPage(info: _appInfo)),
+    );
+  });
+
+  Future<void> _openShop() => _navigate((navigator) async {
+    // A failed first load may be transient; retry (shared with a running one).
+    unawaited(_shop.load());
+    await navigator.push<void>(
+      MaterialPageRoute(builder: (_) => ShopPage(controller: _shop)),
     );
   });
 
@@ -173,11 +211,15 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     WidgetsBinding.instance.removeObserver(this);
     _monitor.dispose();
     _settings.dispose();
+    _shop.dispose();
     super.dispose();
   }
 }
 
-MonitorViewData _viewData(MonitorState state) => MonitorViewData(
+MonitorViewData _viewData(
+  MonitorState state,
+  Set<KittyAccessory> accessories,
+) => MonitorViewData(
   phase: _phase(state.status),
   thresholds: state.thresholds,
   levelDb: state.displayLevelDb,
@@ -189,6 +231,7 @@ MonitorViewData _viewData(MonitorState state) => MonitorViewData(
   alarmOutputFailed: state.alarmOutputFailed,
   signalThin: state.signalThin,
   kittyWalkedAway: state.kittyAway,
+  kittyAccessories: accessories,
   stars: state.stars,
   starProgress: state.starProgress,
   starJustEarned: state.starJustEarned,

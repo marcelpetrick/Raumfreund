@@ -25,6 +25,7 @@ class MonitorPage extends StatelessWidget {
     required this.onToggleMeasurement,
     required this.onOpenSettings,
     required this.onOpenAbout,
+    required this.onOpenShop,
     this.onRetry,
     this.onOpenAndroidSettings,
     super.key,
@@ -42,6 +43,9 @@ class MonitorPage extends StatelessWidget {
   /// Stops measurement if needed, then opens About.
   final MonitorNavigationCallback onOpenAbout;
 
+  /// Stops measurement if needed, then opens the star shop.
+  final MonitorNavigationCallback onOpenShop;
+
   /// Retries a failed start.
   final VoidCallback? onRetry;
 
@@ -56,6 +60,11 @@ class MonitorPage extends StatelessWidget {
         appBar: AppBar(
           title: Text(l10n.appTitle),
           actions: [
+            IconButton(
+              onPressed: () => unawaited(onOpenShop()),
+              tooltip: l10n.actionShop,
+              icon: const Icon(Icons.storefront_rounded),
+            ),
             IconButton(
               onPressed: () => unawaited(onOpenSettings()),
               tooltip: l10n.actionSettings,

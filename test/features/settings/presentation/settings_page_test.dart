@@ -60,7 +60,82 @@ Future<void> _open(
   await tester.pumpAndSettle();
 }
 
+Future<void> _pumpWithReset(
+  WidgetTester tester,
+  bool Function() onReset,
+) async {
+  await tester.pumpWidget(
+    testApp(
+      SettingsPage(
+        initialSettings: AppSettings.defaults,
+        onSave: (_) async => true,
+        onResetStars: onReset,
+      ),
+      scaffold: false,
+    ),
+  );
+  await tester.pumpAndSettle();
+  await tester.ensureVisible(find.text(l10nDe.settingsResetButton));
+  await tester.pumpAndSettle();
+}
+
+void _resetTests() {
+  testWidgets('star reset is hidden unless the app offers it', (tester) async {
+    await _open(tester, (_) {});
+    expect(find.text(l10nDe.settingsResetHeading), findsNothing);
+  });
+
+  testWidgets('star reset needs confirmation and can be cancelled', (
+    tester,
+  ) async {
+    var resets = 0;
+    await _pumpWithReset(tester, () {
+      resets++;
+      return true;
+    });
+    expect(find.text(l10nDe.settingsResetBody), findsOneWidget);
+    await tester.tap(find.text(l10nDe.settingsResetButton));
+    await tester.pumpAndSettle();
+    expect(find.text(l10nDe.settingsResetConfirmTitle), findsOneWidget);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text(l10nDe.shopConfirmCancel),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(resets, 0);
+    expect(find.text(l10nDe.settingsResetDone), findsNothing);
+  });
+
+  testWidgets('confirmed star reset runs once and says so', (tester) async {
+    var resets = 0;
+    await _pumpWithReset(tester, () {
+      resets++;
+      return true;
+    });
+    await tester.tap(find.text(l10nDe.settingsResetButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10nDe.settingsResetConfirm));
+    await tester.pumpAndSettle();
+    expect(resets, 1);
+    expect(find.text(l10nDe.settingsResetDone), findsOneWidget);
+  });
+
+  testWidgets('star reset reports a wallet that is not loaded yet', (
+    tester,
+  ) async {
+    await _pumpWithReset(tester, () => false);
+    await tester.tap(find.text(l10nDe.settingsResetButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10nDe.settingsResetConfirm));
+    await tester.pumpAndSettle();
+    expect(find.text(l10nDe.settingsResetNotReady), findsOneWidget);
+  });
+}
+
 void main() {
+  _resetTests();
   testWidgets('renders all controls and cancel discards the draft', (
     tester,
   ) async {

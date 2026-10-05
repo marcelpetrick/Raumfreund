@@ -12,7 +12,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 [![Flutter 3.47.6](https://img.shields.io/badge/Flutter-3.47.6-02569B.svg)](https://docs.flutter.dev/release/archive)
 [![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2.svg)](https://dart.dev/)
 [![Android 7+](https://img.shields.io/badge/Android-7.0%2B-3DDC84.svg)](docs/toolchain.md)
-[![Coverage: 98.07%](https://img.shields.io/badge/coverage-98.07%25-brightgreen.svg)](docs/testing.md)
+[![Coverage: 98.53%](https://img.shields.io/badge/coverage-98.53%25-brightgreen.svg)](docs/testing.md)
 [![Status: release candidate](https://img.shields.io/badge/status-release%20candidate-blue.svg)](plan.md)
 
 Raumfreund is a child-friendly Android noise traffic light for shared rooms.
@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.4.11+38` — code-complete release candidate**
+Current version: **`0.5.0+39` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -78,7 +78,7 @@ build.
   vibration, persisted locally with validated schema migration.
 - Dedicated Settings and About views; navigating away safely stops measurement.
 - German localization, reduced-motion support and responsive phone/tablet UI.
-- Reproducible pinned toolchain, 392 automated tests, 98.07% Dart coverage,
+- Reproducible pinned toolchain, 463 automated tests, 98.53% Dart coverage,
   Android lint, secret/vulnerability scans, Docker packaging and tag releases.
 
 ## Interaction
@@ -99,6 +99,18 @@ The **About** button opens a read-only view with app/version/build details,
 author and project links, the privacy summary, GPL notice and Flutter's
 open-source license view. Opening and closing About follows the same stop and
 no-auto-restart rule.
+
+The **Sternenladen** button (shop icon) opens the star shop: the star balance,
+a preview of Mia with what she currently wears, and five items (bow, scarf,
+party hat, cushion, toy mouse) with their prices. Buying asks for a short
+confirmation; with too few stars the button shows how many are missing.
+Bought items can be put on and taken off at any time. If the stars cannot be
+stored, the shop says so and keeps working in memory. Opening and closing the
+shop follows the same stop and no-auto-restart rule.
+
+Teachers can clear all stars and bought items in **Settings** under
+**Für Lehrkräfte** (**Sterne zurücksetzen**, with a confirmation). This acts
+immediately and is not part of Speichern/Abbrechen.
 
 ## Build and test
 

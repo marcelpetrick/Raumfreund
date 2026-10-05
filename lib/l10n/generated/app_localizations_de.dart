@@ -19,6 +19,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get actionAbout => 'Über Raumfreund';
 
   @override
+  String get actionShop => 'Sternenladen';
+
+  @override
   String get actionBack => 'Zurück';
 
   @override
@@ -379,4 +382,110 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutLicensesButton => 'Open-Source-Lizenzen';
+
+  @override
+  String get shopTitle => 'Sternenladen';
+
+  @override
+  String shopBalance(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Du hast $count Sterne',
+      one: 'Du hast 1 Stern',
+      zero: 'Du hast noch keine Sterne',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shopLoading => 'Sterne werden geladen …';
+
+  @override
+  String get shopLoadFailed =>
+      'Sterne werden gerade nur zwischengespeichert. Kaufen und Anlegen gehen erst, wenn der Speicher wieder antwortet.';
+
+  @override
+  String get shopSaveFailed =>
+      'Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird bei der nächsten Änderung erneut versucht.';
+
+  @override
+  String get shopDismiss => 'Ausblenden';
+
+  @override
+  String get shopBuy => 'Kaufen';
+
+  @override
+  String get shopEquip => 'Anlegen';
+
+  @override
+  String get shopUnequip => 'Ablegen';
+
+  @override
+  String shopMissing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Noch $count Sterne',
+      one: 'Noch 1 Stern',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shopWorn => 'Wird getragen';
+
+  @override
+  String get shopOwned => 'Gekauft';
+
+  @override
+  String shopPrice(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Sterne',
+      one: '1 Stern',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String shopConfirmTitle(String item, String price) {
+    return '$item für $price kaufen?';
+  }
+
+  @override
+  String get shopConfirmBuy => 'Kaufen';
+
+  @override
+  String get shopConfirmCancel => 'Abbrechen';
+
+  @override
+  String get settingsResetHeading => 'Für Lehrkräfte';
+
+  @override
+  String get settingsResetBody =>
+      'Löscht alle Sterne und gekauften Sachen im Sternenladen. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.';
+
+  @override
+  String get settingsResetButton => 'Sterne zurücksetzen';
+
+  @override
+  String get settingsResetConfirmTitle =>
+      'Alle Sterne und gekauften Sachen löschen?';
+
+  @override
+  String get settingsResetConfirmBody =>
+      'Das kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get settingsResetConfirm => 'Löschen';
+
+  @override
+  String get settingsResetDone =>
+      'Alle Sterne und gekauften Sachen wurden gelöscht.';
+
+  @override
+  String get settingsResetNotReady =>
+      'Die Sterne werden noch geladen. Bitte versuche es gleich noch einmal.';
 }
