@@ -56,7 +56,7 @@ must never import it.
 | Area | Responsibility | Current state |
 | --- | --- | --- |
 | `lib/core/` | Monotonic-clock abstraction | Foundation implemented |
-| `lib/features/monitor/domain/` | Zones, validated thresholds, history and alarm rules | Implemented and unit-tested |
+| `lib/features/monitor/domain/` | Zones, zone hysteresis, validated thresholds, peak envelope, history and alarm rules | Implemented and unit-tested |
 | `lib/features/monitor/application/` | Permission/start/stop/session controller and platform ports | Implemented and unit-tested |
 | `lib/features/monitor/infrastructure/` | Channel adapters | Implemented with protocol tests |
 | `lib/features/monitor/presentation/` | Main monitor, gauge, Mia and timeline | Implemented for phone/tablet layouts |
@@ -73,16 +73,19 @@ Android AudioRecord
   -> RMS and dBFS on a native worker
   -> EventChannel {sessionId, dbfs}
   -> session-id filter
-  -> calibration and zone classification
-  -> alarm state machine (raw decision value)
-  -> independent display smoothing/history
-  -> immutable monitor state
+  -> calibration (raw estimated level)
+  -> alarm state machine
+       -> zone hysteresis: raw zone per sample -> confirmed zone
+       -> phases, countdown and the one alarm per phase
+  -> peak envelope -> calmer gauge value and 10-minute timeline
+  -> immutable monitor state (confirmed zone drives UI, stars and Mia)
   -> Flutter widgets
 ```
 
 The raw PCM window is released immediately after its level is calculated. Only
-numeric levels may cross the platform channel. Display smoothing must never
-feed back into the alarm timer. Exact measurement semantics live in
+numeric levels may cross the platform channel. Display smoothing and the
+timeline envelope must never feed back into the alarm timer; the alarm works on
+raw levels through the zone hysteresis only. Exact measurement semantics live in
 [`measurement.md`](measurement.md); the wire contract lives in
 [`platform-channels.md`](platform-channels.md).
 
@@ -107,14 +110,25 @@ is foregrounded. ADR 0003 defines the race-resolution rules.
 
 ## Alarm ownership
 
-The pure domain state machine owns zone phases and elapsed monotonic time. The
-application controller owns the asynchronous alarm output. A phase starts on
-its first valid sample; yellow/red changes start a new phase; green, gaps over
-one second and session termination reset continuity. Each phase can fire once.
+The pure domain state machine owns zones, phases and elapsed monotonic time;
+the application controller owns the asynchronous alarm output. The machine
+first passes every raw zone through the zone hysteresis
+([ADR 0004](adr/0004-zone-hysteresis.md)): a zone is entered when at least
+50 % of the last second is at or above it and left only when it falls below
+15 % of the last 3 s. Only this confirmed zone is exposed, so the traffic
+light, quiet stars and Mia never disagree with the alarm phase.
 
-While the app's own tone/vibration is active, alarm evaluation is suspended.
+A phase starts at the first sample of the loud run that led to its confirmed
+zone. Dips inside the phase count, a quiet tail does not, and the alarm fires
+only on a loud sample once the configured delay (3–60 s, default 10 s) has
+passed, at most once per phase. A confirmed green zone, gaps over one second,
+long stretches of too few samples and session termination reset continuity.
+
+While the app's own tone/vibration is active, readings are dropped entirely:
+they neither advance the alarm nor reach the gauge, timeline or stars.
 Completion resets continuity, and a new phase can begin only on a later valid
-sample. This keeps the alarm from retriggering on its own sound.
+sample. This keeps the alarm from retriggering on its own sound. Mia leaves
+when a red phase alarms and returns only on a settled green zone.
 
 ## Settings and persistence
 
