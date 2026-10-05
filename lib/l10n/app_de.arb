@@ -136,6 +136,11 @@
     "description": "Number of stars earned for quiet minutes.",
     "placeholders": {"count": {"type": "int"}}
   },
+  "starsWithTotal": "{count, plural, =0{Noch keine Sterne heute} =1{1 Stern heute} other{{count} Sterne heute}} · {total} im Sternenladen",
+  "@starsWithTotal": {
+    "description": "Session stars plus the persistent Sternenladen balance.",
+    "placeholders": {"count": {"type": "int"}, "total": {"type": "int"}}
+  },
   "starsHint": "Für jede ruhige Minute gibt es einen Stern",
   "@starsHint": {"description": "Explains the star counter."},
   "starsProgress": "{percent} % bis zum nächsten Stern",

@@ -62,6 +62,7 @@ final class MonitorViewData {
     this.kittyWalkedAway = false,
     this.kittyAccessories = const <KittyAccessory>{},
     this.stars = 0,
+    this.walletStars,
     this.starProgress = 0,
     this.starJustEarned = false,
     this.error,
@@ -112,6 +113,10 @@ final class MonitorViewData {
 
   /// Quiet minutes earned during this app session.
   final int stars;
+
+  /// Stars in the persistent Sternenladen wallet, or null while unknown
+  /// (still loading or failed to load) so no misleading total is shown.
+  final int? walletStars;
 
   /// Progress from 0 to 1 toward the next quiet-minute star.
   final double starProgress;

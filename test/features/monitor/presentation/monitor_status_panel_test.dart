@@ -18,6 +18,8 @@ MonitorViewData _data({
   bool fired = false,
   bool playing = false,
   bool starEarned = false,
+  int stars = 3,
+  int? wallet,
 }) => MonitorViewData(
   phase: phase,
   thresholds: Thresholds.defaults,
@@ -25,7 +27,8 @@ MonitorViewData _data({
   alarmSecondsRemaining: countdown,
   alarmFired: fired,
   alarmPlaying: playing,
-  stars: 3,
+  stars: stars,
+  walletStars: wallet,
   starProgress: .4,
   starJustEarned: starEarned,
 );
@@ -52,6 +55,43 @@ Future<double> _panelHeight(
   return tester.getSize(find.byType(MonitorStatusPanel)).height;
 }
 
+/// Tests for the Sternenladen total in the star line.
+void _totalTests() {
+  testWidgets('shows the Sternenladen total next to the session stars', (
+    tester,
+  ) async {
+    await _panelHeight(tester, _data(stars: 2, wallet: 7), 1);
+    expect(find.text('2 Sterne heute · 7 im Sternenladen'), findsOneWidget);
+
+    await _panelHeight(tester, _data(stars: 0, wallet: 7), 1);
+    expect(
+      find.text('Noch keine Sterne heute · 7 im Sternenladen'),
+      findsOneWidget,
+    );
+
+    await _panelHeight(tester, _data(stars: 1, wallet: 7), 1);
+    expect(find.text('1 Stern heute · 7 im Sternenladen'), findsOneWidget);
+  });
+
+  testWidgets('hides the total while the wallet is unknown', (tester) async {
+    await _panelHeight(tester, _data(stars: 2), 1);
+
+    expect(find.text('2 Sterne'), findsOneWidget);
+    expect(find.textContaining('Sternenladen'), findsNothing);
+  });
+
+  testWidgets('the star semantics label includes the total', (tester) async {
+    final handle = tester.ensureSemantics();
+    await _panelHeight(tester, _data(stars: 2, wallet: 7), 1);
+
+    expect(
+      find.bySemanticsLabel(RegExp('2 Sterne heute · 7 im Sternenladen')),
+      findsOneWidget,
+    );
+    handle.dispose();
+  });
+}
+
 void main() {
   for (final scale in [1.0, 2.0]) {
     testWidgets('panel height is stable across zones at scale $scale', (
@@ -68,6 +108,12 @@ void main() {
         _data(zone: Zone.red, countdown: 0),
         _data(zone: Zone.red, fired: true),
         _data(zone: Zone.red, fired: true, playing: true, starEarned: true),
+        _data(wallet: 7),
+        _data(stars: 0, wallet: 0),
+        _data(stars: 1, wallet: 1),
+        _data(stars: 0, wallet: 999),
+        _data(stars: 120, wallet: 999),
+        _data(wallet: 999, starEarned: true),
       ];
       final heights = <double>[];
       for (final data in variants) {
@@ -76,6 +122,8 @@ void main() {
       expect(heights.toSet(), hasLength(1), reason: '$heights');
     });
   }
+
+  _totalTests();
 
   testWidgets('only the visible variant is exposed to semantics', (
     tester,

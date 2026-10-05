@@ -180,6 +180,18 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String starsWithTotal(int count, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Sterne heute',
+      one: '1 Stern heute',
+      zero: 'Noch keine Sterne heute',
+    );
+    return '$_temp0 · $total im Sternenladen';
+  }
+
+  @override
   String get starsHint => 'Für jede ruhige Minute gibt es einen Stern';
 
   @override

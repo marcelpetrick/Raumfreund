@@ -20,7 +20,6 @@ import '../features/settings/domain/app_settings.dart';
 import '../features/settings/infrastructure/shared_preferences_settings_repository.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/shop/application/shop_controller.dart';
-import '../features/shop/domain/kitty_accessory.dart';
 import '../features/shop/domain/shop_repository.dart';
 import '../features/shop/infrastructure/shared_preferences_shop_repository.dart';
 import '../features/shop/presentation/shop_page.dart';
@@ -127,7 +126,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     home: AnimatedBuilder(
       animation: Listenable.merge([_monitor, _settings, _shop]),
       builder: (context, _) => MonitorPage(
-        data: _viewData(_monitor.state, _shop.wallet.equipped),
+        data: _viewData(_monitor.state, _shop),
         onToggleMeasurement: _initialSettingsReady
             ? () => unawaited(_monitor.toggle())
             : null,
@@ -216,27 +215,30 @@ class _RaumfreundAppState extends State<RaumfreundApp>
   }
 }
 
-MonitorViewData _viewData(
-  MonitorState state,
-  Set<KittyAccessory> accessories,
-) => MonitorViewData(
-  phase: _phase(state.status),
-  thresholds: state.thresholds,
-  levelDb: state.displayLevelDb,
-  zone: state.zone,
-  history: state.history,
-  alarmSecondsRemaining: _seconds(state.remainingUntilAlarm),
-  alarmFired: state.alarmFiredInPhase,
-  alarmPlaying: state.alarmPlaying,
-  alarmOutputFailed: state.alarmOutputFailed,
-  signalThin: state.signalThin,
-  kittyWalkedAway: state.kittyAway,
-  kittyAccessories: accessories,
-  stars: state.stars,
-  starProgress: state.starProgress,
-  starJustEarned: state.starJustEarned,
-  error: _error(state.failure),
-);
+MonitorViewData _viewData(MonitorState state, ShopController shop) =>
+    MonitorViewData(
+      phase: _phase(state.status),
+      thresholds: state.thresholds,
+      levelDb: state.displayLevelDb,
+      zone: state.zone,
+      history: state.history,
+      alarmSecondsRemaining: _seconds(state.remainingUntilAlarm),
+      alarmFired: state.alarmFiredInPhase,
+      alarmPlaying: state.alarmPlaying,
+      alarmOutputFailed: state.alarmOutputFailed,
+      signalThin: state.signalThin,
+      kittyWalkedAway: state.kittyAway,
+      kittyAccessories: shop.wallet.equipped,
+      stars: state.stars,
+      // Before a successful load the wallet only holds this session's stars, so
+      // showing it as the total would be misleading.
+      walletStars: shop.isLoading || shop.loadFailed
+          ? null
+          : shop.wallet.balance,
+      starProgress: state.starProgress,
+      starJustEarned: state.starJustEarned,
+      error: _error(state.failure),
+    );
 
 MonitorPhase _phase(MonitorStatus status) => switch (status) {
   MonitorStatus.stopped => MonitorPhase.idle,

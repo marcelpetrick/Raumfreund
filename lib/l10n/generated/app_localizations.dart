@@ -388,6 +388,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{Noch keine Sterne} =1{1 Stern} other{{count} Sterne}}'**
   String starsCount(int count);
 
+  /// Session stars plus the persistent Sternenladen balance.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Noch keine Sterne heute} =1{1 Stern heute} other{{count} Sterne heute}} · {total} im Sternenladen'**
+  String starsWithTotal(int count, int total);
+
   /// Explains the star counter.
   ///
   /// In de, this message translates to:

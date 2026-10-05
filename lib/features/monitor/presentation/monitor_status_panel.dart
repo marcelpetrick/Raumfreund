@@ -165,12 +165,20 @@ class _QuietStars extends StatelessWidget {
 
   final MonitorViewData data;
 
+  /// Session stars, plus the wallet total once it is known.
+  String _sessionText(AppLocalizations l10n) {
+    final total = data.walletStars;
+    return total == null
+        ? l10n.starsCount(data.stars)
+        : l10n.starsWithTotal(data.stars, total);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final percent = (data.starProgress * 100).round();
     return Semantics(
-      label: '${l10n.starsCount(data.stars)}. ${l10n.starsProgress(percent)}',
+      label: '${_sessionText(l10n)}. ${l10n.starsProgress(percent)}',
       child: Column(
         children: [
           Row(
@@ -183,8 +191,15 @@ class _QuietStars extends StatelessWidget {
                 child: StableText(
                   text: data.starJustEarned
                       ? l10n.starsJustEarned
-                      : l10n.starsCount(data.stars),
-                  variants: [l10n.starsJustEarned, l10n.starsCount(data.stars)],
+                      : _sessionText(l10n),
+                  variants: [
+                    l10n.starsJustEarned,
+                    _sessionText(l10n),
+                    // Longest realistic totals: 0 stars today with a 3-digit
+                    // wallet, and the widest session count with it.
+                    l10n.starsWithTotal(0, 999),
+                    l10n.starsWithTotal(data.stars, 999),
+                  ],
                   textAlign: TextAlign.center,
                 ),
               ),

@@ -131,15 +131,39 @@ void _shopTests() {
       {KittyAccessory.bow},
     );
 
+    expect(find.text(l10nDe.starsWithTotal(0, 2)), findsOneWidget);
+
     await tester.tap(find.text(l10nDe.measureStart));
     await _finishAsyncWork(tester);
     monitor.readings(greenDbfs, 601);
     await _finishAsyncWork(tester);
     expect(repository.stored.balance, 3);
+    // The visible slot says "Neuer Stern!" right after the earn.
+    expect(find.text(l10nDe.starsJustEarned), findsOneWidget);
 
     await tester.tap(find.byTooltip(l10nDe.actionShop));
     await _finishWithRealAsync(tester);
     expect(find.text(l10nDe.shopBalance(3)), findsOneWidget);
+  });
+
+  testWidgets('the monitor shows no total while the wallet fails to load', (
+    tester,
+  ) async {
+    final repository = InMemoryShopRepository()
+      ..loadException = Exception('storage down');
+    await tester.pumpWidget(
+      RaumfreundApp(
+        settingsController: SettingsController(InMemorySettingsRepository()),
+        monitorFactory: (onStarEarned) =>
+            MonitorHarness(onStarEarned: onStarEarned).controller,
+        shopRepository: repository,
+        appInfoPort: const _FakeAppInfoPort(),
+      ),
+    );
+    await _finishAsyncWork(tester);
+
+    expect(find.text(l10nDe.starsCount(0)), findsOneWidget);
+    expect(find.textContaining('Sternenladen'), findsNothing);
   });
 }
 

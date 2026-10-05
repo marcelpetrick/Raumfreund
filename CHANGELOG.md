@@ -43,3 +43,4 @@ these lines (see docs/releasing.md).
 * v0.4.11 adds the persistent star wallet and shop logic: quiet-minute stars are kept on the device, items can be bought once and worn for free, and a failed load never overwrites stored stars
 * v0.5.0 adds the star shop: kids spend quiet-minute stars on a bow, scarf, party hat, cushion or toy mouse for Mia, and teachers can reset all stars in Settings
 * v0.5.1 documents the emulator smoke tests and the emulator crash seen on the development host
+* v0.5.2 shows the Sternenladen total next to today's stars on the monitor
