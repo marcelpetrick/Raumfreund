@@ -39,8 +39,14 @@ class StableText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final centered = textAlign == TextAlign.center;
-    // Same style resolution as Text, so measuring and visible text agree.
-    final effectiveStyle = DefaultTextStyle.of(context).style.merge(style);
+    // Same style resolution as Text, so measuring and visible text agree,
+    // including Android's "bold text" accessibility setting.
+    var effectiveStyle = DefaultTextStyle.of(context).style.merge(style);
+    if (MediaQuery.boldTextOf(context)) {
+      effectiveStyle = effectiveStyle.merge(
+        const TextStyle(fontWeight: FontWeight.bold),
+      );
+    }
     return Stack(
       // Passthrough keeps the incoming tight width, so wrapping matches the
       // surrounding layout.

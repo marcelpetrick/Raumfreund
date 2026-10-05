@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
-import 'dart:ui' show Size;
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/features/monitor/domain/thresholds.dart';
 import 'package:raumfreund/features/monitor/domain/zone.dart';
@@ -95,5 +94,26 @@ void main() {
 
     final slot = find.byType(StableText).at(1);
     expect(tester.getSize(slot).height, greaterThan(0));
+  });
+
+  testWidgets('measuring copies follow the bold text setting', (tester) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(boldText: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    await _panelHeight(tester, _data(zone: Zone.red, fired: true), 1);
+
+    final hidden = find.descendant(
+      of: find.byType(StableText).at(1),
+      matching: find.byType(RichText),
+    );
+    final styles = [
+      for (final element in hidden.evaluate())
+        (element.widget as RichText).text.style,
+    ];
+    expect(styles, isNotEmpty);
+    expect(
+      styles.every((style) => style?.fontWeight == FontWeight.bold),
+      isTrue,
+    );
   });
 }

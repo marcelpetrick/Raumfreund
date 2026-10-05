@@ -31,3 +31,4 @@ these lines (see docs/releasing.md).
 * v0.3.1 shows real screenshots in the README, documents the release command and records the emulator smoke test
 * v0.4.0 makes the alarm delay configurable in Settings (3–60 s, default 10 s); settings schema v2 migrates older data to 10 s, and older app versions reading v2 data fall back to defaults
 * v0.4.1 brings docs/architecture.md in line with the zone hysteresis, envelope and configurable delay
+* v0.4.2 keeps the reserved status text height correct with Android's bold text setting
