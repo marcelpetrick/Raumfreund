@@ -27,3 +27,20 @@ Open device acceptance work:
 - TalkBack, large text and reduced-motion checks on real hardware.
 
 These checks are never claimed from an emulator-only run.
+
+## Emulator smoke tests and a known emulator defect
+
+Manual emulator checks on 2026-10-04/05 (Android 16 / API 36 and Android 14 /
+API 34 images, emulator 36.6.11, Linux host) confirmed: in-place update over
+earlier debug releases, settings migration and persistence across restarts,
+the start of a measurement in the confirmed green zone, and the rendering of
+the monitor, Settings and Sternenladen pages.
+
+The emulator process itself (`qemu-system-x86_64-headless`) repeatedly died
+with SIGSEGV on this host: around microphone start/stop, while scrolling the
+shop page and once during boot before the app was launched, with
+`swiftshader_indirect` and with `guest` rendering, with and without host
+audio. Core dumps show a smashed host stack, and the crash during boot rules
+out the app as the cause. Longer emulator sessions (earning stars, the red
+zone, alarms) are therefore not possible on this host; they belong to the
+real-device checks above.
