@@ -74,8 +74,9 @@ integrates, bumps the version, runs the full pipeline and commits.
 | S | Configurable alarm delay in Settings (3–60 s, default 10 s) | Opus | done in `0.4.0` |
 | R | Independent review of A (4 rounds) and T | Opus | done; no blocking findings |
 | P | README with real screenshots, vision/docs sync | Coordinator | done in `0.3.1` |
-| Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.3.0-build25`; next one after S |
-| — | Run `/reviewBranch` over all changes since `c40ec1a` and fix findings | Coordinator | open |
+| Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.4.5-build32` is the latest release |
+| — | Run `/reviewBranch` over all changes since `c40ec1a` and fix findings | Coordinator | done: 3 findings plus 4 reviewer notes fixed (`9a490b9`, `cf5e1f0`, `b386f3c`, `605e688`) |
+| — | `/updateDependencies` | Coordinator | done: Docker base digests updated (`e7b4533`); everything else current or held on purpose |
 
 ### Hysteresis decisions (package A)
 
@@ -102,6 +103,14 @@ Four review rounds with probe tests shaped the rule; details are in
   a possible follow-up.
 - Pauses of up to about 2.5 s inside a loud phase count towards the delay.
 - The countdown may wait just above zero until the next loud sample.
+
+### Latest release check (2026-10-05)
+
+`debug-v0.4.5-build32` (commit `e7b4533`): downloaded from GitHub, checksum
+verified, `minSdkVersion` 24, permissions microphone and vibration only. On
+the Android 16 emulator it updates 0.3.0 in place, the Settings show the new
+alarm delay (migrated to 10 s), and a changed value of 15 s survives saving
+and an app restart. No app crash was logged.
 
 ## Open: automated quality evidence
 
