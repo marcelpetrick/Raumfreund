@@ -11,8 +11,12 @@ or tracking, and its release manifest requests no Internet permission.
 
 Persisted data is limited to the user's thresholds, calibration correction,
 alarm delay, alarm-sound choice, vibration choice and a settings schema
-version. Numeric
-history and stars disappear when the process exits. Logs contain neither audio
+version. The star shop
+additionally stores the star balance and the names of the bought and worn
+Kitty accessories (for example `bow`), only on the device, as one snapshot
+with a schema version; the teacher can delete it with "Sterne
+zurücksetzen". Numeric history and the level readings disappear when the
+process exits. Logs contain neither audio
 content nor personal data.
 
 Android microphone permission is requested only when measurement starts. A

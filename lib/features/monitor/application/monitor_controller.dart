@@ -42,6 +42,7 @@ final class MonitorController extends ChangeNotifier {
     required AppSettings settings,
     LevelHistory? history,
     QuietStars? stars,
+    this._onStarEarned = ignoreStarEarned,
   }) : _settings = settings,
        _sessionSettings = settings,
        _history = history ?? LevelHistory(),
@@ -59,6 +60,7 @@ final class MonitorController extends ChangeNotifier {
   final MonotonicClock _clock;
   final LevelHistory _history;
   final QuietStars _stars;
+  final StarEarnedSink _onStarEarned;
   final DisplaySmoother _smoother = DisplaySmoother();
 
   AppSettings _settings;
@@ -285,6 +287,8 @@ final class MonitorController extends ChangeNotifier {
     final zone = snapshot.zone;
     _history.add(timestamp: now, levelDb: level);
     if (zone != null) _stars.onSample(timestamp: now, zone: zone);
+    // Exactly once per star: earnedStarNow is true only after that sample.
+    if (zone != null && _stars.earnedStarNow) _onStarEarned();
     _emit(
       _state.copyWith(
         displayLevelDb: display,

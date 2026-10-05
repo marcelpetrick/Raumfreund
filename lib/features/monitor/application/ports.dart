@@ -110,3 +110,12 @@ abstract interface class ScreenAwakePort {
   /// Enables or disables the keep-screen-on flag of the activity.
   Future<void> setKeepScreenOn({required bool enabled});
 }
+
+/// Called exactly once for every quiet-minute star the monitor earns.
+///
+/// Lets the app composition feed a persistent star wallet without the
+/// monitor knowing about the shop. Must not throw and returns immediately.
+typedef StarEarnedSink = void Function();
+
+/// The default [StarEarnedSink]: ignores the star.
+void ignoreStarEarned() {}

@@ -3,6 +3,7 @@
 
 import 'package:raumfreund/features/monitor/application/monitor_controller.dart';
 import 'package:raumfreund/features/monitor/application/monitor_state.dart';
+import 'package:raumfreund/features/monitor/application/ports.dart';
 import 'package:raumfreund/features/settings/domain/app_settings.dart';
 
 import 'fake_alarm_output.dart';
@@ -24,7 +25,7 @@ const double redDbfs = 0;
 /// Controller wired to fakes, recording every emitted status.
 final class MonitorHarness {
   /// Creates the harness with [settings] (defaults if omitted).
-  MonitorHarness({AppSettings? settings}) {
+  MonitorHarness({AppSettings? settings, StarEarnedSink? onStarEarned}) {
     controller = MonitorController(
       permission: permission,
       levelSource: source,
@@ -32,6 +33,7 @@ final class MonitorHarness {
       screenAwake: screen,
       clock: clock,
       settings: settings ?? AppSettings.defaults,
+      onStarEarned: onStarEarned ?? ignoreStarEarned,
     );
     controller.addListener(() => statuses.add(controller.state.status));
   }

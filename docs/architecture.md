@@ -61,6 +61,7 @@ must never import it.
 | `lib/features/monitor/infrastructure/` | Channel adapters | Implemented with protocol tests |
 | `lib/features/monitor/presentation/` | Main monitor, gauge, Mia and timeline | Implemented for phone/tablet layouts |
 | `lib/features/settings/` | Valid settings, persistence and Settings view | Implemented with schema validation |
+| `lib/features/shop/` | Kitty accessory catalog, star wallet and inventory, persistence and shop controller (logic only so far) | Implemented with schema validation |
 | `lib/features/about/` | App information and About view | Implemented |
 | `lib/l10n/` | All user-visible German strings | Implemented in ARB/generated files |
 | `android/app/src/main/kotlin/` | Recorder, permission, alarm and channel host | Implemented with JVM tests |
@@ -139,6 +140,23 @@ missing or invalid values. Future migrations are explicit and tested.
 The Settings view edits a draft. Save validates and writes atomically; cancel
 does not mutate active or persisted settings. Threshold changes never affect a
 running session because navigation stops measurement first.
+
+## Star shop
+
+`lib/features/shop/` follows the settings pattern: an immutable, always-valid
+`StarWallet` (balance, owned and equipped items; typed `PurchaseResult`),
+a `ShopRepository` port, `SharedPreferencesShopRepository` (own `shop.`
+namespace, one JSON snapshot, schema version 1, per-field repair, newer or
+unreadable data loads an empty wallet) and `ShopController`, which applies
+changes immediately, saves them serialized and coalesced, and reports save
+failures in `saveFailed` instead of throwing.
+
+Dependency direction: shop depends on nothing but the shared
+`PreferencesStore` abstraction of settings; the monitor feature does not
+import shop. The monitor reports every earned quiet-minute star through the
+`StarEarnedSink` port (default no-op), and the composition root connects it
+to `ShopController.earn(1)`. Stars of a session that run before the wallet
+has loaded are added to it after loading.
 
 ## Composition and test seams
 
