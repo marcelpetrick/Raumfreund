@@ -8,8 +8,10 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 `./localPipeline.sh` is the authoritative gate. It verifies formatting,
 analysis, the 100-line function limit, shell/Python/Kotlin tooling, docs and
 workflow YAML, secret and vulnerability scans, Dart/JVM/widget tests, at least
-95% line coverage for measurable first-party Dart, Android lint, APK creation
-and the Docker package.
+95% line coverage for measurable first-party Dart, Android lint, APK creation,
+the privacy gate (`tool/check_privacy.sh`: release-APK permission allowlist
+plus a scan for audio-persisting and network APIs, see
+[`privacy.md`](privacy.md)) and the Docker package.
 
 Automated tests cover the alarm state machine, measurement/session races,
 permission outcomes, stale events, settings migrations, channel payloads,

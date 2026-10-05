@@ -19,6 +19,7 @@ globally. Supported platform for downloads: **Linux x86_64** only.
 | `check_function_length.sh` | Enforces max. 100 physical lines per function (`--max N` to override) with both parser-based checkers over `lib/`, `test/`, `integration_test/`, `tool/`, `android/app/src/` and every `*.sh`. | 0 ok; 1 violations; 2 usage, setup or parse error |
 | `check_secrets.sh` | Scans Git history and the source worktree with gitleaks without copying ignored SDK/build caches. | gitleaks status; 2 if the pinned tool is absent |
 | `kotlin_lint.sh` | Runs pinned ktlint and detekt over the Android Kotlin sources. | tool status; 2 if a tool is absent |
+| `check_privacy.sh` | Privacy gate: release APK permissions against an allowlist (`aapt2 dump badging`), forbidden audio-persisting/network APIs in Kotlin and Dart, network/analytics dependencies in `pubspec.yaml`. `--source-only`, `--apk-only`, `--apk FILE`. Pipeline step `privacy`. | 0 ok; 1 violation; 2 usage/missing APK or aapt2 |
 | `build_apk.sh` | Builds named release-mode APK/AAB artifacts, checksums and version metadata in `dist/`; unsigned local builds are explicitly `-debugsigned`. | 0 success; 1 build failure; 2 usage |
 | `release_debug.sh` | One-command public debug APK release: preconditions, local build with this machine's debug keystore (CI keystores differ per run and could not update installs), verification, notes, tag and `gh release create --latest`; `--dry-run` skips tag/push/publish. | 0 success; 1 precondition/build/verification failure; 2 usage/tool missing |
 | `write_signing_config.sh` | Materializes/removes ignored Android signing files from CI secrets. | 0 success; 1 missing/invalid secret |
@@ -34,6 +35,9 @@ tool/flutter.sh --ensure
 tool/install_tools.sh
 tool/check_function_length.sh
 ```
+
+`lib/android_sdk.sh` is a sourced helper (not executable) that finds the newest
+Android build-tools; `release_debug.sh` and `check_privacy.sh` share it.
 
 ## Pinned binary tools
 

@@ -28,6 +28,8 @@ set -euo pipefail
 
 root_dir="${RAUMFREUND_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 dist="${root_dir}/dist"
+# shellcheck source=tool/lib/android_sdk.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/android_sdk.sh"
 package_id="it.marcelpetrick.raumfreund"
 dry_run=0
 aapt2=""
@@ -89,13 +91,8 @@ check_preconditions() {
 
 # Sets aapt2 and apksigner from the newest build-tools directory.
 locate_sdk_tools() {
-	local sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-${HOME}/Android/Sdk}}" newest
-	newest="$(find "${sdk}/build-tools" -mindepth 1 -maxdepth 1 -type d 2>/dev/null |
-		sort -V | tail -n 1)"
-	[[ -n "${newest}" ]] || {
-		echo "release_debug: no Android build-tools below ${sdk}" >&2
-		exit 2
-	}
+	local newest
+	newest="$(newest_build_tools)" || exit 2
 	aapt2="${newest}/aapt2"
 	apksigner="${newest}/apksigner"
 	[[ -x "${aapt2}" && -x "${apksigner}" ]] || {

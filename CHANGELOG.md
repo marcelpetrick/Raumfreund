@@ -36,3 +36,4 @@ these lines (see docs/releasing.md).
 * v0.4.4 removes the pushed tag again when creating the GitHub release fails, so the release command can simply be retried
 * v0.4.5 updates the Docker base images (Temurin 21 JDK, unprivileged nginx) to their current digests
 * v0.4.6 records the 0.4.5 debug release, its smoke test and the finished review and dependency steps in plan.md
+* v0.4.7 adds a privacy gate to the pipeline and CI: the release APK may only request microphone and vibration, and app code may not use audio-writing or network APIs

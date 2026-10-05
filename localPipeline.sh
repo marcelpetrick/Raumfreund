@@ -27,6 +27,7 @@
 #   test        flutter test with coverage
 #   coverage    line coverage gate (>= 95 %) on own Dart code
 #   apk         flutter build apk --debug
+#   privacy     privacy gate: source scan + release APK permissions (tool/check_privacy.sh)
 #   docker      build the Docker image and verify it (tool/docker_check.sh)
 #
 # Usage:
@@ -48,7 +49,7 @@ TOOLS="${ROOT_DIR}/.toolchain/bin"
 VENV="${ROOT_DIR}/.toolchain/venv/bin"
 CHECKER_DIR="${ROOT_DIR}/tool/function_length/dart"
 COVERAGE_MIN_LINE_PERCENT="95.0"
-ALL_STEPS=(toolchain tools deps format analyze fnlen shell python tooltests docs yaml secrets vulns kotlin native test coverage apk docker)
+ALL_STEPS=(toolchain tools deps format analyze fnlen shell python tooltests docs yaml secrets vulns kotlin native test coverage apk privacy docker)
 VERBOSE=0
 ONLY=""
 SKIP=""
@@ -56,7 +57,7 @@ FAILED=0
 declare -a SUMMARY_LINES=()
 
 print_usage() {
-	sed -n '5,30p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+	sed -n '5,42p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 info() { printf '[INFO] %s\n' "$*"; }
@@ -179,6 +180,16 @@ step_coverage() {
 }
 
 step_apk() { run_logged apk "${FLUTTER}" build apk --debug; }
+
+# The debug APK of the apk step legitimately holds INTERNET (hot reload), so
+# the permission proof builds the release variant it ships: without
+# android/key.properties Gradle signs it with the debug key, which is fine here.
+step_privacy() {
+	run_logged privacy "${ROOT_DIR}/tool/check_privacy.sh" --source-only &&
+		run_logged privacy "${FLUTTER}" build apk --release &&
+		run_logged privacy "${ROOT_DIR}/tool/check_privacy.sh" --apk-only
+}
+
 step_docker() { run_logged docker "${ROOT_DIR}/tool/docker_check.sh"; }
 
 # Explicit dispatch (instead of calling "step_${step}") keeps every call
@@ -203,6 +214,7 @@ dispatch_step() {
 	test) step_test ;;
 	coverage) step_coverage ;;
 	apk) step_apk ;;
+	privacy) step_privacy ;;
 	docker) step_docker ;;
 	*) error "No implementation for step '$1'" && return 1 ;;
 	esac
