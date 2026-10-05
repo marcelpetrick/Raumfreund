@@ -6,9 +6,11 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/app/theme/app_colors.dart';
+import 'package:raumfreund/features/monitor/presentation/kitty/kitty_accessories.dart';
 import 'package:raumfreund/features/monitor/presentation/kitty/kitty_character.dart';
 import 'package:raumfreund/features/monitor/presentation/kitty/kitty_painter.dart';
 import 'package:raumfreund/features/monitor/presentation/kitty/kitty_pose.dart';
+import 'package:raumfreund/features/shop/domain/kitty_accessory.dart';
 
 import '../../../../shared/widgets/test_app.dart';
 
@@ -16,6 +18,7 @@ Widget _kitty({
   required KittyMood mood,
   bool walkedAway = false,
   bool reduceMotion = false,
+  Set<KittyAccessory> accessories = const {},
 }) => Center(
   child: SizedBox(
     width: 240,
@@ -24,6 +27,7 @@ Widget _kitty({
       mood: rt(mood),
       walkedAway: rt(walkedAway),
       reduceMotion: rt(reduceMotion),
+      accessories: accessories,
     ),
   ),
 );
@@ -33,10 +37,16 @@ Future<void> _pump(
   required KittyMood mood,
   bool walkedAway = false,
   bool reduceMotion = false,
+  Set<KittyAccessory> accessories = const {},
 }) async {
   await tester.pumpWidget(
     testApp(
-      _kitty(mood: mood, walkedAway: walkedAway, reduceMotion: reduceMotion),
+      _kitty(
+        mood: mood,
+        walkedAway: walkedAway,
+        reduceMotion: reduceMotion,
+        accessories: accessories,
+      ),
       scaffold: false,
     ),
   );
@@ -47,6 +57,7 @@ void main() {
   _poseTests();
   _painterTests();
   _characterTests();
+  _accessoryTests();
 }
 
 void _poseTests() {
@@ -277,6 +288,96 @@ void _characterTests() {
         KittyMood.scared.describe(l10nDe),
         'Mia hat Angst – es ist viel zu laut',
       );
+    });
+  });
+}
+
+/// None, each single item and all of them.
+List<Set<KittyAccessory>> _accessorySamples() => [
+  const {},
+  for (final item in KittyAccessory.values) {item},
+  KittyAccessory.values.toSet(),
+];
+
+void _accessoryTests() {
+  group('Kitty accessories', () {
+    test('paint in every mood, subset and walk state without errors', () {
+      for (final mood in KittyMood.values) {
+        for (final items in _accessorySamples()) {
+          for (final walk in [0.0, 0.5, 1.0]) {
+            for (final running in [false, true]) {
+              final recorder = ui.PictureRecorder();
+              KittyPainter(
+                mood: mood,
+                phase: 0.3,
+                walk: walk,
+                running: running,
+                accessories: items,
+              ).paint(Canvas(recorder), const Size(240, 224));
+              recorder.endRecording().dispose();
+            }
+          }
+        }
+      }
+    });
+
+    test('repaint when the worn items change, not when they stay equal', () {
+      const base = KittyPainter(mood: KittyMood.happy, phase: 0, walk: 0);
+      const bow = KittyPainter(
+        mood: KittyMood.happy,
+        phase: 0,
+        walk: 0,
+        accessories: {KittyAccessory.bow},
+      );
+      expect(base.shouldRepaint(bow), isTrue);
+      expect(
+        bow.shouldRepaint(
+          const KittyPainter(
+            mood: KittyMood.happy,
+            phase: 0,
+            walk: 0,
+            accessories: {KittyAccessory.bow},
+          ),
+        ),
+        isFalse,
+      );
+    });
+
+    test('every item has a German name', () {
+      expect(
+        [for (final item in KittyAccessory.values) item.describe(l10nDe)],
+        ['Schleife', 'Schal', 'Partyhut', 'Kissen', 'Spielzeugmaus'],
+      );
+    });
+
+    testWidgets('label lists what Mia wears in catalog order', (tester) async {
+      final handle = tester.ensureSemantics();
+      await _pump(
+        tester,
+        mood: KittyMood.happy,
+        reduceMotion: true,
+        accessories: const {KittyAccessory.scarf, KittyAccessory.bow},
+      );
+      expect(
+        tester.getSemantics(find.byType(KittyCharacter)),
+        matchesSemantics(
+          label: 'Mia ist fröhlich und schnurrt. Mia trägt: Schleife, Schal',
+          isImage: true,
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('animated Mia with all items keeps the mood label', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        mood: KittyMood.scared,
+        walkedAway: true,
+        accessories: KittyAccessory.values.toSet(),
+      );
+      expect(find.bySemanticsLabel(RegExp('Mia trägt')), findsOneWidget);
     });
   });
 }

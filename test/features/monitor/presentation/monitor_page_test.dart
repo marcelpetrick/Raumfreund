@@ -9,6 +9,7 @@ import 'package:raumfreund/features/monitor/domain/zone.dart';
 import 'package:raumfreund/features/monitor/presentation/kitty/kitty_character.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_page.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_view_data.dart';
+import 'package:raumfreund/features/shop/domain/kitty_accessory.dart';
 
 import '../../../shared/widgets/test_app.dart';
 
@@ -36,6 +37,7 @@ MonitorViewData _data({
   bool alarmPlaying = false,
   bool alarmOutputFailed = false,
   int? countdown,
+  Set<KittyAccessory> accessories = const {},
 }) => MonitorViewData(
   phase: phase,
   thresholds: Thresholds.defaults,
@@ -51,6 +53,7 @@ MonitorViewData _data({
   alarmPlaying: alarmPlaying,
   alarmOutputFailed: alarmOutputFailed,
   kittyWalkedAway: zone == Zone.red && alarmFired,
+  kittyAccessories: accessories,
   stars: 2,
   starProgress: .5,
   starJustEarned: alarmPlaying,
@@ -58,6 +61,7 @@ MonitorViewData _data({
 );
 
 void main() {
+  _accessoryTest();
   testWidgets('idle page exposes Settings and About actions', (tester) async {
     var toggles = 0;
     var settings = 0;
@@ -145,5 +149,24 @@ void main() {
     final away = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
     expect(away.mood, KittyMood.scared);
     expect(away.walkedAway, isTrue);
+  });
+}
+
+void _accessoryTest() {
+  testWidgets('hands the worn accessories to Mia in both layouts', (
+    tester,
+  ) async {
+    const worn = {KittyAccessory.bow, KittyAccessory.mouse};
+    await _pumpPage(tester, _data(accessories: worn));
+    expect(
+      tester.widget<KittyCharacter>(find.byType(KittyCharacter)).accessories,
+      worn,
+    );
+    setScreenSize(tester, const Size(1000, 900));
+    await _pumpPage(tester, _data(accessories: worn));
+    expect(
+      tester.widget<KittyCharacter>(find.byType(KittyCharacter)).accessories,
+      worn,
+    );
   });
 }

@@ -3,8 +3,11 @@
 
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show setEquals;
 import 'package:flutter/rendering.dart';
 
+import '../../../shop/domain/kitty_accessory.dart';
+import 'kitty_accessories.dart';
 import 'kitty_body.dart';
 import 'kitty_effects.dart';
 import 'kitty_face.dart';
@@ -26,6 +29,7 @@ class KittyPainter extends CustomPainter {
     required this.phase,
     required this.walk,
     this.running = false,
+    this.accessories = const <KittyAccessory>{},
   });
 
   /// Mood to draw.
@@ -39,6 +43,11 @@ class KittyPainter extends CustomPainter {
 
   /// Whether the walk is a scared run away (false: calm walk back).
   final bool running;
+
+  /// Items Mia wears or plays with.
+  ///
+  /// Everything she wears moves with her; the toy mouse stays on the stage.
+  final Set<KittyAccessory> accessories;
 
   /// Fleeing Mia is scared whatever the current zone says.
   KittyMood get _shown => running ? KittyMood.scared : mood;
@@ -69,6 +78,7 @@ class KittyPainter extends CustomPainter {
       ..scale(scale);
     paintStage(canvas, _shown.glowColor);
     if (walk > 0) paintPawPrints(canvas, walkDx);
+    if (accessories.contains(KittyAccessory.mouse)) paintMouse(canvas);
     canvas
       ..save()
       ..translate(walkDx + pose.shakeDx, pose.bobDy);
@@ -81,10 +91,7 @@ class KittyPainter extends CustomPainter {
   void _paintKitty(Canvas canvas, KittyPose pose) {
     _paintAura(canvas);
     for (final layer in KittyLayer.values) {
-      paintTail(canvas, pose, layer);
-      paintBody(canvas, layer);
-      paintPaws(canvas, pose, layer);
-      paintHead(canvas, pose, layer);
+      _paintLayer(canvas, pose, layer);
     }
     canvas.save();
     // While walking, the face is shifted sideways so that Mia appears to
@@ -104,6 +111,26 @@ class KittyPainter extends CustomPainter {
     }
   }
 
+  /// One silhouette pass. Cushion goes below everything, the scarf between
+  /// body and head, bow and hat on top of the head; none of them reaches the
+  /// face, which is painted afterwards anyway.
+  void _paintLayer(Canvas canvas, KittyPose pose, KittyLayer layer) {
+    if (accessories.contains(KittyAccessory.cushion)) {
+      paintCushion(canvas, layer);
+    }
+    paintTail(canvas, pose, layer);
+    paintBody(canvas, layer);
+    paintPaws(canvas, pose, layer);
+    if (accessories.contains(KittyAccessory.scarf)) paintScarf(canvas, layer);
+    paintHead(canvas, pose, layer);
+    if (accessories.contains(KittyAccessory.bow)) {
+      paintBow(canvas, pose, layer);
+    }
+    if (accessories.contains(KittyAccessory.hat)) {
+      paintHat(canvas, pose, layer);
+    }
+  }
+
   void _paintAura(Canvas canvas) {
     final aura = Paint()
       ..color = _shown.glowColor.withValues(alpha: 0.18)
@@ -116,5 +143,6 @@ class KittyPainter extends CustomPainter {
       oldDelegate.mood != mood ||
       oldDelegate.phase != phase ||
       oldDelegate.walk != walk ||
-      oldDelegate.running != running;
+      oldDelegate.running != running ||
+      !setEquals(oldDelegate.accessories, accessories);
 }

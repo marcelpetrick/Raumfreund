@@ -340,6 +340,42 @@ abstract class AppLocalizations {
   /// **'Zu laut – Mia hat sich versteckt'**
   String get kittyAwaySign;
 
+  /// Appended to the kitty label (screen reader) when she wears shop items.
+  ///
+  /// In de, this message translates to:
+  /// **'Mia trägt: {items}'**
+  String kittyWearing(String items);
+
+  /// Shop item name: bow.
+  ///
+  /// In de, this message translates to:
+  /// **'Schleife'**
+  String get accessoryBow;
+
+  /// Shop item name: scarf.
+  ///
+  /// In de, this message translates to:
+  /// **'Schal'**
+  String get accessoryScarf;
+
+  /// Shop item name: party hat.
+  ///
+  /// In de, this message translates to:
+  /// **'Partyhut'**
+  String get accessoryHat;
+
+  /// Shop item name: cushion.
+  ///
+  /// In de, this message translates to:
+  /// **'Kissen'**
+  String get accessoryCushion;
+
+  /// Shop item name: toy mouse.
+  ///
+  /// In de, this message translates to:
+  /// **'Spielzeugmaus'**
+  String get accessoryMouse;
+
   /// Number of stars earned for quiet minutes.
   ///
   /// In de, this message translates to:

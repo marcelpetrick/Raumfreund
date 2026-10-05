@@ -113,6 +113,21 @@
   "@kittyScared": {"description": "Kitty mood scared (screen reader)."},
   "kittyAwaySign": "Zu laut – Mia hat sich versteckt",
   "@kittyAwaySign": {"description": "Sign shown when the kitty walked away."},
+  "kittyWearing": "Mia trägt: {items}",
+  "@kittyWearing": {
+    "description": "Appended to the kitty label (screen reader) when she wears shop items.",
+    "placeholders": {"items": {"type": "String"}}
+  },
+  "accessoryBow": "Schleife",
+  "@accessoryBow": {"description": "Shop item name: bow."},
+  "accessoryScarf": "Schal",
+  "@accessoryScarf": {"description": "Shop item name: scarf."},
+  "accessoryHat": "Partyhut",
+  "@accessoryHat": {"description": "Shop item name: party hat."},
+  "accessoryCushion": "Kissen",
+  "@accessoryCushion": {"description": "Shop item name: cushion."},
+  "accessoryMouse": "Spielzeugmaus",
+  "@accessoryMouse": {"description": "Shop item name: toy mouse."},
 
   "starsCount": "{count, plural, =0{Noch keine Sterne} =1{1 Stern} other{{count} Sterne}}",
   "@starsCount": {

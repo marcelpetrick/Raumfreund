@@ -145,6 +145,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get kittyAwaySign => 'Zu laut – Mia hat sich versteckt';
 
   @override
+  String kittyWearing(String items) {
+    return 'Mia trägt: $items';
+  }
+
+  @override
+  String get accessoryBow => 'Schleife';
+
+  @override
+  String get accessoryScarf => 'Schal';
+
+  @override
+  String get accessoryHat => 'Partyhut';
+
+  @override
+  String get accessoryCushion => 'Kissen';
+
+  @override
+  String get accessoryMouse => 'Spielzeugmaus';
+
+  @override
   String starsCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

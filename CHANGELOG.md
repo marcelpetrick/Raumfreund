@@ -39,3 +39,4 @@ these lines (see docs/releasing.md).
 * v0.4.7 adds a privacy gate to the pipeline and CI: the release APK may only request microphone and vibration, and app code may not use audio-writing or network APIs
 * v0.4.8 shows "Messung gestört" when readings arrive too sparsely to judge, with its own hysteresis so stalls and irregular rates do not make it flicker
 * v0.4.9 adds the KittyAccessory catalog contract and the star-shop plan
+* v0.4.10 draws Mia's shop accessories (bow, scarf, party hat, cushion, toy mouse) in every mood and mentions them to screen readers

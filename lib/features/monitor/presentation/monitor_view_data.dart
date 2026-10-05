@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
+import '../../shop/domain/kitty_accessory.dart';
 import '../domain/level_history_point.dart';
 import '../domain/thresholds.dart';
 import '../domain/zone.dart';
@@ -59,6 +60,7 @@ final class MonitorViewData {
     this.alarmOutputFailed = false,
     this.signalThin = false,
     this.kittyWalkedAway = false,
+    this.kittyAccessories = const <KittyAccessory>{},
     this.stars = 0,
     this.starProgress = 0,
     this.starJustEarned = false,
@@ -104,6 +106,9 @@ final class MonitorViewData {
 
   /// Whether Mia completed her walk out of the scene.
   final bool kittyWalkedAway;
+
+  /// Shop items Mia currently wears.
+  final Set<KittyAccessory> kittyAccessories;
 
   /// Quiet minutes earned during this app session.
   final int stars;

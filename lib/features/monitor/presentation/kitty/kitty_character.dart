@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/glow.dart';
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../../shop/domain/kitty_accessory.dart';
+import 'kitty_accessories.dart';
 import 'kitty_mood.dart';
 import 'kitty_painter.dart';
 
@@ -24,6 +26,7 @@ class KittyCharacter extends StatefulWidget {
     required this.mood,
     this.walkedAway = false,
     this.reduceMotion = false,
+    this.accessories = const <KittyAccessory>{},
     super.key,
   });
 
@@ -35,6 +38,9 @@ class KittyCharacter extends StatefulWidget {
 
   /// Disables walking and looping animations.
   final bool reduceMotion;
+
+  /// Equipped shop items, drawn on or next to Mia.
+  final Set<KittyAccessory> accessories;
 
   /// Duration of the idle loop (blink, tail, purr, trembling).
   static const Duration loopDuration = Duration(seconds: 4);
@@ -117,7 +123,7 @@ class _KittyCharacterState extends State<KittyCharacter>
         ? l10n.kittyAwaySign
         : widget.mood.describe(l10n);
     return Semantics(
-      label: label,
+      label: _withAccessories(l10n, label),
       image: true,
       container: true,
       child: ExcludeSemantics(
@@ -130,6 +136,16 @@ class _KittyCharacterState extends State<KittyCharacter>
     );
   }
 
+  /// Appends what Mia wears, in catalog order, to the screen-reader label.
+  String _withAccessories(AppLocalizations l10n, String label) {
+    final worn = [
+      for (final item in KittyAccessory.values)
+        if (widget.accessories.contains(item)) item.describe(l10n),
+    ];
+    if (worn.isEmpty) return label;
+    return '$label. ${l10n.kittyWearing(worn.join(', '))}';
+  }
+
   Widget _buildStatic(AppLocalizations l10n) => AnimatedSwitcher(
     duration: KittyCharacter.fadeDuration,
     child: _KittyScene(
@@ -138,6 +154,7 @@ class _KittyCharacterState extends State<KittyCharacter>
       phase: 0,
       walk: widget.walkedAway ? 1 : 0,
       running: false,
+      accessories: widget.accessories,
       signText: l10n.kittyAwaySign,
     ),
   );
@@ -152,6 +169,7 @@ class _KittyCharacterState extends State<KittyCharacter>
         phase: _loop.value,
         walk: Curves.easeInOut.transform(_walk.value),
         running: widget.walkedAway,
+        accessories: widget.accessories,
         signText: l10n.kittyAwaySign,
       ),
     ),
@@ -165,6 +183,7 @@ class _KittyScene extends StatelessWidget {
     required this.phase,
     required this.walk,
     required this.running,
+    required this.accessories,
     required this.signText,
     super.key,
   });
@@ -173,6 +192,7 @@ class _KittyScene extends StatelessWidget {
   final double phase;
   final double walk;
   final bool running;
+  final Set<KittyAccessory> accessories;
   final String signText;
 
   @override
@@ -188,6 +208,7 @@ class _KittyScene extends StatelessWidget {
             phase: phase,
             walk: walk,
             running: running,
+            accessories: accessories,
           ),
         ),
         if (signOpacity > 0)

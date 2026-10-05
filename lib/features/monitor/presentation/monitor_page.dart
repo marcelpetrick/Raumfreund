@@ -103,6 +103,7 @@ class MonitorPage extends StatelessWidget {
         child: KittyCharacter(
           mood: _kittyMood,
           walkedAway: data.kittyWalkedAway,
+          accessories: data.kittyAccessories,
           reduceMotion: MediaQuery.disableAnimationsOf(context),
         ),
       ),
@@ -129,6 +130,7 @@ class MonitorPage extends StatelessWidget {
               child: KittyCharacter(
                 mood: _kittyMood,
                 walkedAway: data.kittyWalkedAway,
+                accessories: data.kittyAccessories,
                 reduceMotion: MediaQuery.disableAnimationsOf(context),
               ),
             ),
