@@ -17,7 +17,7 @@
 # "keystore" (see docs/releasing.md); without it the APK is debug-signed and
 # named *-debugsigned.apk.
 
-FROM eclipse-temurin:21-jdk-noble@sha256:70898f0f893a6b772a0f29834d8b022e3ac20b6a0c33a922973cf66342ef56be AS toolchain
+FROM eclipse-temurin:21-jdk-noble@sha256:b468c3fc688b14450571494f588bd939378e7fd542ed5a73f8efc13f17872a87 AS toolchain
 
 ARG ANDROID_CMDLINE_TOOLS_BUILD=16111833
 ARG ANDROID_CMDLINE_TOOLS_SHA256=0877a1d048fe4a24efe2eff536ca4223f7adeb58648bb81909d33c446918cfa8
@@ -69,7 +69,7 @@ RUN --mount=type=cache,target=/root/.gradle \
     && rm -f android/key.properties android/upload-keystore.jks \
     && docker/render_index.sh dist docker/index.html.template dist/index.html
 
-FROM nginxinc/nginx-unprivileged:1-alpine@sha256:26b0bf6fbf07297983cb341998d79c831508787de26627dd2a112321b9c3a4af AS runtime
+FROM nginxinc/nginx-unprivileged:1-alpine@sha256:b9241c6e7b8e9a862f129d8d4199ab64b10390949a78bdd5603379b32c844083 AS runtime
 ARG GIT_COMMIT=unknown
 LABEL org.opencontainers.image.title="Raumfreund" \
       org.opencontainers.image.description="Raumfreund Android APK download server (friendly noise traffic light)" \
