@@ -207,10 +207,16 @@ publish() {
 	local tag="$1" version="$2" notes="$3"
 	git_root tag -a "${tag}" -m "Raumfreund ${version} debug APK" HEAD
 	git_root push origin "refs/tags/${tag}"
-	gh release create "${tag}" \
+	if ! gh release create "${tag}" \
 		"${dist}/raumfreund-${version%+*}-debugsigned.apk" "${dist}/SHA256SUMS" "${dist}/VERSION" \
 		--title "Raumfreund ${version%+*}+${version#*+} – Debug APK" \
-		--notes-file "${notes}" --latest --verify-tag
+		--notes-file "${notes}" --latest --verify-tag; then
+		# Without this, the orphaned tag would block every retry with
+		# "tag already exists".
+		git_root push --quiet origin --delete "refs/tags/${tag}" || true
+		git_root tag -d "${tag}" >/dev/null || true
+		die "gh release create failed; tag ${tag} removed again, retry later"
+	fi
 }
 
 main() {

@@ -33,3 +33,4 @@ these lines (see docs/releasing.md).
 * v0.4.1 brings docs/architecture.md in line with the zone hysteresis, envelope and configurable delay
 * v0.4.2 keeps the reserved status text height correct with Android's bold text setting
 * v0.4.3 shows "Alarm gleich" instead of a stuck "0 s", speaks the countdown in full words and explains that short pauses count towards the alarm delay
+* v0.4.4 removes the pushed tag again when creating the GitHub release fails, so the release command can simply be retried

@@ -41,7 +41,8 @@ EOF
 setup_shims() {
 	write_stub "${shims}/gh" <<'EOF'
 echo "gh $*" >>"${CALLS}"
-[[ "${FAKE_NO_AUTH:-}" != 1 ]] || [[ "$1" != auth ]]
+[[ "${FAKE_NO_AUTH:-}" != 1 ]] || [[ "$1" != auth ]] || exit 1
+[[ "${FAKE_RELEASE_FAILS:-}" != 1 ]] || [[ "$1" != release ]]
 EOF
 	write_stub "${shims}/git" <<'EOF'
 echo "git $*" >>"${CALLS}"
@@ -150,6 +151,14 @@ test_publish() {
 	grep -q -- '--title Raumfreund 1.2.3+45 – Debug APK' "${calls}"
 }
 
+# A failed release creation must not leave the pushed tag behind.
+test_failed_publish_removes_tag() {
+	run_release 1 'tag debug-v1.2.3-build45 removed again' "${env_base[@]}" \
+		FAKE_RELEASE_FAILS=1 "${script}"
+	grep -q 'git -C .* push --quiet origin --delete refs/tags/debug-v1.2.3-build45' "${calls}"
+	grep -q 'git -C .* tag -d debug-v1.2.3-build45' "${calls}"
+}
+
 env_base=("PATH=${shims}:${PATH}" "RAUMFREUND_ROOT=${fake}" "CALLS=${calls}" "ANDROID_HOME=${work}/sdk")
 setup_repo_stubs
 setup_shims
@@ -158,4 +167,5 @@ test_precondition_failures
 test_dry_run
 test_changelog_range
 test_publish
+test_failed_publish_removes_tag
 echo "all release_debug tests passed"
