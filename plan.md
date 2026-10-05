@@ -112,6 +112,30 @@ the Android 16 emulator it updates 0.3.0 in place, the Settings show the new
 alarm delay (migrated to 10 s), and a changed value of 15 s survives saving
 and an app restart. No app crash was logged.
 
+## Star shop (started 2026-10-05)
+
+Owner idea: "when the kids collect enough stars, maybe they can buy stuff for
+the cat". Coordinator defaults, to be confirmed by the owner:
+
+- Quiet-minute stars are still earned only while measuring (one per minute
+  of confirmed green). Earned stars also go into a **persistent wallet** on
+  the device (schema-versioned `shared_preferences`, no account, no network,
+  no money, no ads).
+- A **shop page** (app bar action, stops measurement like Settings/About)
+  lists five cosmetic items from `KittyAccessory`: bow 3, scarf 5, hat 8,
+  cushion 10, toy mouse 12 stars. Buying is one-time; owned items can be put
+  on and taken off for free. Items never affect zones or alarms.
+- Settings gets **"Sterne zurücksetzen"** with a confirmation dialog for the
+  teacher; it clears the wallet and the owned items.
+- Mia draws one painter layer per equipped item in every mood, including
+  while running away.
+
+| ID | Package | Agent tier | Status |
+| --- | --- | --- | --- |
+| W | Wallet, inventory, persistence, shop controller, star wiring from the monitor | Sonnet | in progress |
+| K1 | Accessory painter layers for Mia | Sonnet | in progress |
+| K2 | Shop page, Settings reset, app composition (after W and K1) | Sonnet | waiting |
+
 ## Open: automated quality evidence
 
 - [ ] Emulator tests for grant/deny/permanent deny, settings redirect, dialog
@@ -141,11 +165,4 @@ must not claim a production-signed release or completed device certification.
 
 ## Later ideas (not in the first release)
 
-- **Star shop for Mia.** Quiet-minute stars become a persistent local balance
-  (device-only, no account, no money, no ads). Kids spend stars on cosmetic
-  items for Mia: bow, hat, scarf, cushion, toy mouse, stage lights. Concept:
-  a pure `StarWallet` domain object with schema-versioned persistence, a
-  fixed local catalog with prices, an "owned/equipped" inventory, and painter
-  layers in the kitty renderer for each item. Open questions: should stars
-  survive app restarts and days, can a teacher reset them, and is spending
-  allowed during measurement? Needs an owner decision before planning.
+- **Star shop for Mia** — now in progress, see "Star shop" above.
