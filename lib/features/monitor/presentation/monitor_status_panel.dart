@@ -71,24 +71,35 @@ class MonitorStatusPanel extends StatelessWidget {
 
   /// Always reserved outside the error phase so that the zone change into
   /// yellow/red does not push the content below down.
-  Widget _alarmSlot(AppLocalizations l10n) => StableText(
-    text: _alarmText(l10n),
-    // The countdown starts at the configured alarm delay, so its widest text
-    // is the largest selectable delay: two digits, never wider than any other
-    // in-range value. Reserving it keeps the height equal for every setting.
-    variants: [
-      l10n.alarmCountdown(AppSettings.maxAlarmDelaySeconds),
-      l10n.alarmFired,
-      l10n.alarmPlaying,
-    ],
-    textAlign: TextAlign.center,
-  );
+  Widget _alarmSlot(AppLocalizations l10n) {
+    final remaining = data.alarmSecondsRemaining;
+    final counting =
+        !data.alarmPlaying && !data.alarmFired && remaining != null;
+    return StableText(
+      text: _alarmText(l10n),
+      // The longest configurable delay; fewer digits are never wider.
+      variants: [
+        l10n.alarmCountdown(AppSettings.maxAlarmDelaySeconds),
+        l10n.alarmImminent,
+        l10n.alarmFired,
+        l10n.alarmPlaying,
+      ],
+      textAlign: TextAlign.center,
+      // Screen readers say "Sekunden" instead of the abbreviated "s".
+      semanticsLabel: counting && remaining > 0
+          ? l10n.alarmCountdownSemantics(remaining)
+          : null,
+    );
+  }
 
   String _alarmText(AppLocalizations l10n) {
     if (data.alarmPlaying) return l10n.alarmPlaying;
     if (data.alarmFired) return l10n.alarmFired;
     final remaining = data.alarmSecondsRemaining;
-    return remaining == null ? '' : l10n.alarmCountdown(remaining);
+    if (remaining == null) return '';
+    // The delay can be reached during a short pause; the alarm then fires
+    // with the next loud reading, so "0 s" would look stuck.
+    return remaining > 0 ? l10n.alarmCountdown(remaining) : l10n.alarmImminent;
   }
 
   Widget _action(AppLocalizations l10n) {

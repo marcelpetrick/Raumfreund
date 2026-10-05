@@ -190,6 +190,12 @@ abstract class AppLocalizations {
   /// **'Alarm in {seconds} Sekunden'**
   String alarmCountdownSemantics(int seconds);
 
+  /// Countdown reached zero; the alarm fires with the next loud reading.
+  ///
+  /// In de, this message translates to:
+  /// **'Alarm gleich'**
+  String get alarmImminent;
+
   /// Shown after the alarm of the current phase fired.
   ///
   /// In de, this message translates to:
@@ -529,7 +535,7 @@ abstract class AppLocalizations {
   /// Explains the alarm rule with the configured delay and its range.
   ///
   /// In de, this message translates to:
-  /// **'So funktioniert der Alarm: Er ertönt erst, wenn es mindestens {seconds} Sekunden ohne Unterbrechung gelb oder rot ist – und nur einmal pro Phase. Wechselt die Farbe, beginnt die Zeit neu; bei Grün wird alles zurückgesetzt. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.'**
+  /// **'So funktioniert der Alarm: Er ertönt erst, wenn es insgesamt {seconds} Sekunden gelb oder rot bleibt – kurze Pausen zählen mit – und nur einmal pro Phase. Wechselt die Ampel die Farbe, beginnt die Zeit neu; wird sie wieder grün, wird alles zurückgesetzt. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.'**
   String settingsAlarmDelayRule(int seconds, int min, int max, int standard);
 
   /// Alarm sound switch.

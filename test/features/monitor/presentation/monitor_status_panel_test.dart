@@ -65,6 +65,7 @@ void main() {
         // Longest configurable alarm delay (AppSettings, 3..60 s).
         _data(zone: Zone.yellow, countdown: 60),
         _data(zone: Zone.red, countdown: 3),
+        _data(zone: Zone.red, countdown: 0),
         _data(zone: Zone.red, fired: true),
         _data(zone: Zone.red, fired: true, playing: true, starEarned: true),
       ];
@@ -115,5 +116,26 @@ void main() {
       styles.every((style) => style?.fontWeight == FontWeight.bold),
       isTrue,
     );
+  });
+
+  testWidgets('countdown at zero says the alarm is imminent', (tester) async {
+    await _panelHeight(tester, _data(zone: Zone.red, countdown: 0), 1);
+
+    expect(find.text(l10nDe.alarmImminent), findsOneWidget);
+    expect(find.text(l10nDe.alarmCountdown(0)), findsNothing);
+  });
+
+  testWidgets('screen readers hear the countdown in full words', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await _panelHeight(tester, _data(zone: Zone.yellow, countdown: 7), 1);
+
+    expect(
+      find.bySemanticsLabel(l10nDe.alarmCountdownSemantics(7)),
+      findsOneWidget,
+    );
+    expect(find.bySemanticsLabel(l10nDe.alarmCountdown(7)), findsNothing);
+    handle.dispose();
   });
 }

@@ -21,6 +21,7 @@ class StableText extends StatelessWidget {
     required this.variants,
     this.style,
     this.textAlign = TextAlign.start,
+    this.semanticsLabel,
     super.key,
   });
 
@@ -35,6 +36,9 @@ class StableText extends StatelessWidget {
 
   /// Horizontal alignment of the text inside the slot.
   final TextAlign textAlign;
+
+  /// Spoken replacement for [text], e.g. without abbreviations.
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +69,12 @@ class StableText extends StatelessWidget {
               textScaler: MediaQuery.textScalerOf(context),
             ),
           ),
-        Text(text, style: style, textAlign: textAlign),
+        Text(
+          text,
+          style: style,
+          textAlign: textAlign,
+          semanticsLabel: semanticsLabel,
+        ),
       ],
     );
   }
