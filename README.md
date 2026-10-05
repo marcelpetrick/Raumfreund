@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.5.2+41` — code-complete release candidate**
+Current version: **`0.5.3+42` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,

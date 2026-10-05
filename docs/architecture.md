@@ -146,10 +146,16 @@ running session because navigation stops measurement first.
 `lib/features/shop/` follows the settings pattern: an immutable, always-valid
 `StarWallet` (balance, owned and equipped items; typed `PurchaseResult`),
 a `ShopRepository` port, `SharedPreferencesShopRepository` (own `shop.`
-namespace, one JSON snapshot, schema version 1, per-field repair, newer or
-unreadable data loads an empty wallet) and `ShopController`, which applies
+namespace, one JSON snapshot, schema version 1, per-field repair, corrupt
+data loads an empty wallet) and `ShopController`, which applies
 changes immediately, saves them serialized and coalesced, and reports save
-failures in `saveFailed` instead of throwing.
+failures in `saveFailed` instead of throwing. Unavailable or unreadable
+storage and data of a newer schema make `load()` throw; the controller then
+sets `loadFailed`, keeps earning in memory, never saves, and merges the earned
+stars into the stored wallet once a later load succeeds, so stored stars are
+never overwritten by a wallet that was not read. `retryPending()` (called on
+app resume and when the shop opens) retries a failed load or save. The
+teacher reset waits for the save and reports a failure.
 
 Dependency direction: shop domain, application and infrastructure depend on
 nothing but the shared `PreferencesStore` abstraction of settings. The only

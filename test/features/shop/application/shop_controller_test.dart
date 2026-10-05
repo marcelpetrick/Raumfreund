@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/features/shop/application/shop_controller.dart';
 import 'package:raumfreund/features/shop/domain/kitty_accessory.dart';
@@ -29,6 +30,67 @@ void main() {
 
   loadTests();
   changeTests();
+  robustnessTests();
+}
+
+void robustnessTests() {
+  group('robustness', () {
+    setUp(() => controller.load());
+
+    test('an Error in save does not break the queue', () async {
+      final errors = <FlutterErrorDetails>[];
+      final previous = FlutterError.onError;
+      FlutterError.onError = errors.add;
+      addTearDown(() => FlutterError.onError = previous);
+      repository.saveError = StateError('boom');
+      controller.earn(1);
+      await controller.flush();
+      expect(errors, hasLength(1));
+      expect(controller.saveFailed, isTrue);
+      expect(controller.isSaving, isFalse);
+      repository.saveError = null;
+      controller.earn(1);
+      await controller.flush();
+      expect(controller.saveFailed, isFalse);
+      expect(repository.stored.balance, 6);
+    });
+
+    test('retryPending saves again after a failed save', () async {
+      repository.saveException = const FormatException('disk');
+      controller.earn(1);
+      await controller.flush();
+      expect(controller.saveFailed, isTrue);
+      repository.saveException = null;
+      await controller.retryPending();
+      expect(controller.saveFailed, isFalse);
+      expect(repository.stored.balance, 5);
+      final saves = repository.saves.length;
+      await controller.retryPending();
+      expect(repository.saves, hasLength(saves));
+    });
+  });
+
+  group('load errors', () {
+    test('an Error in load does not leave loading hanging', () async {
+      repository.loadError = StateError('boom');
+      await expectLater(controller.load(), throwsStateError);
+      expect(controller.isLoading, isFalse);
+      expect(controller.loadFailed, isTrue);
+      repository.loadError = null;
+      await controller.load();
+      expect(controller.loadFailed, isFalse);
+      expect(controller.wallet.balance, 4);
+    });
+
+    test('retryPending loads after a failed load', () async {
+      repository.loadException = const FormatException('x');
+      await controller.load();
+      repository.loadException = null;
+      await controller.retryPending();
+      expect(controller.loadFailed, isFalse);
+      expect(controller.wallet.balance, 4);
+    });
+  });
 }
 
 void loadTests() {

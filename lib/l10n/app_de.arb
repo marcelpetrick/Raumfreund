@@ -301,7 +301,7 @@
   "@shopLoading": {"description": "Shown while the wallet is loading."},
   "shopLoadFailed": "Sterne werden gerade nur zwischengespeichert. Kaufen und Anlegen gehen erst, wenn der Speicher wieder antwortet.",
   "@shopLoadFailed": {"description": "Non-blocking hint when loading the wallet failed."},
-  "shopSaveFailed": "Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird bei der nächsten Änderung erneut versucht.",
+  "shopSaveFailed": "Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird beim nächsten Öffnen der App oder des Sternenladens und bei der nächsten Änderung erneut versucht.",
   "@shopSaveFailed": {"description": "Non-blocking hint when saving the wallet failed."},
   "shopDismiss": "Ausblenden",
   "@shopDismiss": {"description": "Hides the save error hint."},
@@ -350,5 +350,7 @@
   "settingsResetDone": "Alle Sterne und gekauften Sachen wurden gelöscht.",
   "@settingsResetDone": {"description": "Snackbar after a reset."},
   "settingsResetNotReady": "Die Sterne werden noch geladen. Bitte versuche es gleich noch einmal.",
-  "@settingsResetNotReady": {"description": "Snackbar when the wallet is not loaded."}
+  "@settingsResetNotReady": {"description": "Snackbar when the wallet is not loaded."},
+  "settingsResetSaveFailed": "Die Sterne wurden zurückgesetzt, aber das Speichern hat nicht geklappt. Es wird später erneut versucht.",
+  "@settingsResetSaveFailed": {"description": "Snackbar when the reset could not be stored."}
 }

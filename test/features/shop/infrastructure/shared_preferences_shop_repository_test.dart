@@ -28,6 +28,7 @@ final StarWallet sample = StarWallet(
 
 void main() {
   loadTests();
+  loadFailureTests();
   saveTests();
   test('works on top of real SharedPreferences', () async {
     SharedPreferences.setMockInitialValues({});
@@ -99,9 +100,9 @@ void loadTests() {
     });
 
     test(
-      'missing, mistyped, too old or newer version gives defaults',
+      'missing, mistyped or too old version gives an empty wallet',
       () async {
-        for (final version in [null, '1', 0, 2, 99]) {
+        for (final version in [null, '1', 0]) {
           final wallet = await loadRaw(
             snapshot({'schemaVersion': version, 'balance': 5}),
           );
@@ -109,8 +110,22 @@ void loadTests() {
         }
       },
     );
+  });
+}
 
-    test('unavailable storage gives an empty wallet and retries', () async {
+void loadFailureTests() {
+  group('load failures', () {
+    test('a newer version is not loaded and stays untouched', () async {
+      final raw = snapshot({'schemaVersion': 2, 'balance': 5});
+      final store = FakePreferencesStore({Repo.snapshotKey: raw});
+      await expectLater(
+        Repo(openStore: () async => store).load(),
+        throwsA(isA<ShopNewerSchemaException>()),
+      );
+      expect(store.values[Repo.snapshotKey], raw);
+    });
+
+    test('unavailable storage throws and is retried', () async {
       var calls = 0;
       final store = FakePreferencesStore({
         Repo.snapshotKey: jsonEncode(Repo.encode(sample)),
@@ -121,8 +136,13 @@ void loadTests() {
           return store;
         },
       );
-      expect(await repo.load(), StarWallet.empty());
+      await expectLater(repo.load(), throwsA(isA<ShopStorageException>()));
       expect(await repo.load(), sample);
+    });
+
+    test('a failing read is a storage failure', () async {
+      final repo = Repo(openStore: () async => _ThrowingReadStore());
+      await expectLater(repo.load(), throwsA(isA<ShopStorageException>()));
     });
   });
 }
@@ -166,12 +186,20 @@ void saveTests() {
         ),
       );
     });
-
-    test('a newer snapshot stays untouched by load', () async {
-      final raw = snapshot({'schemaVersion': 9, 'balance': 5});
-      final store = FakePreferencesStore({Repo.snapshotKey: raw});
-      await Repo(openStore: () async => store).load();
-      expect(store.values[Repo.snapshotKey], raw);
-    });
   });
+}
+
+/// Store whose reads fail.
+final class _ThrowingReadStore implements PreferencesStore {
+  @override
+  Object? read(String key) => throw Exception('read failed');
+
+  @override
+  Future<bool> writeInt(String key, int value) async => true;
+
+  @override
+  Future<bool> writeBool(String key, {required bool value}) async => true;
+
+  @override
+  Future<bool> writeString(String key, String value) async => true;
 }

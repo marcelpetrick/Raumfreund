@@ -98,6 +98,15 @@ final class ShopController extends ChangeNotifier {
     return true;
   }
 
+  /// Retries what failed earlier: loads the wallet if that has not worked
+  /// yet, otherwise saves again if the last save failed. Call it when the app
+  /// resumes or the shop opens. Completes when the retry has finished.
+  Future<void> retryPending() async {
+    if (!_loaded) return load();
+    if (_revision != _savedRevision) _enqueueSave();
+    return flush();
+  }
+
   /// Completes when all pending saves have finished.
   Future<void> flush() => _saveQueue;
 
@@ -122,6 +131,7 @@ final class ShopController extends ChangeNotifier {
   }
 
   Future<void> _load() async {
+    var succeeded = false;
     try {
       final loaded = await _repository.load();
       _wallet = _unsavedStars > 0 ? loaded.earn(_unsavedStars) : loaded;
@@ -129,19 +139,41 @@ final class ShopController extends ChangeNotifier {
       _loadFailed = false;
       if (_unsavedStars > 0) _scheduleSave();
       _unsavedStars = 0;
+      succeeded = true;
     } on Exception {
-      // The repository already falls back for bad data; this covers an
-      // unexpected failure of the storage itself. Allow a retry.
-      _loadFailed = true;
-      _loading = null;
+      // Storage unavailable or data from a newer app version: keep what is
+      // stored untouched (nothing is saved) and allow a retry.
+    } finally {
+      // Also runs for an Error, so the state never hangs in "loading".
+      if (!succeeded) {
+        _loadFailed = true;
+        _loading = null;
+      }
+      _isLoading = false;
+      _notify();
     }
-    _isLoading = false;
-    _notify();
   }
 
   void _scheduleSave() {
     _revision++;
-    _saveQueue = _saveQueue.then((_) => _save());
+    _enqueueSave();
+  }
+
+  void _enqueueSave() {
+    _saveQueue = _saveQueue.then<void>((_) => _save()).onError<Object>((
+      error,
+      stack,
+    ) {
+      // Keep the queue alive after an unexpected failure, but report it.
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stack,
+          library: 'raumfreund shop',
+          context: ErrorDescription('while saving the star wallet'),
+        ),
+      );
+    });
   }
 
   Future<void> _save() async {
@@ -149,15 +181,18 @@ final class ShopController extends ChangeNotifier {
     if (revision == _savedRevision) return; // a later save covered it
     _isSaving = true;
     _notify();
+    var succeeded = false;
     try {
       await _repository.save(_wallet);
       _savedRevision = revision;
-      _saveFailed = false;
+      succeeded = true;
     } on Exception {
-      _saveFailed = true;
+      // Reported through saveFailed; retried by retryPending.
+    } finally {
+      _saveFailed = !succeeded;
+      _isSaving = false;
+      _notify();
     }
-    _isSaving = false;
-    _notify();
   }
 
   void _notify() {

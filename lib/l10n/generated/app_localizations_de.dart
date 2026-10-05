@@ -419,7 +419,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get shopSaveFailed =>
-      'Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird bei der nächsten Änderung erneut versucht.';
+      'Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird beim nächsten Öffnen der App oder des Sternenladens und bei der nächsten Änderung erneut versucht.';
 
   @override
   String get shopDismiss => 'Ausblenden';
@@ -500,4 +500,8 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settingsResetNotReady =>
       'Die Sterne werden noch geladen. Bitte versuche es gleich noch einmal.';
+
+  @override
+  String get settingsResetSaveFailed =>
+      'Die Sterne wurden zurückgesetzt, aber das Speichern hat nicht geklappt. Es wird später erneut versucht.';
 }

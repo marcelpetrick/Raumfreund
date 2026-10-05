@@ -44,3 +44,4 @@ these lines (see docs/releasing.md).
 * v0.5.0 adds the star shop: kids spend quiet-minute stars on a bow, scarf, party hat, cushion or toy mouse for Mia, and teachers can reset all stars in Settings
 * v0.5.1 documents the emulator smoke tests and the emulator crash seen on the development host
 * v0.5.2 shows the Sternenladen total next to today's stars on the monitor
+* v0.5.3 never overwrites stored stars after a failed or newer-version load, retries failed saves on resume and when the shop opens, and confirms the teacher reset only after it was saved

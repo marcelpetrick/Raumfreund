@@ -769,7 +769,7 @@ abstract class AppLocalizations {
   /// Non-blocking hint when saving the wallet failed.
   ///
   /// In de, this message translates to:
-  /// **'Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird bei der nächsten Änderung erneut versucht.'**
+  /// **'Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird beim nächsten Öffnen der App oder des Sternenladens und bei der nächsten Änderung erneut versucht.'**
   String get shopSaveFailed;
 
   /// Hides the save error hint.
@@ -885,6 +885,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Die Sterne werden noch geladen. Bitte versuche es gleich noch einmal.'**
   String get settingsResetNotReady;
+
+  /// Snackbar when the reset could not be stored.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Sterne wurden zurückgesetzt, aber das Speichern hat nicht geklappt. Es wird später erneut versucht.'**
+  String get settingsResetSaveFailed;
 }
 
 class _AppLocalizationsDelegate

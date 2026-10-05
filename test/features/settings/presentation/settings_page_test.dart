@@ -62,7 +62,7 @@ Future<void> _open(
 
 Future<void> _pumpWithReset(
   WidgetTester tester,
-  bool Function() onReset,
+  Future<StarResetResult> Function() onReset,
 ) async {
   await tester.pumpWidget(
     testApp(
@@ -89,9 +89,9 @@ void _resetTests() {
     tester,
   ) async {
     var resets = 0;
-    await _pumpWithReset(tester, () {
+    await _pumpWithReset(tester, () async {
       resets++;
-      return true;
+      return StarResetResult.done;
     });
     expect(find.text(l10nDe.settingsResetBody), findsOneWidget);
     await tester.tap(find.text(l10nDe.settingsResetButton));
@@ -110,9 +110,9 @@ void _resetTests() {
 
   testWidgets('confirmed star reset runs once and says so', (tester) async {
     var resets = 0;
-    await _pumpWithReset(tester, () {
+    await _pumpWithReset(tester, () async {
       resets++;
-      return true;
+      return StarResetResult.done;
     });
     await tester.tap(find.text(l10nDe.settingsResetButton));
     await tester.pumpAndSettle();
@@ -125,12 +125,22 @@ void _resetTests() {
   testWidgets('star reset reports a wallet that is not loaded yet', (
     tester,
   ) async {
-    await _pumpWithReset(tester, () => false);
+    await _pumpWithReset(tester, () async => StarResetResult.notReady);
     await tester.tap(find.text(l10nDe.settingsResetButton));
     await tester.pumpAndSettle();
     await tester.tap(find.text(l10nDe.settingsResetConfirm));
     await tester.pumpAndSettle();
     expect(find.text(l10nDe.settingsResetNotReady), findsOneWidget);
+  });
+
+  testWidgets('star reset says when storing failed', (tester) async {
+    await _pumpWithReset(tester, () async => StarResetResult.saveFailed);
+    await tester.tap(find.text(l10nDe.settingsResetButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10nDe.settingsResetConfirm));
+    await tester.pumpAndSettle();
+    expect(find.text(l10nDe.settingsResetSaveFailed), findsOneWidget);
+    expect(find.text(l10nDe.settingsResetDone), findsNothing);
   });
 }
 

@@ -113,6 +113,15 @@ class _RaumfreundAppState extends State<RaumfreundApp>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _monitor.onLifecycleChanged(state);
+    // A failed load or save of the wallet may have been transient.
+    if (state == AppLifecycleState.resumed) unawaited(_shop.retryPending());
+  }
+
+  /// Teacher reset: clears the wallet and reports whether it was stored.
+  Future<StarResetResult> _resetStars() async {
+    if (!_shop.resetAll()) return StarResetResult.notReady;
+    await _shop.flush();
+    return _shop.saveFailed ? StarResetResult.saveFailed : StarResetResult.done;
   }
 
   @override
@@ -163,7 +172,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
         builder: (_) => SettingsPage(
           initialSettings: _settings.settings,
           onSave: _saveSettings,
-          onResetStars: _shop.resetAll,
+          onResetStars: _resetStars,
         ),
       ),
     );
@@ -177,7 +186,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
 
   Future<void> _openShop() => _navigate((navigator) async {
     // A failed first load may be transient; retry (shared with a running one).
-    unawaited(_shop.load());
+    unawaited(_shop.retryPending());
     await navigator.push<void>(
       MaterialPageRoute(builder: (_) => ShopPage(controller: _shop)),
     );

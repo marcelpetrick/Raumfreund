@@ -18,8 +18,14 @@ final class InMemoryShopRepository implements ShopRepository {
   /// When set, [save] throws it.
   Exception? saveException;
 
+  /// When set, [save] throws it (an unexpected programming error).
+  Error? saveError;
+
   /// When set, [load] throws it.
   Exception? loadException;
+
+  /// When set, [load] throws it (an unexpected programming error).
+  Error? loadError;
 
   /// When set, [load] waits for this completer first.
   Completer<void>? loadGate;
@@ -35,6 +41,8 @@ final class InMemoryShopRepository implements ShopRepository {
     await loadGate?.future;
     final exception = loadException;
     if (exception != null) throw exception;
+    final error = loadError;
+    if (error != null) throw error;
     return stored;
   }
 
@@ -44,6 +52,8 @@ final class InMemoryShopRepository implements ShopRepository {
     await saveGate?.future;
     final exception = saveException;
     if (exception != null) throw exception;
+    final error = saveError;
+    if (error != null) throw error;
     stored = wallet;
   }
 }

@@ -12,6 +12,18 @@ import '../domain/app_settings.dart';
 
 /// Editable settings page.
 ///
+/// Outcome of the teacher's star reset, reported to the settings page.
+enum StarResetResult {
+  /// Cleared and stored.
+  done,
+
+  /// Not possible yet (data still loading).
+  notReady,
+
+  /// Cleared on screen, but writing to storage failed (retried later).
+  saveFailed,
+}
+
 /// Save awaits application-layer persistence and closes only after success.
 /// Cancel always discards the independent draft.
 class SettingsPage extends StatefulWidget {
@@ -29,12 +41,12 @@ class SettingsPage extends StatefulWidget {
   /// Validates and persists the draft, returning whether it was saved.
   final Future<bool> Function(AppSettings settings) onSave;
 
-  /// Teacher reset of stars and shop items; returns false if it was not
-  /// possible yet (data still loading). The section is hidden when null.
+  /// Teacher reset of stars and shop items; completes with the outcome after
+  /// the change has been stored. The section is hidden when null.
   ///
   /// Deliberately outside the Save/Cancel draft: it acts immediately on
   /// another store, so Cancel could not undo it.
-  final bool Function()? onResetStars;
+  final Future<StarResetResult> Function()? onResetStars;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -320,7 +332,7 @@ class _SettingsSection extends StatelessWidget {
 class _StarResetSection extends StatelessWidget {
   const _StarResetSection({required this.onReset});
 
-  final bool Function() onReset;
+  final Future<StarResetResult> Function() onReset;
 
   @override
   Widget build(BuildContext context) {
@@ -363,12 +375,14 @@ class _StarResetSection extends StatelessWidget {
       ),
     );
     if (!(confirmed ?? false)) return;
-    final done = onReset();
+    final result = await onReset();
     messenger.showSnackBar(
       SnackBar(
-        content: Text(
-          done ? l10n.settingsResetDone : l10n.settingsResetNotReady,
-        ),
+        content: Text(switch (result) {
+          StarResetResult.done => l10n.settingsResetDone,
+          StarResetResult.notReady => l10n.settingsResetNotReady,
+          StarResetResult.saveFailed => l10n.settingsResetSaveFailed,
+        }),
       ),
     );
   }

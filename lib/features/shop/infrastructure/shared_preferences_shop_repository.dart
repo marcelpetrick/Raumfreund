@@ -24,6 +24,18 @@ final class ShopStorageException implements Exception {
   String toString() => 'ShopStorageException: $message';
 }
 
+/// Thrown by [SharedPreferencesShopRepository.load] when the stored wallet was
+/// written by a newer app version and cannot be interpreted safely.
+///
+/// Distinct from corrupt data (decided policy: empty wallet): the data is
+/// valid for a later release, so it must not be replaced. The shop controller
+/// treats it like a failed load and never saves over it.
+final class ShopNewerSchemaException extends ShopStorageException {
+  /// Creates the exception for the found [version].
+  const ShopNewerSchemaException(int version)
+    : super('stored wallet has newer schema version $version');
+}
+
 /// Versioned, validating persistence of the [StarWallet] in
 /// SharedPreferences, in its own `shop.` key namespace.
 ///
@@ -32,14 +44,19 @@ final class ShopStorageException implements Exception {
 /// balance, the names of the owned and of the equipped items, and the
 /// schema version. Nothing else is stored, and it never leaves the device.
 ///
-/// Loading never throws and follows the settings policy:
+/// Loading follows the settings policy for *bad data* and throws for
+/// *unavailable or unreadable storage* and for *newer data*, so the caller
+/// never mistakes those for an empty wallet and overwrites stored stars:
 ///
+/// * Storage that cannot be opened or read: [ShopStorageException]. The
+///   stored data may be perfectly fine.
+/// * A *newer* schema version (e.g. after an app downgrade):
+///   [ShopNewerSchemaException]. The stored data stays untouched.
 /// * Every field is validated on its own: a missing, mistyped or negative
 ///   balance becomes 0; unknown item names are ignored; equipped items that
 ///   are not owned are dropped.
-/// * Unreadable JSON, a missing or non-integer version and a *newer* version
-///   (e.g. after an app downgrade) cannot be interpreted safely and load an
-///   empty wallet. The stored data stays untouched until the next save.
+/// * Unreadable JSON and a missing, non-integer or too old version are
+///   genuinely corrupt and load an empty wallet (decided policy).
 final class SharedPreferencesShopRepository implements ShopRepository {
   /// Creates the repository; [openStore] defaults to the real
   /// SharedPreferences.
@@ -58,14 +75,14 @@ final class SharedPreferencesShopRepository implements ShopRepository {
 
   @override
   Future<StarWallet> load() async {
-    final PreferencesStore store;
     try {
-      store = await _storeOnce();
-    } on Exception {
-      // Storage unavailable: the app must still work, with an empty wallet.
-      return StarWallet.empty();
+      final store = await _storeOnce();
+      return decode(store.read(snapshotKey));
+    } on ShopStorageException {
+      rethrow;
+    } on Exception catch (error) {
+      throw ShopStorageException('storage unavailable', error);
     }
-    return decode(store.read(snapshotKey));
   }
 
   @override
@@ -95,14 +112,16 @@ final class SharedPreferencesShopRepository implements ShopRepository {
     'equipped': [for (final item in wallet.equipped) item.name],
   };
 
-  /// Builds a valid wallet from the raw stored value (see class comment).
+  /// Builds a valid wallet from the raw stored value (see class comment);
+  /// throws [ShopNewerSchemaException] for newer data.
   static StarWallet decode(Object? raw) {
     final data = _parse(raw);
     if (data == null) return StarWallet.empty();
     final version = data['schemaVersion'];
-    if (version is! int || version > schemaVersion || version < 1) {
-      return StarWallet.empty();
+    if (version is int && version > schemaVersion) {
+      throw ShopNewerSchemaException(version);
     }
+    if (version is! int || version < 1) return StarWallet.empty();
     final balance = data['balance'];
     return StarWallet.sanitized(
       balance: balance is int ? balance : 0,
