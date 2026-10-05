@@ -44,7 +44,11 @@
 /// phase progress, no further alarm; the snapshot reports `suppressed`).
 /// When the tone ends the machine is reset, so a new phase starts only with
 /// valid samples taken after the tone. This short measurement pause is
-/// intended.
+/// intended and never reported as a thin signal.
+///
+/// Thin signal: [AlarmSnapshot.signalThin] reports when samples arrive too
+/// sparsely to judge the room ([ZoneDecision.signalThin]); the alarm rules
+/// are unchanged by it, it only makes the blocked alarm visible.
 ///
 /// The class is pure Dart: no Flutter, no platform, no real clock.
 library;
@@ -64,6 +68,7 @@ final class AlarmSnapshot {
     required this.suppressed,
     required this.shouldFireAlarm,
     this.zoneSettled = false,
+    this.signalThin = false,
   });
 
   /// State before the first sample or after a reset.
@@ -91,6 +96,11 @@ final class AlarmSnapshot {
   /// Whether [zone] is backed by at least the hold time of raw samples (see
   /// [ZoneDecision.settled]); false right after a reset or gap.
   final bool zoneSettled;
+
+  /// Whether samples have been too sparse to judge the room for a while
+  /// (see [ZoneDecision.signalThin]); false while the alarm tone suppresses
+  /// samples and after a reset.
+  final bool signalThin;
 
   /// Whether the alarm of the current phase has already fired.
   final bool alarmFiredInPhase;
@@ -153,6 +163,7 @@ final class AlarmStateMachine {
   Duration? _lastLoud;
   bool _fired = false;
   bool _settled = false;
+  bool _signalThin = false;
   bool _suppressed = false;
   AlarmSnapshot _snapshot = AlarmSnapshot.idle;
 
@@ -175,6 +186,7 @@ final class AlarmStateMachine {
     final decision = _debouncer.onSample(timestamp: timestamp, zone: raw);
     _zone = decision.zone;
     _settled = decision.settled;
+    _signalThin = decision.signalThin;
     if (decision.zone == Zone.green) {
       _phaseStart = null;
       _lastLoud = null;
@@ -206,6 +218,7 @@ final class AlarmStateMachine {
     _lastLoud = null;
     _debouncer.reset();
     _settled = false;
+    _signalThin = false;
     _fired = false;
     _suppressed = false;
     _snapshot = AlarmSnapshot.idle;
@@ -246,6 +259,7 @@ final class AlarmStateMachine {
       suppressed: _suppressed,
       shouldFireAlarm: shouldFire,
       zoneSettled: _settled,
+      signalThin: _signalThin,
     );
   }
 
@@ -257,5 +271,7 @@ final class AlarmStateMachine {
     suppressed: _suppressed,
     shouldFireAlarm: shouldFire,
     zoneSettled: _snapshot.zoneSettled,
+    // Ignored samples are not judged at all, so nothing is thin then.
+    signalThin: !_suppressed && _snapshot.signalThin,
   );
 }

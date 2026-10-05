@@ -304,6 +304,12 @@ abstract class AppLocalizations {
   /// **'Der Alarmton konnte nicht wiedergegeben werden. Die Messung läuft weiter.'**
   String get alarmOutputFailed;
 
+  /// Warning while microphone readings arrive too sparsely to judge the room; no alarm can fire then.
+  ///
+  /// In de, this message translates to:
+  /// **'Messung gestört – zu wenige Messwerte. Das Handy drosselt vielleicht das Mikrofon.'**
+  String get signalThin;
+
   /// Kitty mood idle (screen reader).
   ///
   /// In de, this message translates to:

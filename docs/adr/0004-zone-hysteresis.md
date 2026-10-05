@@ -67,6 +67,26 @@ sliding windows:
   weighing only 200 ms), this counts as a gap and the current sample is
   adopted. The alarm never fires while the release window is unusable
   (`ZoneDecision.usable`).
+- Thin signal (amendment 2026-10-05, after the independent review): because
+  thin data blocks the alarm silently, `ZoneDecision.signalThin` /
+  `AlarmSnapshot.signalThin` report it. Tracked independently of runs (gaps
+  and thin-data adoptions keep it; only reset clears it): every sample after
+  the first since reset covers the time since the previous sample, capped at
+  200 ms, also across gaps. A sample is *poor* if these intervals cover less
+  than half of the last 3 s, limited to the time since the first sample after
+  reset (a normal start is never poor); it is *good* if they cover at least
+  60 % (`thinClearShare`). The signal becomes thin after poor samples for at
+  least 2 s (`thinEnterTime`) without interruption and clears after good
+  samples for at least 3 s (`thinClearTime`); in between nothing changes.
+  The entry time outlasts the ~1.3 s in which the window refills after a
+  single stall at 10 Hz, so a stall alone never raises the hint. The longer
+  clear time and the 50/60 % gap keep jittered rates right at the limit
+  (300–500 ms) from toggling it (review finding: 2–12 toggles per 2 min with
+  holds alone, at most one with the share gap). Regular readings slower than
+  one per 0.4 s are poor (each covers at most 200 ms); once thin, the hint
+  clears only at one per 0.33 s or faster. The flag does not change any zone or
+  alarm decision; the alarm tone pause and stop/reset/error clear it. The
+  status panel shows a German hint (live region for TalkBack).
 - The leave share 15 % lies between a quiet room with clicks (7 green : 1 red,
   at most 13.3 % over 3 s, must become green) and the worst 3 s alignment of
   0.6 s bursts every 2 s (20 %, must stay loud).
@@ -124,6 +144,11 @@ accordingly.
 | Red 3 s, then 1 in 6 clicks | stays red; alarm on the first click at or after 10 s |
 | 0.5 s shouts every 3 s from green | red; alarm on a shout sample (15.1 s) |
 | Red until 5 s, then green every 1 s | no alarm; green once treated as a gap |
+| Readings every 1 s (or 0.5 s, or 1.5 s) | no alarm; thin signal 2 s after the first poor reading (3 s, 2.5 s, 4.5 s) |
+| Readings every 0.3 s or 0.1 s | never thin |
+| Readings jittered 300–500 ms for 2 min | hint changes at most once |
+| 1 s readings, then 10 Hz again | thin clears about 4.4 s after 10 Hz resumes |
+| 10 Hz with a single stall of 1.5, 2, 3 or 5 s | never thin |
 
 ## Consequences
 
@@ -132,7 +157,15 @@ accordingly.
   counts once loud samples resume, so the alarm means "the configured delay
   (default 10 s) of a loud room", not that long of strictly loud samples; it can fire as soon as a loud sample
   follows such a pause.
-- With sparse samples (stalled recorder) no alarm fires at all.
+- With sparse samples (stalled or throttled recorder) no alarm fires at all.
+  Since the thin-signal amendment this is no longer silent: after about 2 s
+  of too sparse readings the status panel says the measurement is disturbed.
+  A recorder that delivers no readings at all is not detected by this rule
+  (the domain is driven by samples, not by a clock).
+- A single stall does not show the hint (the alarm phase still restarts after
+  a gap over 1 s, as before). Rates between one per 0.33 s and one per 0.4 s
+  keep whichever hint state they found; the alarm may fire while the hint is
+  still shown there (accepted: such a rate is unstable anyway).
 - The first sample after start, reset or a gap holds its zone for 1 s even if
   the room changes immediately (accepted).
 - A fast rise can step green → yellow → red within about 0.2 s, because yellow

@@ -49,16 +49,27 @@ class MonitorStatusPanel extends StatelessWidget {
             const SizedBox(height: 12),
             _ErrorBody(error: data.error),
           ],
-          // The error body and the output warning stay height-variable on
-          // purpose: they only occur in rare states, where a layout change is
-          // expected and a permanently reserved slot would waste space.
+          // The error body and the warnings (alarm output failed, readings
+          // too sparse) stay height-variable on purpose: they only occur in
+          // rare states, where a layout change is expected and a permanently
+          // reserved slot would waste space.
           if (data.phase != MonitorPhase.error) ...[
             const SizedBox(height: 10),
             _alarmSlot(l10n),
           ],
           if (data.alarmOutputFailed) ...[
             const SizedBox(height: 10),
-            _AlarmOutputWarning(message: l10n.alarmOutputFailed),
+            _PanelWarning(
+              icon: Icons.volume_off_rounded,
+              message: l10n.alarmOutputFailed,
+            ),
+          ],
+          if (data.isActive && data.signalThin) ...[
+            const SizedBox(height: 10),
+            _PanelWarning(
+              icon: Icons.warning_amber_rounded,
+              message: l10n.signalThin,
+            ),
           ],
           const SizedBox(height: 12),
           _QuietStars(data: data),
@@ -129,9 +140,11 @@ class MonitorStatusPanel extends StatelessWidget {
   }
 }
 
-class _AlarmOutputWarning extends StatelessWidget {
-  const _AlarmOutputWarning({required this.message});
+/// Non-fatal hint with an icon, announced by TalkBack when it appears.
+class _PanelWarning extends StatelessWidget {
+  const _PanelWarning({required this.icon, required this.message});
 
+  final IconData icon;
   final String message;
 
   @override
@@ -139,7 +152,7 @@ class _AlarmOutputWarning extends StatelessWidget {
     liveRegion: true,
     child: Row(
       children: [
-        const Icon(Icons.volume_off_rounded, color: AppColors.yellow),
+        Icon(icon, color: AppColors.yellow),
         const SizedBox(width: 8),
         Expanded(child: Text(message)),
       ],

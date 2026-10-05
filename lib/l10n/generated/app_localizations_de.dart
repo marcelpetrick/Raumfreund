@@ -126,6 +126,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Alarmton konnte nicht wiedergegeben werden. Die Messung läuft weiter.';
 
   @override
+  String get signalThin =>
+      'Messung gestört – zu wenige Messwerte. Das Handy drosselt vielleicht das Mikrofon.';
+
+  @override
   String get kittyIdle => 'Mia sitzt gemütlich da und wartet';
 
   @override

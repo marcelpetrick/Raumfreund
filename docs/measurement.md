@@ -42,7 +42,13 @@ sample, at least the configured alarm delay after the phase start (Settings,
 3–60 s in whole seconds, default 10 s; owner decision 2026-10-04). A changed
 delay applies from the next measurement start. Samples that arrive too sparsely to
 fill the three-second window (e.g. one per second) for more than three seconds
-are treated like a gap and never trigger an alarm. Confirmed green, a confirmed zone change, a gap
+are treated like a gap and never trigger an alarm. So that this is not silent,
+the status panel shows "Messung gestört – zu wenige Messwerte" once readings
+have covered less than half of the last three seconds for at least two seconds
+(regular readings slower than one per 0.4 s); a single stall does not show it.
+The hint disappears after three seconds with at least 60 % coverage (about one
+reading per 0.33 s or faster) and on stop, reset or error, and does not change any zone or
+alarm decision (ADR 0004). Confirmed green, a confirmed zone change, a gap
 over one second, session stop or the app's own alarm starts a new phase. Each
 phase alarms at most once. While the alarm tone plays, readings are ignored:
 the displayed zone stays frozen and gauge and timeline do not show the tone.

@@ -187,6 +187,7 @@ MonitorViewData _viewData(MonitorState state) => MonitorViewData(
   alarmFired: state.alarmFiredInPhase,
   alarmPlaying: state.alarmPlaying,
   alarmOutputFailed: state.alarmOutputFailed,
+  signalThin: state.signalThin,
   kittyWalkedAway: state.kittyAway,
   stars: state.stars,
   starProgress: state.starProgress,

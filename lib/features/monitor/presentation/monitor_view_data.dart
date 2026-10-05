@@ -57,6 +57,7 @@ final class MonitorViewData {
     this.alarmFired = false,
     this.alarmPlaying = false,
     this.alarmOutputFailed = false,
+    this.signalThin = false,
     this.kittyWalkedAway = false,
     this.stars = 0,
     this.starProgress = 0,
@@ -96,6 +97,10 @@ final class MonitorViewData {
 
   /// Whether the latest alarm output failed while measurement continued.
   final bool alarmOutputFailed;
+
+  /// Whether readings arrive too sparsely to judge the room (no alarm can
+  /// fire until they recover).
+  final bool signalThin;
 
   /// Whether Mia completed her walk out of the scene.
   final bool kittyWalkedAway;

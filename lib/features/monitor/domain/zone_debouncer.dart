@@ -49,6 +49,28 @@
 /// sample must itself be in range, every sample between phase start and
 /// confirmation is in that range, so the alarm cannot fire before
 /// `alarmDelay` of such samples.
+///
+/// Thin signal ([ZoneDecision.signalThin]): the rules above silently block
+/// the alarm while samples are too sparse (e.g. a throttled recorder that
+/// delivers one level per second), so this is reported separately. It is
+/// tracked across runs (gaps and thin-data adoptions do not clear it, only
+/// [ZoneDebouncer.reset] does):
+///
+/// * Every sample after the first since [ZoneDebouncer.reset] covers the
+///   time since the previous sample, capped at `maxSampleWeight` (as above,
+///   but also across gaps).
+/// * A sample is *poor* if these intervals cover less than half of the last
+///   `releaseTime`, limited to the time since the first sample after reset
+///   (so the start of a measurement at the nominal rate is never poor).
+/// * The signal becomes thin once samples have been poor without
+///   interruption for at least [ZoneDebouncer.thinEnterTime] (2 s), and
+///   stops being thin once they have been *good* (covering at least
+///   [ZoneDebouncer.thinClearShare], 60 %) without interruption for at
+///   least [ZoneDebouncer.thinClearTime] (3 s). The entry time outlasts the
+///   ~1.3 s in which the window refills after a single stall at the normal
+///   rate, so a stall alone never raises the hint; the longer clear time
+///   and the higher clear share keep irregular rates near the limit from
+///   toggling it.
 library;
 
 import 'dart:collection';
@@ -64,6 +86,7 @@ final class ZoneDecision {
     required this.started,
     required this.settled,
     required this.usable,
+    this.signalThin = false,
   });
 
   /// Confirmed zone after the sample.
@@ -85,6 +108,89 @@ final class ZoneDecision {
   /// Whether the release window is at least half covered. While it is not,
   /// the data is too thin for an alarm decision.
   final bool usable;
+
+  /// Whether samples have been too sparse to judge the room for a while
+  /// (see "Thin signal" in the library documentation). Unlike [usable] it
+  /// ignores the normal filling of the windows after a start or gap.
+  final bool signalThin;
+}
+
+/// Thin-signal tracker (see the library documentation). Pure, fed only with
+/// sample timestamps.
+final class _SampleDensity {
+  _SampleDensity({
+    required this.window,
+    required this.enterHold,
+    required this.clearHold,
+    required this.clearShare,
+    required this.maxWeight,
+  });
+
+  final Duration window;
+  final Duration enterHold;
+  final Duration clearHold;
+  final double clearShare;
+  final Duration maxWeight;
+
+  final Queue<({Duration start, Duration end})> _covered = ListQueue();
+  Duration? _first;
+  Duration? _last;
+  // Start of the current uninterrupted poor (or good) stretch.
+  Duration? _poorSince;
+  Duration? _goodSince;
+  bool thin = false;
+
+  void onSample(Duration t) {
+    final last = _last;
+    _last = t;
+    if (last == null || t < last) {
+      // First sample, or a clock going backwards: start measuring afresh
+      // (the hysteresis state is kept, so a thin signal is not hidden).
+      _covered.clear();
+      _first = t;
+    } else if (t > last) {
+      final from = t - last > maxWeight ? t - maxWeight : last;
+      _covered.add((start: from, end: t));
+    }
+    final elapsed = t - _first!;
+    final span = elapsed < window ? elapsed : window;
+    final windowStart = t - span;
+    while (_covered.isNotEmpty && _covered.first.end <= windowStart) {
+      _covered.removeFirst();
+    }
+    var micros = 0;
+    for (final interval in _covered) {
+      final from = interval.start > windowStart ? interval.start : windowStart;
+      micros += (interval.end - from).inMicroseconds;
+    }
+    final spanMicros = span.inMicroseconds;
+    _update(
+      poor: micros * 2 < spanMicros,
+      good: micros >= spanMicros * clearShare,
+      t: t,
+    );
+  }
+
+  /// Between "poor" and "good" neither stretch continues, so a rate right
+  /// at the limit keeps the current state instead of toggling it.
+  void _update({required bool poor, required bool good, required Duration t}) {
+    if (!poor) _poorSince = null;
+    if (!good) _goodSince = null;
+    if (poor) {
+      final since = _poorSince ??= t;
+      if (t - since >= enterHold) thin = true;
+    }
+    if (good) {
+      final since = _goodSince ??= t;
+      if (t - since >= clearHold) thin = false;
+    }
+  }
+
+  void reset() {
+    _covered.clear();
+    _first = _last = _poorSince = _goodSince = null;
+    thin = false;
+  }
 }
 
 /// One sample's weighted coverage `(start, end]` with its raw zone.
@@ -145,6 +251,29 @@ final class ZoneDebouncer {
         0 < leaveShare && leaveShare <= 1 && 0 < enterShare && enterShare <= 1;
     if (!sharesValid) throw ArgumentError('shares must lie in (0, 1]');
   }
+
+  late final _SampleDensity _density = _SampleDensity(
+    window: releaseTime,
+    enterHold: thinEnterTime,
+    clearHold: thinClearTime,
+    clearShare: thinClearShare,
+    maxWeight: maxSampleWeight,
+  );
+
+  /// Poor coverage needed before the thin hint shows. Longer than the
+  /// ~1.3 s it takes the release window to refill after a stall at the
+  /// normal rate, so recovering from a gap never raises the hint.
+  static const Duration thinEnterTime = Duration(seconds: 2);
+
+  /// Good coverage needed before the thin hint clears. Longer than the
+  /// entry time, so irregular rates around the limit do not toggle it.
+  static const Duration thinClearTime = Duration(seconds: 3);
+
+  /// Coverage share of the last `releaseTime` that counts as good for
+  /// clearing the thin hint (entering it needs less than 50 %). Without this
+  /// gap, jittered rates averaging exactly the limit (300–500 ms) toggled
+  /// the hint several times per 2 minutes despite the holds.
+  static const double thinClearShare = 0.6;
 
   /// Attack window: entering a zone needs 50 % of it.
   static const Duration defaultHoldTime = Duration(seconds: 1);
@@ -208,6 +337,7 @@ final class ZoneDebouncer {
 
   /// Feeds the raw [zone] of one valid sample at monotonic [timestamp].
   ZoneDecision onSample({required Duration timestamp, required Zone zone}) {
+    _density.onSample(timestamp);
     final last = _lastSample;
     _lastSample = timestamp;
     final continuous =
@@ -246,8 +376,15 @@ final class ZoneDebouncer {
     return _decide(zone, timestamp, attack, release);
   }
 
-  /// Forgets the confirmed zone, the samples and all runs.
+  /// Forgets the confirmed zone, the samples, all runs and the thin signal.
   void reset() {
+    _clearRun();
+    _density.reset();
+  }
+
+  /// Forgets the current run; the thin signal survives (see the library
+  /// documentation), because sparse samples keep starting new runs.
+  void _clearRun() {
     _samples.clear();
     _confirmed = null;
     _since = null;
@@ -260,7 +397,7 @@ final class ZoneDebouncer {
   }
 
   ZoneDecision _adopt(Zone zone, Duration timestamp) {
-    reset();
+    _clearRun();
     _lastSample = timestamp;
     _runStart = timestamp;
     _trackRuns(zone, timestamp);
@@ -318,5 +455,6 @@ final class ZoneDebouncer {
     started: started,
     settled: _settled,
     usable: _usable,
+    signalThin: _density.thin,
   );
 }

@@ -100,6 +100,9 @@
   "alarmOutputFailed": "Der Alarmton konnte nicht wiedergegeben werden. Die Messung läuft weiter.",
   "@alarmOutputFailed": {"description": "Non-fatal warning after alarm output fails."},
 
+  "signalThin": "Messung gestört – zu wenige Messwerte. Das Handy drosselt vielleicht das Mikrofon.",
+  "@signalThin": {"description": "Warning while microphone readings arrive too sparsely to judge the room; no alarm can fire then."},
+
   "kittyIdle": "Mia sitzt gemütlich da und wartet",
   "@kittyIdle": {"description": "Kitty mood idle (screen reader)."},
   "kittyHappy": "Mia ist fröhlich und schnurrt",

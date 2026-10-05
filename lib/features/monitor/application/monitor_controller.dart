@@ -195,6 +195,7 @@ final class MonitorController extends ChangeNotifier {
         kittyAway: false,
         alarmPlaying: false,
         alarmOutputFailed: false,
+        signalThin: false,
         thresholds: _settings.thresholds,
         starJustEarned: false,
         starProgress: 0,
@@ -293,6 +294,7 @@ final class MonitorController extends ChangeNotifier {
         clearRemaining: snapshot.remainingUntilAlarm == null,
         alarmFiredInPhase: snapshot.alarmFiredInPhase,
         kittyAway: _kittyAway(snapshot),
+        signalThin: snapshot.signalThin,
         history: _history.points,
         historyNow: now,
         stars: _stars.stars,
@@ -337,6 +339,8 @@ final class MonitorController extends ChangeNotifier {
         alarmOutputFailed: _state.alarmOutputFailed || failed,
         alarmFiredInPhase: false,
         clearRemaining: true,
+        // The machine was reset; the next reading judges afresh.
+        signalThin: false,
       ),
     );
   }
@@ -354,6 +358,7 @@ final class MonitorController extends ChangeNotifier {
         alarmFiredInPhase: false,
         kittyAway: false,
         alarmPlaying: false,
+        signalThin: false,
         starProgress: 0,
         starJustEarned: false,
       ),

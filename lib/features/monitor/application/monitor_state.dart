@@ -59,6 +59,7 @@ final class MonitorState {
     this.kittyAway = false,
     this.alarmPlaying = false,
     this.alarmOutputFailed = false,
+    this.signalThin = false,
     this.history = const [],
     this.historyNow = Duration.zero,
     this.stars = 0,
@@ -104,6 +105,11 @@ final class MonitorState {
   /// Non-fatal: the last alarm output failed. Reset on the next start.
   final bool alarmOutputFailed;
 
+  /// Whether readings have been too sparse to judge the room for a while
+  /// (e.g. a throttled recorder), so no alarm can fire. Cleared on stop,
+  /// reset, error and after the alarm tone.
+  final bool signalThin;
+
   /// Zone limits of the current/next measurement.
   final Thresholds thresholds;
 
@@ -142,6 +148,7 @@ final class MonitorState {
     bool? kittyAway,
     bool? alarmPlaying,
     bool? alarmOutputFailed,
+    bool? signalThin,
     Thresholds? thresholds,
     List<LevelHistoryPoint>? history,
     Duration? historyNow,
@@ -161,6 +168,7 @@ final class MonitorState {
     kittyAway: kittyAway ?? this.kittyAway,
     alarmPlaying: alarmPlaying ?? this.alarmPlaying,
     alarmOutputFailed: alarmOutputFailed ?? this.alarmOutputFailed,
+    signalThin: signalThin ?? this.signalThin,
     thresholds: thresholds ?? this.thresholds,
     history: history ?? this.history,
     historyNow: historyNow ?? this.historyNow,
