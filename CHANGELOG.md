@@ -29,3 +29,4 @@ these lines (see docs/releasing.md).
 * v0.2.3 fixes the minimum Android API in debug release notes (aapt2 reports minSdkVersion)
 * v0.3.0 adds zone hysteresis (fast attack, slow release) so the light no longer flickers and loud rooms still alarm after the delay; Mia stays away after the red alarm until green is settled (ADR 0004)
 * v0.3.1 shows real screenshots in the README, documents the release command and records the emulator smoke test
+* v0.4.0 makes the alarm delay configurable in Settings (3–60 s, default 10 s); settings schema v2 migrates older data to 10 s, and older app versions reading v2 data fall back to defaults

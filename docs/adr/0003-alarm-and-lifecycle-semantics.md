@@ -6,7 +6,8 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 # ADR 0003 – Alarm and measurement lifecycle semantics
 
 - Status: accepted; implemented; independent review required before release
-- Date: 2026-10-03 (alarm rules amended 2026-10-04 by ADR 0004)
+- Date: 2026-10-03 (alarm rules amended 2026-10-04 by ADR 0004; alarm delay
+  made configurable 2026-10-04)
 
 ## Context
 
@@ -51,13 +52,19 @@ state and id before changing state.
 - The phase time is measured from the phase start to the latest sample whose
   raw zone is at least the phase's zone: dips between such samples count, a
   quiet tail after the last one does not. The alarm fires only on such a
-  sample, once the phase time reaches 10.0 seconds, and only while the
+  sample, once the phase time reaches the configured alarm delay (default
+  10.0 seconds), and only while the
   release window is at least half covered; otherwise with the next such
   sample. While the zone holds, pauses and dips do not reset the phase.
 - Samples that stay too sparse to fill the release window (e.g. one per
   second) for more than three seconds are treated like a gap.
-- The alarm delay must not be shorter than the hysteresis window (1 s); the
-  machine rejects such a configuration.
+- The alarm delay is a user setting (`AppSettings.alarmDelaySeconds`, whole
+  seconds 3–60, default 10; owner decision 2026-10-04). The controller
+  creates a new alarm machine with that delay for every session, so a change
+  takes effect with the next start (opening Settings stops the measurement).
+  The machine itself still rejects a delay shorter than the hysteresis window
+  (1 s); the 3 s lower bound keeps a margin above it and avoids a nervous
+  alarm, the 60 s upper bound keeps the feedback connected to its cause.
 - A confirmed yellow-to-red or red-to-yellow transition creates a new phase
   and timer.
 - Confirmed green, stop, background, error or a sample gap greater than one

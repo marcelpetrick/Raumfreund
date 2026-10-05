@@ -12,7 +12,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 [![Flutter 3.47.6](https://img.shields.io/badge/Flutter-3.47.6-02569B.svg)](https://docs.flutter.dev/release/archive)
 [![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2.svg)](https://dart.dev/)
 [![Android 7+](https://img.shields.io/badge/Android-7.0%2B-3DDC84.svg)](docs/toolchain.md)
-[![Coverage: 97.94%](https://img.shields.io/badge/coverage-97.94%25-brightgreen.svg)](docs/testing.md)
+[![Coverage: 98.01%](https://img.shields.io/badge/coverage-98.01%25-brightgreen.svg)](docs/testing.md)
 [![Status: release candidate](https://img.shields.io/badge/status-release%20candidate-blue.svg)](plan.md)
 
 Raumfreund is a child-friendly Android noise traffic light for shared rooms.
@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.3.1+26` — code-complete release candidate**
+Current version: **`0.4.0+27` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -68,16 +68,17 @@ build.
   room is calm again.
 - Zone hysteresis: peaks switch the light quickly, but it cools down slowly,
   so the colour does not flicker at a threshold and the text does not jump.
-- Ten-second alarm rule with one alarm per loud yellow/red phase, never
-  before the delay, and protection against retriggering on the app's own
-  sound ([ADR 0004](docs/adr/0004-zone-hysteresis.md)).
+- Configurable alarm delay (3–60 s, default 10 s) with one alarm per loud
+  yellow/red phase, never before the delay, and protection against
+  retriggering on the app's own sound
+  ([ADR 0004](docs/adr/0004-zone-hysteresis.md)).
 - A 10-minute RAM-only timeline (one smoothed point per 10 s; peaks rise fast
   and cool down slowly) and quiet-minute stars.
-- Configurable thresholds, calibration correction, alarm tone and vibration,
-  persisted locally with validated schema migration.
+- Configurable thresholds, alarm delay, calibration correction, alarm tone and
+  vibration, persisted locally with validated schema migration.
 - Dedicated Settings and About views; navigating away safely stops measurement.
 - German localization, reduced-motion support and responsive phone/tablet UI.
-- Reproducible pinned toolchain, 336 automated tests, 97.94% Dart coverage,
+- Reproducible pinned toolchain, 359 automated tests, 98.01% Dart coverage,
   Android lint, secret/vulnerability scans, Docker packaging and tag releases.
 
 ## Interaction
@@ -89,8 +90,8 @@ Opening another page always stops an active measurement safely; returning does
 not restart it automatically.
 
 The **Settings** button in the top app bar opens a separate view for the
-yellow and red thresholds, calibration correction, alarm sound and vibration.
-The view edits a working copy: **Speichern** validates and persists it,
+yellow and red thresholds, the alarm delay (how long it may be too loud before
+the alarm), calibration correction, alarm sound and vibration. The view edits a working copy: **Speichern** validates and persists it,
 **Abbrechen** discards it, and **Standardwerte** restores the proposed defaults.
 Measurement stays stopped while settings are open and after returning.
 

@@ -46,7 +46,7 @@ final class MonitorController extends ChangeNotifier {
        _sessionSettings = settings,
        _history = history ?? LevelHistory(),
        _stars = stars ?? QuietStars(),
-       _alarm = AlarmStateMachine(thresholds: settings.thresholds),
+       _alarm = _alarmFor(settings),
        _calibration = Calibration(
          correctionDb: settings.calibrationCorrectionDb,
        ),
@@ -144,7 +144,7 @@ final class MonitorController extends ChangeNotifier {
   }
 
   /// Stops the measurement and uses [settings] (thresholds, calibration,
-  /// alarm options) from the next start on.
+  /// alarm delay and options) from the next start on.
   Future<void> applySettings(AppSettings settings) async {
     if (_disposed) return;
     _settings = settings;
@@ -181,7 +181,7 @@ final class MonitorController extends ChangeNotifier {
 
   void _prepareSession() {
     _sessionSettings = _settings;
-    _alarm = AlarmStateMachine(thresholds: _settings.thresholds);
+    _alarm = _alarmFor(_settings);
     _calibration = Calibration(correctionDb: _settings.calibrationCorrectionDb);
     _smoother.reset();
     _stars.reset();
@@ -402,6 +402,14 @@ final class MonitorController extends ChangeNotifier {
     _state = state;
     notifyListeners();
   }
+
+  /// A fresh machine per session: thresholds and the configured alarm delay
+  /// are fixed for its lifetime, so a settings change takes effect with the
+  /// next start (Settings stop the measurement anyway).
+  static AlarmStateMachine _alarmFor(AppSettings settings) => AlarmStateMachine(
+    thresholds: settings.thresholds,
+    alarmDelay: settings.alarmDelay,
+  );
 
   static MonitorFailure _mapFailure(LevelFailure failure) => switch (failure) {
     LevelFailure.microphoneBusy => MonitorFailure.microphoneBusy,

@@ -37,7 +37,8 @@ Version 1 ist eine Android-App für Handy und Tablet. iOS, Desktop und Web gehö
 
 - Gelb- und Rotgrenzen in ganzen dB innerhalb 0–130 einstellbar; immer `0 <= gelb < rot <= 130`.
 - Verhindere ungültige Werte in UI, Domänenlogik und persistenten Daten.
-- Speichere Grenzen, Kalibrierung und Alarmoptionen lokal und dauerhaft; validiere beim Laden und migriere zukünftige Datenversionen.
+- Die Alarmverzögerung (wie lange es durchgehend zu laut sein muss) ist in ganzen Sekunden von 3 bis 60 einstellbar, Standard 10 Sekunden (Entscheidung des Projektinhabers vom 2026-10-04). Untergrenze 3 s: mit Abstand über dem 1-s-Haltefenster der Zonenhysterese und nicht nervös; Obergrenze 60 s: die Rückmeldung bleibt mit dem Lärm verbunden.
+- Speichere Grenzen, Kalibrierung, Alarmverzögerung und Alarmoptionen lokal und dauerhaft; validiere beim Laden und migriere zukünftige Datenversionen.
 - Speichern und Abbrechen haben klare, unterschiedliche Wirkung. Standardwerte können wiederhergestellt werden.
 - Erlaube einen verständlich beschriebenen Kalibrierungsoffset.
 - Alarmton ist abschaltbar; kurze Vibration sofern vorhanden. Keine Voraussetzung, dass jedes Gerät vibrieren kann.
@@ -49,13 +50,13 @@ Version 1 ist eine Android-App für Handy und Tablet. iOS, Desktop und Web gehö
 | Grün | Kein Alarm; Zeit und Auslösestatus zurücksetzen |
 | Eintritt in Gelb | Neue gelbe Phase, Timer startet bei null |
 | Eintritt in Rot | Neue rote Phase, Timer startet bei null |
-| Gelb oder Rot für mindestens 10 Sekunden durchgehend | Ein Alarm für diese Phase |
+| Gelb oder Rot durchgehend für mindestens die eingestellte Alarmverzögerung (Standard 10 Sekunden, 3–60 Sekunden einstellbar) | Ein Alarm für diese Phase |
 | Weiterhin gleiche Phase nach Alarm | Kein wiederholter Daueralarm |
 | Wechsel Gelb ↔ Rot | Neuer Timer und neuer Auslösestatus |
 | Stopp, Hintergrund, Fehler oder Messlücke über 1 Sekunde | Kontinuität aufheben; keine Zeit ohne Samples mitzählen |
-| Änderung der Grenzwerte | Messung bleibt gestoppt; nächster Start beginnt eine neue Phase |
+| Änderung der Grenzwerte oder der Alarmverzögerung | Messung bleibt gestoppt; nächster Start beginnt eine neue Phase mit den neuen Werten |
 
-Nutze monotone Zeit und injizierbare Zeitquellen für Tests. Definiere den Startzeitpunkt als Zeitpunkt des ersten gültigen Samples einer Phase. Messintervalle und Zeitauflösung dokumentieren. Der Alarm darf nicht vor zehn Sekunden auslösen; danach spätestens mit dem nächsten gültigen Sample. Ein Sample exakt auf einer Grenze gehört zur höheren Stufe. Zonen reagieren schnell auf Lärm und kühlen langsam ab (Entscheidung des Projektinhabers vom 2026-10-04, ADR 0004): eine Zone gilt als erreicht, wenn mindestens 50 % der letzten Sekunde in ihr oder darüber lagen, und erst als verlassen, wenn es weniger als 15 % der letzten 3 Sekunden waren. Eine Phase zählt ab dem ersten Sample des zusammenhängenden lauten Abschnitts, der zur Bestätigung geführt hat, bis zum letzten Sample, das mindestens so laut wie die Zone ist: Pausen dazwischen zählen mit und setzen die Phase nicht zurück, solange die Zone gehalten wird; eine leise Nachlaufzeit zählt nicht. Mia läuft weg, sobald der Alarm einer roten Phase auslöst, und kommt erst zurück, wenn Grün bestätigt ist oder die Messung endet.
+Nutze monotone Zeit und injizierbare Zeitquellen für Tests. Definiere den Startzeitpunkt als Zeitpunkt des ersten gültigen Samples einer Phase. Messintervalle und Zeitauflösung dokumentieren. Der Alarm darf nicht vor Ablauf der eingestellten Alarmverzögerung auslösen; danach spätestens mit dem nächsten gültigen Sample. Ein Sample exakt auf einer Grenze gehört zur höheren Stufe. Zonen reagieren schnell auf Lärm und kühlen langsam ab (Entscheidung des Projektinhabers vom 2026-10-04, ADR 0004): eine Zone gilt als erreicht, wenn mindestens 50 % der letzten Sekunde in ihr oder darüber lagen, und erst als verlassen, wenn es weniger als 15 % der letzten 3 Sekunden waren. Eine Phase zählt ab dem ersten Sample des zusammenhängenden lauten Abschnitts, der zur Bestätigung geführt hat, bis zum letzten Sample, das mindestens so laut wie die Zone ist: Pausen dazwischen zählen mit und setzen die Phase nicht zurück, solange die Zone gehalten wird; eine leise Nachlaufzeit zählt nicht. Mia läuft weg, sobald der Alarm einer roten Phase auslöst, und kommt erst zurück, wenn Grün bestätigt ist oder die Messung endet.
 
 Der eigene Alarmton kann das Mikrofon beeinflussen. Definiere und teste eine Behandlung: während des Tons keine weiteren Alarme auslösen, anschließend den Timer zurücksetzen und eine neue Phase erst mit gültigen Samples nach Tonende beginnen. Dokumentiere die kurze Messunterbrechung und halte UI und Domänenzustand konsistent.
 

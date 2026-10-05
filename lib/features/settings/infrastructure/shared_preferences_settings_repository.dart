@@ -42,9 +42,13 @@ final class SettingsStorageException implements Exception {
 /// individual keys remain readable for migration from releases that predate the
 /// snapshot format.
 ///
-/// * [schemaVersion] (1) is the current layout.
+/// * Version 1: thresholds, calibration, sound and vibration.
+/// * Version 2 ([schemaVersion]) adds [alarmDelayKey]. Version 1 data is
+///   upgraded by [migrateV1ToV2]: the alarm delay becomes the factory
+///   default (10 s), because the fixed delay of version 1 was 10 s.
 /// * Missing or non-integer version: treated as the current layout (fields
-///   are validated individually anyway).
+///   are validated individually anyway, a missing delay falls back to its
+///   default).
 /// * Older versions are upgraded step by step through [migrations]
 ///   (`migrations[n]` turns version n into n + 1). A version without a
 ///   migration path loads defaults.
@@ -53,15 +57,19 @@ final class SettingsStorageException implements Exception {
 ///   data is left untouched until the user saves.
 final class SharedPreferencesSettingsRepository implements SettingsRepository {
   /// Creates the repository. [openStore] defaults to the real
-  /// SharedPreferences; [migrations] defaults to none (no older schema
-  /// exists yet).
+  /// SharedPreferences; [migrations] defaults to [defaultMigrations].
   SharedPreferencesSettingsRepository({
     Future<PreferencesStore> Function()? openStore,
-    this.migrations = const {},
+    this.migrations = defaultMigrations,
   }) : _openStore = openStore ?? SharedPreferencesStore.open;
 
   /// Current schema version written by [save].
-  static const int schemaVersion = 1;
+  static const int schemaVersion = 2;
+
+  /// Upgrade steps of all released schema versions.
+  static const Map<int, SettingsMigration> defaultMigrations = {
+    1: migrateV1ToV2,
+  };
 
   /// Storage key of the schema version.
   static const String versionKey = 'settings.schemaVersion';
@@ -83,6 +91,19 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
 
   /// Storage key of the vibration flag.
   static const String vibrationKey = 'settings.vibrationEnabled';
+
+  /// Storage key of the alarm delay in seconds (since schema version 2).
+  static const String alarmDelayKey = 'settings.alarmDelaySeconds';
+
+  /// Upgrades version 1 data: the delay was fixed at the factory default
+  /// then, so any value found under [alarmDelayKey] cannot stem from the
+  /// user and is ignored.
+  static PreferenceReader migrateV1ToV2(PreferenceReader read) =>
+      (key) => switch (key) {
+        alarmDelayKey => AppSettings.defaultAlarmDelaySeconds,
+        versionKey => 2,
+        _ => read(key),
+      };
 
   /// Upgrade steps keyed by the version they upgrade from.
   final Map<int, SettingsMigration> migrations;
@@ -145,6 +166,12 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
       ),
       alarmSoundEnabled: _bool(read(soundKey), defaults.alarmSoundEnabled),
       vibrationEnabled: _bool(read(vibrationKey), defaults.vibrationEnabled),
+      alarmDelaySeconds: _intIn(
+        read(alarmDelayKey),
+        AppSettings.minAlarmDelaySeconds,
+        AppSettings.maxAlarmDelaySeconds,
+        defaults.alarmDelaySeconds,
+      ),
     );
   }
 
@@ -165,6 +192,7 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
     calibrationKey: settings.calibrationCorrectionDb,
     soundKey: settings.alarmSoundEnabled,
     vibrationKey: settings.vibrationEnabled,
+    alarmDelayKey: settings.alarmDelaySeconds,
   };
 
   static PreferenceReader? _snapshotReader(Object raw) {

@@ -233,10 +233,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Gelb liegt immer unter Rot. Schiebst du eine Grenze über die andere, rückt die andere automatisch mit.';
 
   @override
-  String get settingsTenSecondRule =>
-      'Die 10-Sekunden-Regel: Ein Alarm ertönt erst, wenn es mindestens 10 Sekunden ohne Unterbrechung gelb oder rot ist – und nur einmal pro Phase. Wechselt die Farbe, beginnt die Zeit neu; bei Grün wird alles zurückgesetzt.';
-
-  @override
   String get settingsCalibrationHeading => 'Kalibrierung';
 
   @override
@@ -253,6 +249,27 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsAlarmHeading => 'Alarm';
+
+  @override
+  String get settingsAlarmDelayLabel => 'Alarm nach';
+
+  @override
+  String settingsSecondsValue(int value) {
+    return '$value Sekunden';
+  }
+
+  @override
+  String get settingsAlarmDelayDecrease =>
+      'Alarm-Wartezeit um 1 Sekunde verkürzen';
+
+  @override
+  String get settingsAlarmDelayIncrease =>
+      'Alarm-Wartezeit um 1 Sekunde verlängern';
+
+  @override
+  String settingsAlarmDelayRule(int seconds, int min, int max, int standard) {
+    return 'So funktioniert der Alarm: Er ertönt erst, wenn es mindestens $seconds Sekunden ohne Unterbrechung gelb oder rot ist – und nur einmal pro Phase. Wechselt die Farbe, beginnt die Zeit neu; bei Grün wird alles zurückgesetzt. Einstellbar sind $min bis $max Sekunden, Standard sind $standard Sekunden.';
+  }
 
   @override
   String get settingsAlarmSound => 'Alarmton';

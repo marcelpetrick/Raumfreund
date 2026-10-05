@@ -206,6 +206,7 @@ void settingsTests() {
         calibrationCorrectionDb: 10,
         alarmSoundEnabled: true,
         vibrationEnabled: false,
+        alarmDelaySeconds: 10,
       );
       await h.controller.applySettings(settings);
       expect(h.state.status, MonitorStatus.stopped);
@@ -215,6 +216,35 @@ void settingsTests() {
       h.reading(greenDbfs);
       expect(h.state.alarmLevelDb, 60);
       expect(h.state.zone, Zone.red);
+    });
+
+    test('a 5 s delay alarms at exactly 5.0 s, not before', () async {
+      final h = MonitorHarness(
+        settings: AppSettings.defaults.copyWith(alarmDelaySeconds: 5),
+      );
+      await h.controller.start();
+      h.readings(redDbfs, 50); // first sample at t0, last at t0 + 4.9 s
+      expect(h.alarm.calls, isEmpty);
+      expect(h.state.remainingUntilAlarm, const Duration(milliseconds: 100));
+      h.reading(redDbfs); // t0 + 5.0 s
+      expect(h.alarm.calls, hasLength(1));
+    });
+
+    test('a changed delay takes effect with the next start', () async {
+      final h = MonitorHarness();
+      await h.controller.start();
+      h.reading(yellowDbfs);
+      expect(h.state.remainingUntilAlarm, const Duration(seconds: 10));
+      await h.controller.applySettings(
+        AppSettings.defaults.copyWith(alarmDelaySeconds: 60),
+      );
+      await h.controller.start();
+      h.reading(yellowDbfs);
+      expect(h.state.remainingUntilAlarm, const Duration(seconds: 60));
+      h.readings(yellowDbfs, 599); // t0 + 59.9 s
+      expect(h.alarm.calls, isEmpty);
+      h.reading(yellowDbfs); // t0 + 60 s
+      expect(h.alarm.calls, hasLength(1));
     });
 
     test('while stopped only updates the thresholds', () async {

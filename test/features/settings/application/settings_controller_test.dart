@@ -14,6 +14,7 @@ import '../../../fakes/settle.dart';
 final AppSettings custom = AppSettings.defaults.copyWith(
   thresholds: Thresholds(yellowDb: 50, redDb: 70),
   calibrationCorrectionDb: 4,
+  alarmDelaySeconds: 30,
 );
 
 void main() {
@@ -77,6 +78,17 @@ void main() {
     final before = notifications;
     controller.clearSaveError();
     expect(notifications, before);
+  });
+
+  test('the alarm delay is loaded, saved and kept on failure', () async {
+    await controller.load();
+    expect(controller.settings.alarmDelaySeconds, 30);
+    final faster = custom.copyWith(alarmDelaySeconds: 5);
+    expect(await controller.save(faster), isTrue);
+    expect(repository.stored.alarmDelaySeconds, 5);
+    repository.saveException = const FormatException('disk');
+    expect(await controller.save(AppSettings.defaults), isFalse);
+    expect(controller.settings.alarmDelaySeconds, 5);
   });
 
   test('saves are serialized in call order', () async {

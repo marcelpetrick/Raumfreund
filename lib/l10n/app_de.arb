@@ -174,8 +174,6 @@
   },
   "settingsThresholdsHint": "Gelb liegt immer unter Rot. Schiebst du eine Grenze über die andere, rückt die andere automatisch mit.",
   "@settingsThresholdsHint": {"description": "Explains the threshold coupling."},
-  "settingsTenSecondRule": "Die 10-Sekunden-Regel: Ein Alarm ertönt erst, wenn es mindestens 10 Sekunden ohne Unterbrechung gelb oder rot ist – und nur einmal pro Phase. Wechselt die Farbe, beginnt die Zeit neu; bei Grün wird alles zurückgesetzt.",
-  "@settingsTenSecondRule": {"description": "Explains the alarm rule."},
   "settingsCalibrationHeading": "Kalibrierung",
   "@settingsCalibrationHeading": {"description": "Section heading."},
   "settingsCalibrationLabel": "Korrektur",
@@ -189,6 +187,27 @@
   "@settingsCalibrationExplanation": {"description": "How to calibrate."},
   "settingsAlarmHeading": "Alarm",
   "@settingsAlarmHeading": {"description": "Section heading."},
+  "settingsAlarmDelayLabel": "Alarm nach",
+  "@settingsAlarmDelayLabel": {"description": "Label of the alarm delay control."},
+  "settingsSecondsValue": "{value} Sekunden",
+  "@settingsSecondsValue": {
+    "description": "The configured alarm delay.",
+    "placeholders": {"value": {"type": "int"}}
+  },
+  "settingsAlarmDelayDecrease": "Alarm-Wartezeit um 1 Sekunde verkürzen",
+  "@settingsAlarmDelayDecrease": {"description": "Tooltip of the alarm delay minus button."},
+  "settingsAlarmDelayIncrease": "Alarm-Wartezeit um 1 Sekunde verlängern",
+  "@settingsAlarmDelayIncrease": {"description": "Tooltip of the alarm delay plus button."},
+  "settingsAlarmDelayRule": "So funktioniert der Alarm: Er ertönt erst, wenn es mindestens {seconds} Sekunden ohne Unterbrechung gelb oder rot ist – und nur einmal pro Phase. Wechselt die Farbe, beginnt die Zeit neu; bei Grün wird alles zurückgesetzt. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.",
+  "@settingsAlarmDelayRule": {
+    "description": "Explains the alarm rule with the configured delay and its range.",
+    "placeholders": {
+      "seconds": {"type": "int"},
+      "min": {"type": "int"},
+      "max": {"type": "int"},
+      "standard": {"type": "int"}
+    }
+  },
   "settingsAlarmSound": "Alarmton",
   "@settingsAlarmSound": {"description": "Alarm sound switch."},
   "settingsAlarmSoundHint": "Ein kurzer, freundlicher Ton",

@@ -71,7 +71,7 @@ integrates, bumps the version, runs the full pipeline and commits.
 | T | 10-minute timeline, 10 s buckets, attack/release envelope, calmer gauge | Opus | done, `1e54efa` (reviewed) |
 | B | Scared Mia in red, runs away after the alarm, walks back when green | Sonnet | done, `9338322` |
 | A | Zone hysteresis (fast attack, slow release), "Mia away" latch, ADR 0004 | Opus | done in `0.3.0`, four independent review rounds, judged releasable |
-| S | Configurable alarm delay in Settings (3–60 s, default 10 s) | Opus | in progress |
+| S | Configurable alarm delay in Settings (3–60 s, default 10 s) | Opus | done in `0.4.0` |
 | R | Independent review of A (4 rounds) and T | Opus | done; no blocking findings |
 | P | README with real screenshots, vision/docs sync | Coordinator | done in `0.3.1` |
 | Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.3.0-build25`; next one after S |

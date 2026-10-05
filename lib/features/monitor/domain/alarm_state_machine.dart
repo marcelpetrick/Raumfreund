@@ -109,8 +109,8 @@ final class AlarmSnapshot {
 /// or call [reset] (the measurement is stopped anyway).
 final class AlarmStateMachine {
   /// Creates a machine for [thresholds]. Throws an [ArgumentError] if
-  /// [alarmDelay] is shorter than [holdTime]. (The Settings range for the
-  /// delay starts at 3 s; that is added separately.)
+  /// [alarmDelay] is shorter than [holdTime]. The controller passes the
+  /// configured delay (Settings allow 3–60 s, see `AppSettings`).
   AlarmStateMachine({
     required this.thresholds,
     this.alarmDelay = defaultAlarmDelay,
@@ -128,7 +128,8 @@ final class AlarmStateMachine {
     }
   }
 
-  /// Continuous yellow/red time that triggers the alarm.
+  /// Default loud time that triggers the alarm; the user can change it in
+  /// Settings.
   static const Duration defaultAlarmDelay = Duration(seconds: 10);
 
   /// Largest distance between two samples that still counts as continuous.

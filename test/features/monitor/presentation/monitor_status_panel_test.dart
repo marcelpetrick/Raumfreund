@@ -63,6 +63,9 @@ void main() {
         _data(phase: MonitorPhase.idle, zone: null),
         _data(zone: Zone.yellow, countdown: 7),
         _data(zone: Zone.yellow, countdown: 10),
+        // Longest configurable alarm delay (AppSettings, 3..60 s).
+        _data(zone: Zone.yellow, countdown: 60),
+        _data(zone: Zone.red, countdown: 3),
         _data(zone: Zone.red, fired: true),
         _data(zone: Zone.red, fired: true, playing: true, starEarned: true),
       ];

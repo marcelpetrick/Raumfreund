@@ -37,8 +37,10 @@ A yellow or red phase is measured from the first sample of the contiguous loud
 run that led to its confirmation to the latest sample that is still at least
 as loud as the phase's zone. Pauses between loud samples count (a classroom
 with a shout every few seconds is loud), but a quiet tail does not: 8 s of
-shouting followed by silence never alarms. The alarm fires only on a loud
-sample, 10 s or more after the phase start. Samples that arrive too sparsely to
+shouting followed by silence never alarms (default delay). The alarm fires only on a loud
+sample, at least the configured alarm delay after the phase start (Settings,
+3–60 s in whole seconds, default 10 s; owner decision 2026-10-04). A changed
+delay applies from the next measurement start. Samples that arrive too sparsely to
 fill the three-second window (e.g. one per second) for more than three seconds
 are treated like a gap and never trigger an alarm. Confirmed green, a confirmed zone change, a gap
 over one second, session stop or the app's own alarm starts a new phase. Each

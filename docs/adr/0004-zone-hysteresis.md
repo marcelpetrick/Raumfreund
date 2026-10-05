@@ -102,6 +102,10 @@ sliding windows:
 
 ## Expected behaviour (covered by tests)
 
+Times assume the default alarm delay of 10 s; the delay is configurable
+(3–60 s, owner decision 2026-10-04, see ADR 0003) and shifts the alarm times
+accordingly.
+
 | Pattern | Result |
 | --- | --- |
 | Steady green → red | red after 0.5 s; alarm 10.0 s after first red sample |
@@ -125,12 +129,13 @@ sliding windows:
 
 - Entering a zone is visible after about 0.5 s; cooling down takes about 2.5 s
   of quiet. A pause of up to ~2.4 s inside a loud phase does not reset it and
-  counts once loud samples resume, so the alarm means "10 s of a loud room",
-  not 10 s of strictly loud samples; it can fire as soon as a loud sample
+  counts once loud samples resume, so the alarm means "the configured delay
+  (default 10 s) of a loud room", not that long of strictly loud samples; it can fire as soon as a loud sample
   follows such a pause.
 - With sparse samples (stalled recorder) no alarm fires at all.
 - The first sample after start, reset or a gap holds its zone for 1 s even if
   the room changes immediately (accepted).
 - A fast rise can step green → yellow → red within about 0.2 s, because yellow
   reaches 50 % slightly before red does (accepted, cosmetic).
-- The alarm delay can no longer be configured below the attack window.
+- The alarm delay can no longer be configured below the attack window. The
+  user-selectable range (3–60 s) starts well above it.

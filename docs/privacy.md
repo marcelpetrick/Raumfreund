@@ -10,7 +10,8 @@ level. It never stores or transmits audio. It has no accounts, analytics, ads
 or tracking, and its release manifest requests no Internet permission.
 
 Persisted data is limited to the user's thresholds, calibration correction,
-alarm-sound choice, vibration choice and a settings schema version. Numeric
+alarm delay, alarm-sound choice, vibration choice and a settings schema
+version. Numeric
 history and stars disappear when the process exits. Logs contain neither audio
 content nor personal data.
 

@@ -7,6 +7,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/zone_palette.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/glow_panel.dart';
+import '../../settings/domain/app_settings.dart';
 import '../domain/zone.dart';
 import 'monitor_view_data.dart';
 import 'stable_text.dart';
@@ -72,8 +73,14 @@ class MonitorStatusPanel extends StatelessWidget {
   /// yellow/red does not push the content below down.
   Widget _alarmSlot(AppLocalizations l10n) => StableText(
     text: _alarmText(l10n),
-    // 10 is the widest countdown that matters; fewer digits are never wider.
-    variants: [l10n.alarmCountdown(10), l10n.alarmFired, l10n.alarmPlaying],
+    // The countdown starts at the configured alarm delay, so its widest text
+    // is the largest selectable delay: two digits, never wider than any other
+    // in-range value. Reserving it keeps the height equal for every setting.
+    variants: [
+      l10n.alarmCountdown(AppSettings.maxAlarmDelaySeconds),
+      l10n.alarmFired,
+      l10n.alarmPlaying,
+    ],
     textAlign: TextAlign.center,
   );
 

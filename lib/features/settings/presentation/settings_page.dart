@@ -97,8 +97,6 @@ class _SettingsPageState extends State<SettingsPage> {
         onChanged: _setRed,
       ),
       Text(l10n.settingsThresholdsHint),
-      const SizedBox(height: 12),
-      Text(l10n.settingsTenSecondRule),
     ],
   );
 
@@ -136,6 +134,20 @@ class _SettingsPageState extends State<SettingsPage> {
     icon: Icons.notifications_active_rounded,
     color: AppColors.green,
     children: [
+      _AlarmDelayControl(
+        value: _draft.alarmDelaySeconds,
+        onChanged: (value) =>
+            _update(_draft.copyWith(alarmDelaySeconds: value)),
+      ),
+      Text(
+        l10n.settingsAlarmDelayRule(
+          _draft.alarmDelaySeconds,
+          AppSettings.minAlarmDelaySeconds,
+          AppSettings.maxAlarmDelaySeconds,
+          AppSettings.defaultAlarmDelaySeconds,
+        ),
+      ),
+      const SizedBox(height: 8),
       SwitchListTile.adaptive(
         contentPadding: EdgeInsets.zero,
         title: Text(l10n.settingsAlarmSound),
@@ -352,4 +364,77 @@ class _ThresholdControl extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Alarm delay stepper: minus/plus buttons around a 1 s slider.
+///
+/// Unlike the threshold rows the value sits above the slider in a [Wrap],
+/// because "60 Sekunden" is too wide for a fixed slot next to the buttons at
+/// large text scales.
+class _AlarmDelayControl extends StatelessWidget {
+  const _AlarmDelayControl({required this.value, required this.onChanged});
+
+  final int value;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final valueText = l10n.settingsSecondsValue(value);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Wrap(
+          spacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(l10n.settingsAlarmDelayLabel, style: textTheme.titleMedium),
+            Text(
+              valueText,
+              style: textTheme.titleMedium?.copyWith(color: AppColors.green),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: value <= AppSettings.minAlarmDelaySeconds
+                  ? null
+                  : () => onChanged(value - 1),
+              tooltip: l10n.settingsAlarmDelayDecrease,
+              icon: const Icon(Icons.remove_rounded),
+            ),
+            Expanded(child: _slider(l10n, valueText)),
+            IconButton(
+              onPressed: value >= AppSettings.maxAlarmDelaySeconds
+                  ? null
+                  : () => onChanged(value + 1),
+              tooltip: l10n.settingsAlarmDelayIncrease,
+              icon: const Icon(Icons.add_rounded),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // Merged so screen readers announce name and value as one slider.
+  Widget _slider(AppLocalizations l10n, String valueText) => MergeSemantics(
+    child: Semantics(
+      label: l10n.settingsAlarmDelayLabel,
+      child: Slider(
+        value: value.toDouble(),
+        min: AppSettings.minAlarmDelaySeconds.toDouble(),
+        max: AppSettings.maxAlarmDelaySeconds.toDouble(),
+        divisions:
+            AppSettings.maxAlarmDelaySeconds - AppSettings.minAlarmDelaySeconds,
+        activeColor: AppColors.green,
+        label: valueText,
+        semanticFormatterCallback: (next) =>
+            l10n.settingsSecondsValue(next.round()),
+        onChanged: (next) => onChanged(next.round()),
+      ),
+    ),
+  );
 }

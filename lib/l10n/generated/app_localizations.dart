@@ -472,12 +472,6 @@ abstract class AppLocalizations {
   /// **'Gelb liegt immer unter Rot. Schiebst du eine Grenze über die andere, rückt die andere automatisch mit.'**
   String get settingsThresholdsHint;
 
-  /// Explains the alarm rule.
-  ///
-  /// In de, this message translates to:
-  /// **'Die 10-Sekunden-Regel: Ein Alarm ertönt erst, wenn es mindestens 10 Sekunden ohne Unterbrechung gelb oder rot ist – und nur einmal pro Phase. Wechselt die Farbe, beginnt die Zeit neu; bei Grün wird alles zurückgesetzt.'**
-  String get settingsTenSecondRule;
-
   /// Section heading.
   ///
   /// In de, this message translates to:
@@ -507,6 +501,36 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Alarm'**
   String get settingsAlarmHeading;
+
+  /// Label of the alarm delay control.
+  ///
+  /// In de, this message translates to:
+  /// **'Alarm nach'**
+  String get settingsAlarmDelayLabel;
+
+  /// The configured alarm delay.
+  ///
+  /// In de, this message translates to:
+  /// **'{value} Sekunden'**
+  String settingsSecondsValue(int value);
+
+  /// Tooltip of the alarm delay minus button.
+  ///
+  /// In de, this message translates to:
+  /// **'Alarm-Wartezeit um 1 Sekunde verkürzen'**
+  String get settingsAlarmDelayDecrease;
+
+  /// Tooltip of the alarm delay plus button.
+  ///
+  /// In de, this message translates to:
+  /// **'Alarm-Wartezeit um 1 Sekunde verlängern'**
+  String get settingsAlarmDelayIncrease;
+
+  /// Explains the alarm rule with the configured delay and its range.
+  ///
+  /// In de, this message translates to:
+  /// **'So funktioniert der Alarm: Er ertönt erst, wenn es mindestens {seconds} Sekunden ohne Unterbrechung gelb oder rot ist – und nur einmal pro Phase. Wechselt die Farbe, beginnt die Zeit neu; bei Grün wird alles zurückgesetzt. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.'**
+  String settingsAlarmDelayRule(int seconds, int min, int max, int standard);
 
   /// Alarm sound switch.
   ///

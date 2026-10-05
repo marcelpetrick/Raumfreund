@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/features/monitor/domain/thresholds.dart';
 import 'package:raumfreund/features/settings/domain/app_settings.dart';
@@ -20,18 +22,25 @@ Map<String, Object?> validData() => {
   Repo.calibrationKey: -5,
   Repo.soundKey: false,
   Repo.vibrationKey: false,
+  Repo.alarmDelayKey: 25,
 };
+
+/// The same user data as written by schema version 1 (no alarm delay yet).
+Map<String, Object?> v1Data() => validData()
+  ..[Repo.versionKey] = 1
+  ..remove(Repo.alarmDelayKey);
 
 final AppSettings validSettings = AppSettings(
   thresholds: Thresholds(yellowDb: 55, redDb: 75),
   calibrationCorrectionDb: -5,
   alarmSoundEnabled: false,
   vibrationEnabled: false,
+  alarmDelaySeconds: 25,
 );
 
 Future<AppSettings> loadFrom(
   Map<String, Object?> data, {
-  Map<int, SettingsMigration> migrations = const {},
+  Map<int, SettingsMigration> migrations = Repo.defaultMigrations,
 }) => Repo(
   openStore: () async => FakePreferencesStore(data),
   migrations: migrations,
@@ -41,6 +50,7 @@ void main() {
   loadTests();
   invalidFieldTests();
   versionTests();
+  alarmDelayTests();
   saveTests();
   sharedPreferencesTests();
 }
@@ -192,8 +202,72 @@ void versionTests() {
       };
       PreferenceReader migrate(PreferenceReader read) =>
           (key) => key == Repo.yellowKey ? read('legacy.yellow') : read(key);
-      final loaded = await loadFrom(v0, migrations: {0: migrate});
+      final loaded = await loadFrom(
+        v0,
+        migrations: {...Repo.defaultMigrations, 0: migrate},
+      );
       expect(loaded.thresholds, Thresholds(yellowDb: 50, redDb: 70));
+      expect(loaded.alarmDelaySeconds, AppSettings.defaultAlarmDelaySeconds);
+    });
+  });
+}
+
+void alarmDelayTests() {
+  group('alarm delay', () {
+    for (final bad in <Object?>[null, '20', 20.0, true, 2, 61, -5]) {
+      test('$bad → default 10 s, rest kept', () async {
+        final loaded = await loadFrom(validData()..[Repo.alarmDelayKey] = bad);
+        expect(loaded.alarmDelaySeconds, 10);
+        expect(loaded, validSettings.copyWith(alarmDelaySeconds: 10));
+      });
+    }
+
+    test('limits 3 and 60 are accepted', () async {
+      for (final limit in [3, 60]) {
+        final loaded = await loadFrom(
+          validData()..[Repo.alarmDelayKey] = limit,
+        );
+        expect(loaded.alarmDelaySeconds, limit);
+      }
+    });
+
+    test('version 1 individual keys migrate to the 10 s default', () async {
+      expect(
+        await loadFrom(v1Data()),
+        validSettings.copyWith(alarmDelaySeconds: 10),
+      );
+    });
+
+    test('version 1 snapshot migrates and ignores a stray delay', () async {
+      final snapshot = jsonEncode(v1Data()..[Repo.alarmDelayKey] = 42);
+      expect(
+        await loadFrom({Repo.snapshotKey: snapshot}),
+        validSettings.copyWith(alarmDelaySeconds: 10),
+      );
+    });
+
+    test('the migration reports the new version and keeps other keys', () {
+      final read = Repo.migrateV1ToV2((key) => v1Data()[key]);
+      expect(read(Repo.versionKey), 2);
+      expect(read(Repo.yellowKey), 55);
+      expect(read(Repo.alarmDelayKey), AppSettings.defaultAlarmDelaySeconds);
+    });
+
+    test('the default repository migrates stored version 1 data', () async {
+      final legacy = jsonEncode(v1Data());
+      SharedPreferences.setMockInitialValues({Repo.snapshotKey: legacy});
+      expect(
+        await Repo().load(),
+        validSettings.copyWith(alarmDelaySeconds: 10),
+      );
+    });
+
+    test('save writes the current version and the delay', () async {
+      final store = FakePreferencesStore();
+      await Repo(openStore: () async => store).save(validSettings);
+      final saved = jsonDecode(store.values[Repo.snapshotKey]! as String);
+      expect(saved, containsPair(Repo.versionKey, 2));
+      expect(saved, containsPair(Repo.alarmDelayKey, 25));
     });
   });
 }
