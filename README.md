@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.6.5+50` — code-complete release candidate**
+Current version: **`0.6.6+51` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -98,7 +98,7 @@ yellow and red thresholds, the alarm delay (how long it may be too loud before
 the alarm), calibration correction, alarm sound, vibration and the optional
 **Schneller Stern-Testmodus**. That mode is off by default and awards a star
 after 5 seconds in green instead of 60, without resetting stars already
-earned. The view edits a working copy: **Speichern** validates and persists it,
+earned; while it is on, the star line on the monitor says so. The view edits a working copy: **Speichern** validates and persists it,
 **Abbrechen** discards it, and **Standardwerte** restores the proposed defaults.
 Measurement stays stopped while settings are open and after returning.
 

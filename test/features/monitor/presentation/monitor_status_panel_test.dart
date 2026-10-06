@@ -20,6 +20,7 @@ MonitorViewData _data({
   bool starEarned = false,
   int stars = 3,
   int? wallet,
+  bool quickStars = false,
 }) => MonitorViewData(
   phase: phase,
   thresholds: Thresholds.defaults,
@@ -31,6 +32,7 @@ MonitorViewData _data({
   walletStars: wallet,
   starProgress: .4,
   starJustEarned: starEarned,
+  quickStarMode: quickStars,
 );
 
 Future<double> _panelHeight(
@@ -71,6 +73,15 @@ void _totalTests() {
 
     await _panelHeight(tester, _data(stars: 1, wallet: 7), 1);
     expect(find.text('1 Stern heute · 7 im Sternenladen'), findsOneWidget);
+  });
+
+  testWidgets('says when the five-second star test mode is on', (tester) async {
+    await _panelHeight(tester, _data(), 1);
+    expect(find.text(l10nDe.starsHint), findsOneWidget);
+
+    await _panelHeight(tester, _data(quickStars: true), 1);
+    expect(find.text(l10nDe.starsHintQuickTest), findsOneWidget);
+    expect(find.text(l10nDe.starsHint), findsNothing);
   });
 
   testWidgets('hides the total while the wallet is unknown', (tester) async {

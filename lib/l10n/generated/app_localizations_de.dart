@@ -195,6 +195,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get starsHint => 'Für jede ruhige Minute gibt es einen Stern';
 
   @override
+  String get starsHintQuickTest =>
+      'Stern-Testmodus: alle 5 ruhigen Sekunden ein Stern';
+
+  @override
   String starsProgress(int percent) {
     return '$percent % bis zum nächsten Stern';
   }

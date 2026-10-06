@@ -137,7 +137,11 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     home: AnimatedBuilder(
       animation: Listenable.merge([_monitor, _settings, _shop]),
       builder: (context, _) => MonitorPage(
-        data: _viewData(_monitor.state, _shop),
+        data: _viewData(
+          _monitor.state,
+          _shop,
+          quickStarMode: _monitor.settings.quickStarModeEnabled,
+        ),
         onToggleMeasurement: _initialSettingsReady
             ? () => unawaited(_monitor.toggle())
             : null,
@@ -226,30 +230,32 @@ class _RaumfreundAppState extends State<RaumfreundApp>
   }
 }
 
-MonitorViewData _viewData(MonitorState state, ShopController shop) =>
-    MonitorViewData(
-      phase: _phase(state.status),
-      thresholds: state.thresholds,
-      levelDb: state.displayLevelDb,
-      zone: state.zone,
-      history: state.history,
-      alarmSecondsRemaining: _seconds(state.remainingUntilAlarm),
-      alarmFired: state.alarmFiredInPhase,
-      alarmPlaying: state.alarmPlaying,
-      alarmOutputFailed: state.alarmOutputFailed,
-      signalThin: state.signalThin,
-      kittyWalkedAway: state.kittyAway,
-      kittyAccessories: shop.wallet.equipped,
-      stars: state.stars,
-      // Before a successful load the wallet only holds this session's stars, so
-      // showing it as the total would be misleading.
-      walletStars: shop.isLoading || shop.loadFailed
-          ? null
-          : shop.wallet.balance,
-      starProgress: state.starProgress,
-      starJustEarned: state.starJustEarned,
-      error: _error(state.failure),
-    );
+MonitorViewData _viewData(
+  MonitorState state,
+  ShopController shop, {
+  required bool quickStarMode,
+}) => MonitorViewData(
+  phase: _phase(state.status),
+  thresholds: state.thresholds,
+  levelDb: state.displayLevelDb,
+  zone: state.zone,
+  history: state.history,
+  alarmSecondsRemaining: _seconds(state.remainingUntilAlarm),
+  alarmFired: state.alarmFiredInPhase,
+  alarmPlaying: state.alarmPlaying,
+  alarmOutputFailed: state.alarmOutputFailed,
+  signalThin: state.signalThin,
+  kittyWalkedAway: state.kittyAway,
+  kittyAccessories: shop.wallet.equipped,
+  stars: state.stars,
+  // Before a successful load the wallet only holds this session's stars, so
+  // showing it as the total would be misleading.
+  walletStars: shop.isLoading || shop.loadFailed ? null : shop.wallet.balance,
+  starProgress: state.starProgress,
+  starJustEarned: state.starJustEarned,
+  quickStarMode: quickStarMode,
+  error: _error(state.failure),
+);
 
 MonitorPhase _phase(MonitorStatus status) => switch (status) {
   MonitorStatus.stopped => MonitorPhase.idle,

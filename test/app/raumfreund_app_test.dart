@@ -10,6 +10,7 @@ import 'package:raumfreund/features/about/domain/app_info.dart';
 import 'package:raumfreund/features/monitor/application/monitor_controller.dart';
 import 'package:raumfreund/features/monitor/presentation/kitty/kitty_character.dart';
 import 'package:raumfreund/features/settings/application/settings_controller.dart';
+import 'package:raumfreund/features/settings/domain/app_settings.dart';
 import 'package:raumfreund/features/settings/presentation/settings_page.dart';
 import 'package:raumfreund/features/shop/domain/kitty_accessory.dart';
 import 'package:raumfreund/features/shop/domain/star_wallet.dart';
@@ -96,6 +97,22 @@ void main() {
     await _finishAsyncWork(tester);
     expect(find.text(l10nDe.measureStop), findsOneWidget);
     expect(monitor.source.startCalls, [1, 2]);
+  });
+  testWidgets('the monitor says when the star test mode is on', (tester) async {
+    // The app applies the stored settings to the monitor after loading.
+    final quick = AppSettings.defaults.copyWith(quickStarModeEnabled: true);
+    final monitor = MonitorHarness();
+    await tester.pumpWidget(
+      RaumfreundApp(
+        settingsController: SettingsController(
+          InMemorySettingsRepository(quick),
+        ),
+        monitorController: monitor.controller,
+        appInfoPort: const _FakeAppInfoPort(),
+      ),
+    );
+    await _finishAsyncWork(tester);
+    expect(find.text(l10nDe.starsHintQuickTest), findsOneWidget);
   });
   _shopTests();
 }

@@ -68,6 +68,7 @@ final class MonitorViewData {
     this.walletStars,
     this.starProgress = 0,
     this.starJustEarned = false,
+    this.quickStarMode = false,
     this.error,
   });
 
@@ -126,6 +127,11 @@ final class MonitorViewData {
 
   /// Whether the latest sample earned a star.
   final bool starJustEarned;
+
+  /// Whether the teacher's five-second star test mode is on. The monitor
+  /// says so, otherwise a forgotten test mode would silently fill the
+  /// classroom wallet twelve times faster.
+  final bool quickStarMode;
 
   /// Error detail when [phase] is [MonitorPhase.error].
   final MonitorErrorKind? error;

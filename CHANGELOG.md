@@ -53,3 +53,4 @@ these lines (see docs/releasing.md).
 * v0.6.3 ends a measurement with a clear message when the microphone delivers no values (5 s without a first, 3 s without a further reading)
 * v0.6.4 records the 0.6.3 emulator smoke test and the repeated emulator crash at microphone start
 * v0.6.5 treats an all-silent (muted) microphone as no measurement, so it ends with a clear message instead of a calm green room that earns stars, and names the Android microphone toggle in the error texts
+* v0.6.6 shows on the monitor when the Stern-Testmodus is on

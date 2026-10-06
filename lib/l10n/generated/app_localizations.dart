@@ -400,6 +400,12 @@ abstract class AppLocalizations {
   /// **'Für jede ruhige Minute gibt es einen Stern'**
   String get starsHint;
 
+  /// Star counter hint while the five-second star test mode is on.
+  ///
+  /// In de, this message translates to:
+  /// **'Stern-Testmodus: alle 5 ruhigen Sekunden ein Stern'**
+  String get starsHintQuickTest;
+
   /// Progress towards the next star.
   ///
   /// In de, this message translates to:

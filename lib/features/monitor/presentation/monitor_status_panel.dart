@@ -208,7 +208,10 @@ class _QuietStars extends StatelessWidget {
           const SizedBox(height: 6),
           LinearProgressIndicator(value: data.starProgress),
           const SizedBox(height: 4),
-          Text(l10n.starsHint, style: Theme.of(context).textTheme.bodySmall),
+          Text(
+            data.quickStarMode ? l10n.starsHintQuickTest : l10n.starsHint,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         ],
       ),
     );

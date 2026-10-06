@@ -143,6 +143,8 @@
   },
   "starsHint": "Für jede ruhige Minute gibt es einen Stern",
   "@starsHint": {"description": "Explains the star counter."},
+  "starsHintQuickTest": "Stern-Testmodus: alle 5 ruhigen Sekunden ein Stern",
+  "@starsHintQuickTest": {"description": "Star counter hint while the five-second star test mode is on."},
   "starsProgress": "{percent} % bis zum nächsten Stern",
   "@starsProgress": {
     "description": "Progress towards the next star.",
