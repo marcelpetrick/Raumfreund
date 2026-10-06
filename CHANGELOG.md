@@ -46,3 +46,4 @@ these lines (see docs/releasing.md).
 * v0.5.2 shows the Sternenladen total next to today's stars on the monitor
 * v0.5.3 never overwrites stored stars after a failed or newer-version load, retries failed saves on resume and when the shop opens, and confirms the teacher reset only after it was saved
 * v0.5.4 updates shared_preferences and pinned Node transitive dependencies, repairs the Gradle 9.3.1 wrapper with checksum validation, and pins the CI JDK and Android build tools
+* v0.5.5 keeps ignoring microphone readings while an earlier alarm tone still plays, even after a quick stop and restart

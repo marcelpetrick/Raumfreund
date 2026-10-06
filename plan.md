@@ -33,7 +33,7 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   without auto-restart. About lists author, email `mail@marcelpetrick.it`,
   version/build/commit, project link, privacy and licences.
 
-## Verified state (2026-10-04, `0.1.3+15`, commit `c40ec1a`)
+## Verified state (2026-10-06, `0.5.4+43`, commit `16e84b9`)
 
 - [x] Domain, controller, native `AudioRecord` recorder, platform channels,
   localized UI, Settings, About, persistence, docs and ADRs 0001–0003 exist.
@@ -54,10 +54,11 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   (SIGSEGV) twice around microphone start/stop, once with `-no-audio` and
   once with audio; a guest app cannot do that, so it is treated as an
   emulator audio-backend defect. Real-device microphone tests remain open.
-- [ ] Five parked agent worktrees under `.claude/worktrees/` hold superseded
-  pre-integration work; remove them after owner confirmation.
+- [ ] Eighteen parked agent worktrees under `.claude/worktrees/` and one stash
+  predate this acceptance pass. Several contain uncommitted or not
+  graph-merged work, so archive or remove them only after content review.
 
-## Current work packages (status 2026-10-04 evening, `0.2.1+22`)
+## Completed feature packages
 
 Each package has an exclusive file area and its own worktree; the coordinator
 integrates, bumps the version, runs the full pipeline and commits.
@@ -99,23 +100,22 @@ Four review rounds with probe tests shaped the rule; details are in
 ### Accepted hysteresis behaviour (review round 4)
 
 - Readings slower than one per 0.5 s never alarm (stalled recorder; the
-  recorder normally delivers every 100 ms). A "measurement disturbed" hint is
-  a possible follow-up.
+  recorder normally delivers every 100 ms). The implemented "measurement
+  disturbed" hint makes sparse input visible.
 - Pauses of up to about 2.5 s inside a loud phase count towards the delay.
 - The countdown may wait just above zero until the next loud sample.
 
-### Latest release check (2026-10-05)
+### Latest release check (2026-10-06)
 
-`debug-v0.4.5-build32` (commit `e7b4533`): downloaded from GitHub, checksum
-verified, `minSdkVersion` 24, permissions microphone and vibration only. On
-the Android 16 emulator it updates 0.3.0 in place, the Settings show the new
-alarm delay (migrated to 10 s), and a changed value of 15 s survives saving
-and an app restart. No app crash was logged.
+`debug-v0.5.3-build42` (commit `4e5527f`) is the latest published debug
+release. Its downloaded APK and local copy have the same SHA-256, CI and Docker
+are green for the exact commit, and its release notes identify the Android
+debug certificate and source commit. `0.5.4+43` is committed and pushed after
+a green local pipeline, but has not been published as a debug release.
 
-## Star shop (started 2026-10-05)
+## Star shop (implemented 2026-10-05)
 
-Owner idea: "when the kids collect enough stars, maybe they can buy stuff for
-the cat". Coordinator defaults, to be confirmed by the owner:
+The implemented first-release behaviour is:
 
 - Quiet-minute stars are still earned only while measuring (one per minute
   of confirmed green). Earned stars also go into a **persistent wallet** on
@@ -137,6 +137,21 @@ the cat". Coordinator defaults, to be confirmed by the owner:
 | K2 | Shop page, Settings reset, app composition (after W and K1) | Sonnet | done in `0.5.0` |
 
 ## Open: automated quality evidence
+
+Work packages for the current acceptance pass (re-planned 2026-10-06 after a
+session restart; the earlier A1/N1/I1 agents had stopped):
+
+| ID | Package | Owner | Status |
+| --- | --- | --- | --- |
+| G | Finish pinned dependency/toolchain update | Coordinator | done, `16e84b9`; green pipeline and pushed |
+| A1 | Suppress readings across alarm-output/session boundaries | Coordinator (finished the stopped agent's diff) | done in `0.5.5` |
+| S1 | Owner-confirmed quick-star test mode (5 s) from the parked stash | Coordinator | in progress |
+| N1 | Detect a recorder that produces no samples | Opus sub-agent, own worktree | queued after S1 (touches the controller) |
+| L1 | Complete third-party dependency/license inventory | Sonnet sub-agent, docs only | queued |
+| R1 | Independent review of A1, S1 and N1 | Opus reviewer (read-only) | queued after N1 |
+| Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | queued after R1 fixes |
+| I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | open; emulator audio backend crashed before |
+| D1 | Reconcile plan, testing evidence and release readiness | Coordinator | in progress |
 
 - [ ] Emulator tests for grant/deny/permanent deny, settings redirect, dialog
   lifecycle, background stop, rapid start/stop, stale events, stream failures,
@@ -165,4 +180,5 @@ must not claim a production-signed release or completed device certification.
 
 ## Later ideas (not in the first release)
 
-- **Star shop for Mia** — now in progress, see "Star shop" above.
+- No later feature is committed to the first release. New product ideas require
+  a separate owner decision and plan entry.

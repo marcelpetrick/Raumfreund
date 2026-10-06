@@ -73,7 +73,9 @@ state and id before changing state.
 - Exactly one alarm is allowed per uninterrupted phase.
 - While the alarm output future is active, incoming readings are ignored:
   they neither advance the alarm state machine nor reach the gauge, the
-  timeline or the quiet stars (the microphone hears the own tone).
+  timeline or the quiet stars (the microphone hears the own tone). This
+  suppression follows the physical output lifetime even if the user stops and
+  starts a replacement measurement session before that output completes.
   When output completes, continuity is reset. The next valid sample starts a
   new phase at zero.
 
@@ -90,9 +92,12 @@ and applies the asynchronous completion rule.
 ## Race resolution
 
 The newest user intent wins. Stop increments or clears the session token before
-awaiting external calls. Late permission, start, level, alarm-completion and
-stop callbacks compare their captured token with the current one. Cleanup calls
-remain safe when repeated, partially initialized or already completed.
+awaiting external calls. Late permission, start, level and stop callbacks
+compare their captured token with the current one. Alarm completion additionally
+ends controller-wide sample suppression: it may reset a replacement session
+that deliberately ignored all samples during the old physical output, but it
+must not revive or otherwise mutate a newer stopped intent. Cleanup calls remain
+safe when repeated, partially initialized or already completed.
 
 ## Consequences
 

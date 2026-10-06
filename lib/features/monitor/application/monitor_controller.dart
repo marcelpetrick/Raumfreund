@@ -72,6 +72,7 @@ final class MonitorController extends ChangeNotifier {
   StreamSubscription<LevelEvent>? _subscription;
   int _lastSessionId = 0;
   int? _activeSession;
+  bool _alarmOutputActive = false;
   bool _disposed = false;
 
   /// Current immutable state.
@@ -195,7 +196,7 @@ final class MonitorController extends ChangeNotifier {
         clearRemaining: true,
         alarmFiredInPhase: false,
         kittyAway: false,
-        alarmPlaying: false,
+        alarmPlaying: _alarmOutputActive,
         alarmOutputFailed: false,
         signalThin: false,
         thresholds: _settings.thresholds,
@@ -274,6 +275,9 @@ final class MonitorController extends ChangeNotifier {
   }
 
   void _onReading(int session, double dbfs) {
+    // Output can outlive the session that started it. A replacement session
+    // must still ignore the physical tone until its future completes.
+    if (_alarmOutputActive) return;
     final level = _calibration.estimate(dbfs);
     if (level == null) return;
     final now = _clock.now;
@@ -326,6 +330,8 @@ final class MonitorController extends ChangeNotifier {
     final vibrate = _sessionSettings.vibrationEnabled;
     // Nothing audible or tangible: no need to pause the measurement.
     if (!sound && !vibrate) return;
+    if (_alarmOutputActive) return;
+    _alarmOutputActive = true;
     _alarm.onAlarmOutputStarted();
     _emit(_state.copyWith(alarmPlaying: true));
     var failed = false;
@@ -334,13 +340,22 @@ final class MonitorController extends ChangeNotifier {
     } on Exception {
       failed = true;
     }
-    // A completion of an older session must not touch the current one.
-    if (!_isCurrent(session)) return;
+    _alarmOutputActive = false;
+    _finishAlarmOutput(ownerSession: session, failed: failed);
+  }
+
+  void _finishAlarmOutput({required int ownerSession, required bool failed}) {
+    final activeSession = _activeSession;
+    if (_disposed || activeSession == null) return;
+    // A replacement session ignored every sample while the old output was
+    // active. Reset its continuity too, then accept only later samples.
     _alarm.onAlarmOutputFinished();
     _emit(
       _state.copyWith(
         alarmPlaying: false,
-        alarmOutputFailed: _state.alarmOutputFailed || failed,
+        alarmOutputFailed:
+            _state.alarmOutputFailed ||
+            (ownerSession == activeSession && failed),
         alarmFiredInPhase: false,
         clearRemaining: true,
         // The machine was reset; the next reading judges afresh.

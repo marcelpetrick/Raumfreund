@@ -177,20 +177,54 @@ void alarmOutputTests() {
       expect(h.alarm.calls.single.vibrate, isTrue);
     });
 
-    test('completion of an old session does not touch the new one', () async {
+    test('old output suppresses a replacement session until it ends', () async {
       final h = MonitorHarness();
       await h.controller.start();
       h.readings(redDbfs, 101);
       await h.controller.stop();
       expect(h.state.alarmPlaying, isFalse);
       await h.controller.start();
-      h.readings(redDbfs, 50); // 4.9 s into the new phase
+      expect(h.state.alarmPlaying, isTrue);
+      final history = h.state.history;
+      h.readings(redDbfs, 101);
+      expect(h.state.alarmLevelDb, isNull);
+      expect(h.state.history, history);
+      expect(h.alarm.calls, hasLength(1));
       h.alarm.finish();
       await settle();
-      h.readings(redDbfs, 50); // 9.9 s
+      expect(h.state.alarmPlaying, isFalse);
+      h.readings(redDbfs, 100); // 9.9 s after the first post-tone sample
       expect(h.alarm.calls, hasLength(1));
-      h.reading(redDbfs); // 10 s: the new phase was not reset
+      h.reading(redDbfs); // 10 s: a fresh phase can now alarm
       expect(h.alarm.calls, hasLength(2));
+    });
+
+    test('old output completion preserves the newest stopped intent', () async {
+      final h = MonitorHarness();
+      await h.controller.start();
+      h.readings(redDbfs, 101);
+      await h.controller.stop();
+      await h.controller.start();
+      await h.controller.stop();
+      await h.controller.stop();
+      final emittedStates = h.statuses.length;
+      h.alarm.finish();
+      await settle();
+      expect(h.state.status, MonitorStatus.stopped);
+      expect(h.state.alarmPlaying, isFalse);
+      expect(h.statuses, hasLength(emittedStates));
+      expect(h.source.stopCalls, 2);
+    });
+
+    test('output completion after dispose changes nothing', () async {
+      final h = MonitorHarness();
+      await h.controller.start();
+      h.readings(redDbfs, 101);
+      final emittedStates = h.statuses.length;
+      h.controller.dispose();
+      h.alarm.finish();
+      await settle();
+      expect(h.statuses, hasLength(emittedStates));
     });
   });
 }
