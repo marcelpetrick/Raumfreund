@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/features/monitor/application/monitor_state.dart';
 import 'package:raumfreund/features/monitor/domain/thresholds.dart';
@@ -241,6 +243,7 @@ void settingsTests() {
         alarmSoundEnabled: true,
         vibrationEnabled: false,
         alarmDelaySeconds: 10,
+        quickStarModeEnabled: false,
       );
       await h.controller.applySettings(settings);
       expect(h.state.status, MonitorStatus.stopped);
@@ -290,6 +293,31 @@ void settingsTests() {
       expect(h.state.thresholds, settings.thresholds);
       expect(h.source.stopCalls, 0);
     });
+
+    test('overlapping updates consistently use the last settings', () async {
+      final h = MonitorHarness();
+      await h.controller.start();
+      h.source.stopGate = Completer<void>();
+      final older = h.controller.applySettings(
+        AppSettings.defaults.copyWith(
+          thresholds: Thresholds(yellowDb: 50, redDb: 70),
+        ),
+      );
+      await settle();
+      // The test's green level is 50 dB, so the newest limits stay above it.
+      final newerSettings = AppSettings.defaults.copyWith(
+        thresholds: Thresholds(yellowDb: 55, redDb: 75),
+        quickStarModeEnabled: true,
+      );
+      await h.controller.applySettings(newerSettings);
+      h.source.stopGate!.complete();
+      await older;
+      expect(h.controller.settings, newerSettings);
+      expect(h.state.thresholds, newerSettings.thresholds);
+      await h.controller.start();
+      h.readings(greenDbfs, 51);
+      expect(h.state.stars, 1);
+    });
   });
 }
 
@@ -310,5 +338,60 @@ void starsTests() {
       expect(h.state.stars, 1);
       expect(h.state.starProgress, 0);
     });
+
+    test(
+      'quick mode earns after five seconds and keeps stars through noise',
+      () async {
+        final h = MonitorHarness(
+          settings: AppSettings.defaults.copyWith(quickStarModeEnabled: true),
+        );
+        await h.controller.start();
+        h.readings(greenDbfs, 50);
+        expect(h.state.stars, 0);
+        h.reading(greenDbfs);
+        expect(h.state.stars, 1);
+        // A single peak is filtered by zone hysteresis; sustained noise is not.
+        h.readings(redDbfs, 11);
+        expect(h.state.stars, 1);
+        expect(h.state.starProgress, 0);
+      },
+    );
+
+    test(
+      'enabling quick mode keeps earned stars and resets only progress',
+      () async {
+        final h = MonitorHarness();
+        await h.controller.start();
+        h.readings(greenDbfs, 601);
+        h.readings(greenDbfs, 100);
+        expect(h.state.stars, 1);
+        expect(h.state.starProgress, greaterThan(0));
+        await h.controller.applySettings(
+          AppSettings.defaults.copyWith(quickStarModeEnabled: true),
+        );
+        expect(h.state.stars, 1);
+        expect(h.state.starProgress, 0);
+        await h.controller.start();
+        h.readings(greenDbfs, 51);
+        expect(h.state.stars, 2);
+      },
+    );
+
+    test(
+      'disabling quick mode restores a minute and keeps earned stars',
+      () async {
+        final h = MonitorHarness(
+          settings: AppSettings.defaults.copyWith(quickStarModeEnabled: true),
+        );
+        await h.controller.start();
+        h.readings(greenDbfs, 51);
+        expect(h.state.stars, 1);
+        await h.controller.applySettings(AppSettings.defaults);
+        await h.controller.start();
+        h.readings(greenDbfs, 51);
+        expect(h.state.stars, 1);
+        expect(h.state.starProgress, closeTo(5 / 60, 1e-9));
+      },
+    );
   });
 }

@@ -292,9 +292,10 @@ class _ItemAction extends StatelessWidget {
       );
     }
     final missing = item.price - wallet.balance;
+    final canBuy = controller.isReady && missing <= 0;
     return FilledButton(
       style: FilledButton.styleFrom(minimumSize: size),
-      onPressed: missing > 0 ? null : () => _confirmAndBuy(context),
+      onPressed: canBuy ? () => _confirmAndBuy(context) : null,
       child: Text(missing > 0 ? l10n.shopMissing(missing) : l10n.shopBuy),
     );
   }

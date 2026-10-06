@@ -3,15 +3,20 @@
 
 import 'zone.dart';
 
-/// Playful reward for children: one star for every full minute of
-/// continuous green while measuring.
+/// Playful reward for children: one star for every configured interval of
+/// continuous green while measuring (normally one minute).
 ///
 /// Uses the same continuity rule as the alarm: samples more than [maxGap]
 /// apart, a non-green sample or [reset] restart the current minute. The star
 /// count lives in RAM for the app session only.
 final class QuietStars {
   /// Creates a counter without stars.
-  QuietStars({this.minute = defaultMinute, this.maxGap = defaultMaxGap});
+  QuietStars({Duration minute = defaultMinute, this.maxGap = defaultMaxGap})
+    : _minute = minute {
+    if (minute <= Duration.zero) {
+      throw ArgumentError.value(minute, 'minute', 'must be positive');
+    }
+  }
 
   /// Continuous green time that earns a star.
   static const Duration defaultMinute = Duration(seconds: 60);
@@ -19,8 +24,10 @@ final class QuietStars {
   /// Largest distance between samples that still counts as continuous.
   static const Duration defaultMaxGap = Duration(seconds: 1);
 
-  /// See [defaultMinute].
-  final Duration minute;
+  Duration _minute;
+
+  /// Active continuous-green interval needed for the next star.
+  Duration get minute => _minute;
 
   /// See [defaultMaxGap].
   final Duration maxGap;
@@ -76,6 +83,17 @@ final class QuietStars {
   void reset() {
     _restartMinute();
     _lastSample = null;
+  }
+
+  /// Changes the earning interval and restarts only the partial interval.
+  /// Already earned stars deliberately remain untouched.
+  void setMinute(Duration minute) {
+    if (minute <= Duration.zero) {
+      throw ArgumentError.value(minute, 'minute', 'must be positive');
+    }
+    if (minute == _minute) return;
+    _minute = minute;
+    reset();
   }
 
   void _restartMinute() {

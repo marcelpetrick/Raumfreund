@@ -148,6 +148,23 @@ void _hintAndLayoutTests() {
     expect(find.byType(KittyCharacter), findsOneWidget);
   });
 
+  testWidgets('a failed load never offers purchases with unmerged stars', (
+    tester,
+  ) async {
+    final repository = InMemoryShopRepository()
+      ..loadException = Exception('storage');
+    final shop = await _pump(tester, repository: repository);
+    shop.earn(12);
+    await tester.pump();
+    expect(shop.wallet.balance, 12);
+    expect(shop.isReady, isFalse);
+    final buy = tester.widget<ButtonStyleButton>(_button(l10nDe.shopBuy).first);
+    expect(buy.onPressed, isNull);
+    await tester.tap(_button(l10nDe.shopBuy).first, warnIfMissed: false);
+    await tester.pump();
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
   testWidgets('a failed save shows a hint that can be dismissed', (
     tester,
   ) async {

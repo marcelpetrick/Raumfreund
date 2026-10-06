@@ -11,7 +11,7 @@ or tracking, and its release manifest requests no Internet permission.
 
 Persisted data is limited to the user's thresholds, calibration correction,
 alarm delay, alarm-sound choice, vibration choice and a settings schema
-version. The star shop
+version. This includes the off-by-default five-second star test flag. The star shop
 additionally stores the star balance and the names of the bought and worn
 Kitty accessories (for example `bow`), only on the device, as one snapshot
 with a schema version; the teacher can delete it with "Sterne

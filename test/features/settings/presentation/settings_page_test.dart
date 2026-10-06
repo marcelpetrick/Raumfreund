@@ -154,8 +154,10 @@ void main() {
     expect(find.text(l10nDe.settingsThresholdsHeading), findsOneWidget);
     expect(find.text(l10nDe.settingsCalibrationHeading), findsOneWidget);
     expect(find.text(l10nDe.settingsAlarmHeading), findsOneWidget);
+    expect(find.text(l10nDe.settingsStarTestHeading), findsOneWidget);
+    expect(find.text(l10nDe.settingsStarTestModeHint), findsOneWidget);
     expect(find.byType(Slider), findsNWidgets(4));
-    expect(find.byType(SwitchListTile), findsNWidgets(2));
+    expect(find.byType(SwitchListTile), findsNWidgets(3));
     await tester.ensureVisible(find.text(l10nDe.settingsCancel));
     await tester.tap(find.text(l10nDe.settingsCancel));
     await tester.pumpAndSettle();
@@ -188,6 +190,11 @@ void main() {
         .toList();
     switches[1].onChanged!(false);
     await tester.pump();
+    switches = tester
+        .widgetList<SwitchListTile>(find.byType(SwitchListTile))
+        .toList();
+    switches[2].onChanged!(true);
+    await tester.pump();
 
     await tester.ensureVisible(find.text(l10nDe.settingsSave));
     await tester.pumpAndSettle();
@@ -198,6 +205,7 @@ void main() {
     expect(result?.calibrationCorrectionDb, 7);
     expect(result?.alarmSoundEnabled, isFalse);
     expect(result?.vibrationEnabled, isFalse);
+    expect(result?.quickStarModeEnabled, isTrue);
   });
 
   testWidgets('step buttons clamp limits and defaults reset the draft', (

@@ -43,9 +43,11 @@ final class SettingsStorageException implements Exception {
 /// snapshot format.
 ///
 /// * Version 1: thresholds, calibration, sound and vibration.
-/// * Version 2 ([schemaVersion]) adds [alarmDelayKey]. Version 1 data is
+/// * Version 2 adds [alarmDelayKey]. Version 1 data is
 ///   upgraded by [migrateV1ToV2]: the alarm delay becomes the factory
 ///   default (10 s), because the fixed delay of version 1 was 10 s.
+/// * Version 3 ([schemaVersion]) adds [quickStarModeKey]. Existing installs
+///   migrate with the teacher-facing test mode disabled.
 /// * Missing or non-integer version: treated as the current layout (fields
 ///   are validated individually anyway, a missing delay falls back to its
 ///   default).
@@ -64,11 +66,12 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
   }) : _openStore = openStore ?? SharedPreferencesStore.open;
 
   /// Current schema version written by [save].
-  static const int schemaVersion = 2;
+  static const int schemaVersion = 3;
 
   /// Upgrade steps of all released schema versions.
   static const Map<int, SettingsMigration> defaultMigrations = {
     1: migrateV1ToV2,
+    2: migrateV2ToV3,
   };
 
   /// Storage key of the schema version.
@@ -95,6 +98,9 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
   /// Storage key of the alarm delay in seconds (since schema version 2).
   static const String alarmDelayKey = 'settings.alarmDelaySeconds';
 
+  /// Storage key of the optional five-second star test mode (since v3).
+  static const String quickStarModeKey = 'settings.quickStarModeEnabled';
+
   /// Upgrades version 1 data: the delay was fixed at the factory default
   /// then, so any value found under [alarmDelayKey] cannot stem from the
   /// user and is ignored.
@@ -102,6 +108,14 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
       (key) => switch (key) {
         alarmDelayKey => AppSettings.defaultAlarmDelaySeconds,
         versionKey => 2,
+        _ => read(key),
+      };
+
+  /// Upgrades version 2 data with the new test mode safely disabled.
+  static PreferenceReader migrateV2ToV3(PreferenceReader read) =>
+      (key) => switch (key) {
+        quickStarModeKey => false,
+        versionKey => 3,
         _ => read(key),
       };
 
@@ -172,6 +186,10 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
         AppSettings.maxAlarmDelaySeconds,
         defaults.alarmDelaySeconds,
       ),
+      quickStarModeEnabled: _bool(
+        read(quickStarModeKey),
+        defaults.quickStarModeEnabled,
+      ),
     );
   }
 
@@ -193,6 +211,7 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
     soundKey: settings.alarmSoundEnabled,
     vibrationKey: settings.vibrationEnabled,
     alarmDelayKey: settings.alarmDelaySeconds,
+    quickStarModeKey: settings.quickStarModeEnabled,
   };
 
   static PreferenceReader? _snapshotReader(Object raw) {

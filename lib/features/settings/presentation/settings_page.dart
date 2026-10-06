@@ -83,6 +83,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         _calibrationSection(l10n),
                         const SizedBox(height: 16),
                         _alarmSection(l10n),
+                        const SizedBox(height: 16),
+                        _starTestSection(l10n),
                         if (widget.onResetStars != null) ...[
                           const SizedBox(height: 16),
                           _StarResetSection(onReset: widget.onResetStars!),
@@ -186,6 +188,22 @@ class _SettingsPageState extends State<SettingsPage> {
         subtitle: Text(l10n.settingsVibrationHint),
         value: _draft.vibrationEnabled,
         onChanged: (value) => _update(_draft.copyWith(vibrationEnabled: value)),
+      ),
+    ],
+  );
+
+  Widget _starTestSection(AppLocalizations l10n) => _SettingsSection(
+    title: l10n.settingsStarTestHeading,
+    icon: Icons.science_outlined,
+    color: AppColors.yellow,
+    children: [
+      SwitchListTile.adaptive(
+        contentPadding: EdgeInsets.zero,
+        title: Text(l10n.settingsStarTestMode),
+        subtitle: Text(l10n.settingsStarTestModeHint),
+        value: _draft.quickStarModeEnabled,
+        onChanged: (value) =>
+            _update(_draft.copyWith(quickStarModeEnabled: value)),
       ),
     ],
   );

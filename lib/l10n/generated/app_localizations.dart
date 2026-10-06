@@ -616,6 +616,24 @@ abstract class AppLocalizations {
   /// **'Kurze Vibration, sofern vorhanden'**
   String get settingsVibrationHint;
 
+  /// Heading of the quick star test section.
+  ///
+  /// In de, this message translates to:
+  /// **'Sterne testen'**
+  String get settingsStarTestHeading;
+
+  /// Switch for the five-second star test mode.
+  ///
+  /// In de, this message translates to:
+  /// **'Schneller Stern-Testmodus'**
+  String get settingsStarTestMode;
+
+  /// Explains the quick star test mode and persistence.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Standardmäßig aus; gesammelte Sterne bleiben erhalten.'**
+  String get settingsStarTestModeHint;
+
   /// Save button.
   ///
   /// In de, this message translates to:

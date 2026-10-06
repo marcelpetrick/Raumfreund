@@ -46,7 +46,7 @@ final class MonitorController extends ChangeNotifier {
   }) : _settings = settings,
        _sessionSettings = settings,
        _history = history ?? LevelHistory(),
-       _stars = stars ?? QuietStars(),
+       _stars = stars ?? QuietStars(minute: _starIntervalFor(settings)),
        _alarm = _alarmFor(settings),
        _calibration = Calibration(
          correctionDb: settings.calibrationCorrectionDb,
@@ -147,12 +147,17 @@ final class MonitorController extends ChangeNotifier {
   }
 
   /// Stops the measurement and uses [settings] (thresholds, calibration,
-  /// alarm delay and options) from the next start on.
+  /// alarm delay, star interval and options) from the next start on.
   Future<void> applySettings(AppSettings settings) async {
     if (_disposed) return;
     _settings = settings;
     await stop();
-    _emit(_state.copyWith(thresholds: settings.thresholds));
+    if (_disposed) return;
+    // A newer apply may have completed while this call awaited teardown.
+    // Always publish the last requested settings so fields cannot diverge.
+    final current = _settings;
+    _stars.setMinute(_starIntervalFor(current));
+    _emit(_state.copyWith(thresholds: current.thresholds));
   }
 
   /// Opens the Android app settings (after a permanent denial). Returns
@@ -434,6 +439,11 @@ final class MonitorController extends ChangeNotifier {
     thresholds: settings.thresholds,
     alarmDelay: settings.alarmDelay,
   );
+
+  static Duration _starIntervalFor(AppSettings settings) =>
+      settings.quickStarModeEnabled
+      ? const Duration(seconds: 5)
+      : QuietStars.defaultMinute;
 
   static MonitorFailure _mapFailure(LevelFailure failure) => switch (failure) {
     LevelFailure.microphoneBusy => MonitorFailure.microphoneBusy,

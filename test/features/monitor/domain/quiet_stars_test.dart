@@ -76,4 +76,23 @@ void main() {
     stars.onSample(timestamp: ms(90100), zone: Zone.green);
     expect(stars.progress, 0);
   });
+
+  test('noise after three stars resets progress but not earned stars', () {
+    feed(stars, Zone.green, fromMs: 0, toMs: 180000);
+    stars.onSample(timestamp: ms(180100), zone: Zone.red);
+    expect(stars.stars, 3);
+    expect(stars.progress, 0);
+    expect(stars.earnedStarNow, isFalse);
+  });
+
+  test('changing the interval keeps earned stars and validates the value', () {
+    feed(stars, Zone.green, fromMs: 0, toMs: 60000);
+    feed(stars, Zone.green, fromMs: 60100, toMs: 62000);
+    stars.setMinute(const Duration(seconds: 5));
+    expect(stars.minute, const Duration(seconds: 5));
+    expect(stars.stars, 1);
+    expect(stars.progress, 0);
+    expect(() => stars.setMinute(Duration.zero), throwsArgumentError);
+    expect(() => QuietStars(minute: Duration.zero), throwsArgumentError);
+  });
 }

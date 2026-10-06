@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.5.4+43` — code-complete release candidate**
+Current version: **`0.6.0+45` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -74,6 +74,9 @@ build.
   ([ADR 0004](docs/adr/0004-zone-hysteresis.md)).
 - A 10-minute RAM-only timeline (one smoothed point per 10 s; peaks rise fast
   and cool down slowly) and quiet-minute stars.
+- Earned stars stay in the classroom's local wallet through noise, stops and
+  restarts. A Settings test mode, off by default, shortens only the next-star
+  interval from 60 seconds to 5 seconds.
 - Configurable thresholds, alarm delay, calibration correction, alarm tone and
   vibration, persisted locally with validated schema migration.
 - Dedicated Settings and About views; navigating away safely stops measurement.
@@ -92,7 +95,10 @@ not restart it automatically.
 
 The **Settings** button in the top app bar opens a separate view for the
 yellow and red thresholds, the alarm delay (how long it may be too loud before
-the alarm), calibration correction, alarm sound and vibration. The view edits a working copy: **Speichern** validates and persists it,
+the alarm), calibration correction, alarm sound, vibration and the optional
+**Schneller Stern-Testmodus**. That mode is off by default and awards a star
+after 5 seconds in green instead of 60, without resetting stars already
+earned. The view edits a working copy: **Speichern** validates and persists it,
 **Abbrechen** discards it, and **Standardwerte** restores the proposed defaults.
 Measurement stays stopped while settings are open and after returning.
 

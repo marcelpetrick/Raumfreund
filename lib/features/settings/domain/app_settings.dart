@@ -13,6 +13,7 @@ final class AppSettings {
     required this.alarmSoundEnabled,
     required this.vibrationEnabled,
     required this.alarmDelaySeconds,
+    required this.quickStarModeEnabled,
   }) {
     _checkRange(
       calibrationCorrectionDb,
@@ -61,6 +62,7 @@ final class AppSettings {
     alarmSoundEnabled: true,
     vibrationEnabled: true,
     alarmDelaySeconds: defaultAlarmDelaySeconds,
+    quickStarModeEnabled: false,
   );
 
   /// Zone limits.
@@ -79,6 +81,12 @@ final class AppSettings {
   /// alarm fires; within [minAlarmDelaySeconds]..[maxAlarmDelaySeconds].
   final int alarmDelaySeconds;
 
+  /// Whether one star is earned after five seconds of continuous green.
+  ///
+  /// This teacher-facing test aid is off by default. It changes only the
+  /// current earning interval, never the stored star balance.
+  final bool quickStarModeEnabled;
+
   /// [alarmDelaySeconds] as the duration the alarm state machine expects.
   Duration get alarmDelay => Duration(seconds: alarmDelaySeconds);
 
@@ -89,6 +97,7 @@ final class AppSettings {
     bool? alarmSoundEnabled,
     bool? vibrationEnabled,
     int? alarmDelaySeconds,
+    bool? quickStarModeEnabled,
   }) => AppSettings(
     thresholds: thresholds ?? this.thresholds,
     calibrationCorrectionDb:
@@ -96,6 +105,7 @@ final class AppSettings {
     alarmSoundEnabled: alarmSoundEnabled ?? this.alarmSoundEnabled,
     vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
     alarmDelaySeconds: alarmDelaySeconds ?? this.alarmDelaySeconds,
+    quickStarModeEnabled: quickStarModeEnabled ?? this.quickStarModeEnabled,
   );
 
   @override
@@ -105,7 +115,8 @@ final class AppSettings {
       other.calibrationCorrectionDb == calibrationCorrectionDb &&
       other.alarmSoundEnabled == alarmSoundEnabled &&
       other.vibrationEnabled == vibrationEnabled &&
-      other.alarmDelaySeconds == alarmDelaySeconds;
+      other.alarmDelaySeconds == alarmDelaySeconds &&
+      other.quickStarModeEnabled == quickStarModeEnabled;
 
   @override
   int get hashCode => Object.hash(
@@ -114,6 +125,7 @@ final class AppSettings {
     alarmSoundEnabled,
     vibrationEnabled,
     alarmDelaySeconds,
+    quickStarModeEnabled,
   );
 
   static void _checkRange(int value, int min, int max, String name) {

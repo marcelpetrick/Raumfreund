@@ -53,6 +53,10 @@ final class ShopController extends ChangeNotifier {
   /// Whether loading threw (an empty wallet is used then).
   bool get loadFailed => _loadFailed;
 
+  /// Whether stored stars and inventory have been loaded successfully.
+  /// Purchases, equipment changes and reset are allowed only then.
+  bool get isReady => _loaded;
+
   /// Whether a save is in progress.
   bool get isSaving => _isSaving;
 

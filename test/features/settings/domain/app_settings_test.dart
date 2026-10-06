@@ -14,6 +14,7 @@ void main() {
     expect(d.alarmSoundEnabled, isTrue);
     expect(d.vibrationEnabled, isTrue);
     expect(d.alarmDelaySeconds, 10);
+    expect(d.quickStarModeEnabled, isFalse);
     expect(d.alarmDelay, AlarmStateMachine.defaultAlarmDelay);
   });
 
@@ -63,6 +64,9 @@ void main() {
     final slower = AppSettings.defaults.copyWith(alarmDelaySeconds: 20);
     expect(slower == AppSettings.defaults, isFalse);
     expect(slower.hashCode, isNot(AppSettings.defaults.hashCode));
+    final quick = AppSettings.defaults.copyWith(quickStarModeEnabled: true);
+    expect(quick.quickStarModeEnabled, isTrue);
+    expect(quick, isNot(AppSettings.defaults));
     expect(
       changed,
       AppSettings.defaults.copyWith(

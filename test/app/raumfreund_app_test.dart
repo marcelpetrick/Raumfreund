@@ -140,6 +140,9 @@ void _shopTests() {
     expect(repository.stored.balance, 3);
     // The visible slot says "Neuer Stern!" right after the earn.
     expect(find.text(l10nDe.starsJustEarned), findsOneWidget);
+    monitor.readings(redDbfs, 11);
+    await _finishAsyncWork(tester);
+    expect(repository.stored.balance, 3);
 
     await tester.tap(find.byTooltip(l10nDe.actionShop));
     await _finishWithRealAsync(tester);

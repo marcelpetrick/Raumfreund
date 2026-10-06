@@ -139,7 +139,11 @@ missing or invalid values. Future migrations are explicit and tested.
 
 The Settings view edits a draft. Save validates and writes atomically; cancel
 does not mutate active or persisted settings. Threshold changes never affect a
-running session because navigation stops measurement first.
+running session because navigation stops measurement first. Settings schema 3
+adds the off-by-default quick-star test flag; version 2 data migrates with that
+flag disabled. Applying it changes the `QuietStars` interval for the next
+measurement from 60 seconds to 5 seconds (or back), resets only partial
+progress and keeps every already-earned session and wallet star.
 
 ## Star shop
 
@@ -173,8 +177,11 @@ has loaded are added to it after loading.
 third app-bar action opens `ShopPage` through the same `_navigate` helper as
 Settings and About, so measurement is stopped first and never restarted. The
 teacher reset is passed to `SettingsPage` as a plain callback
-(`onResetStars: shop.resetAll`); it acts at once and is deliberately not
-part of the Save/Cancel draft.
+(`onResetStars: _resetStars`); it acts at once, is deliberately not part of the
+Save/Cancel draft, waits for the wallet save and reports storage failure. Until
+the wallet has loaded successfully, shop actions are disabled even if stars
+were earned in memory, so a button never offers an operation the controller
+must refuse.
 
 ## Composition and test seams
 

@@ -33,6 +33,9 @@ final class FakeLevelSource implements LevelSourcePort {
   /// When set, [stop] throws this exception.
   Exception? stopException;
 
+  /// When set, [stop] waits for this gate before completing.
+  Completer<void>? stopGate;
+
   /// Session currently recording (after a successful start, until stop).
   int? recordingSession;
 
@@ -82,6 +85,8 @@ final class FakeLevelSource implements LevelSourcePort {
   Future<void> stop() async {
     stopCalls++;
     recordingSession = null;
+    final gate = stopGate;
+    if (gate != null) await gate.future;
     final exception = stopException;
     if (exception != null) throw exception;
   }

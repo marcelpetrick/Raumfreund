@@ -23,12 +23,19 @@ Map<String, Object?> validData() => {
   Repo.soundKey: false,
   Repo.vibrationKey: false,
   Repo.alarmDelayKey: 25,
+  Repo.quickStarModeKey: true,
 };
 
 /// The same user data as written by schema version 1 (no alarm delay yet).
 Map<String, Object?> v1Data() => validData()
   ..[Repo.versionKey] = 1
-  ..remove(Repo.alarmDelayKey);
+  ..remove(Repo.alarmDelayKey)
+  ..remove(Repo.quickStarModeKey);
+
+/// The same user data as written by schema version 2 (no star test mode yet).
+Map<String, Object?> v2Data() => validData()
+  ..[Repo.versionKey] = 2
+  ..remove(Repo.quickStarModeKey);
 
 final AppSettings validSettings = AppSettings(
   thresholds: Thresholds(yellowDb: 55, redDb: 75),
@@ -36,6 +43,7 @@ final AppSettings validSettings = AppSettings(
   alarmSoundEnabled: false,
   vibrationEnabled: false,
   alarmDelaySeconds: 25,
+  quickStarModeEnabled: true,
 );
 
 Future<AppSettings> loadFrom(
@@ -51,6 +59,7 @@ void main() {
   invalidFieldTests();
   versionTests();
   alarmDelayTests();
+  quickStarModeTests();
   saveTests();
   sharedPreferencesTests();
 }
@@ -145,6 +154,16 @@ void invalidFieldTests() {
       }
     }
 
+    for (final bad in <Object?>[null, 1, 'true']) {
+      test('${Repo.quickStarModeKey} $bad → default false', () async {
+        final loaded = await loadFrom(
+          validData()..[Repo.quickStarModeKey] = bad,
+        );
+        expect(loaded.quickStarModeEnabled, isFalse);
+        expect(loaded.thresholds, validSettings.thresholds);
+      });
+    }
+
     test('invalid pairs give default thresholds', () async {
       // (90, 131): red falls back to 80 per field, then the pair is invalid.
       for (final pair in [(70, 70), (80, 60), (90, 131), (85, 50)]) {
@@ -208,6 +227,7 @@ void versionTests() {
       );
       expect(loaded.thresholds, Thresholds(yellowDb: 50, redDb: 70));
       expect(loaded.alarmDelaySeconds, AppSettings.defaultAlarmDelaySeconds);
+      expect(loaded.quickStarModeEnabled, isFalse);
     });
   });
 }
@@ -234,7 +254,10 @@ void alarmDelayTests() {
     test('version 1 individual keys migrate to the 10 s default', () async {
       expect(
         await loadFrom(v1Data()),
-        validSettings.copyWith(alarmDelaySeconds: 10),
+        validSettings.copyWith(
+          alarmDelaySeconds: 10,
+          quickStarModeEnabled: false,
+        ),
       );
     });
 
@@ -242,7 +265,10 @@ void alarmDelayTests() {
       final snapshot = jsonEncode(v1Data()..[Repo.alarmDelayKey] = 42);
       expect(
         await loadFrom({Repo.snapshotKey: snapshot}),
-        validSettings.copyWith(alarmDelaySeconds: 10),
+        validSettings.copyWith(
+          alarmDelaySeconds: 10,
+          quickStarModeEnabled: false,
+        ),
       );
     });
 
@@ -258,7 +284,10 @@ void alarmDelayTests() {
       SharedPreferences.setMockInitialValues({Repo.snapshotKey: legacy});
       expect(
         await Repo().load(),
-        validSettings.copyWith(alarmDelaySeconds: 10),
+        validSettings.copyWith(
+          alarmDelaySeconds: 10,
+          quickStarModeEnabled: false,
+        ),
       );
     });
 
@@ -266,8 +295,41 @@ void alarmDelayTests() {
       final store = FakePreferencesStore();
       await Repo(openStore: () async => store).save(validSettings);
       final saved = jsonDecode(store.values[Repo.snapshotKey]! as String);
-      expect(saved, containsPair(Repo.versionKey, 2));
+      expect(saved, containsPair(Repo.versionKey, 3));
       expect(saved, containsPair(Repo.alarmDelayKey, 25));
+    });
+  });
+}
+
+void quickStarModeTests() {
+  group('quick star mode', () {
+    test('version 2 data migrates with the mode disabled', () async {
+      expect(
+        await loadFrom(v2Data()),
+        validSettings.copyWith(quickStarModeEnabled: false),
+      );
+    });
+
+    test('version 2 snapshot migrates with the mode disabled', () async {
+      final snapshot = jsonEncode(v2Data());
+      expect(
+        await loadFrom({Repo.snapshotKey: snapshot}),
+        validSettings.copyWith(quickStarModeEnabled: false),
+      );
+    });
+
+    test('the v2 migration disables the mode and keeps other keys', () {
+      final read = Repo.migrateV2ToV3((key) => v2Data()[key]);
+      expect(read(Repo.versionKey), 3);
+      expect(read(Repo.yellowKey), 55);
+      expect(read(Repo.quickStarModeKey), isFalse);
+    });
+
+    test('save writes the mode in the current snapshot', () async {
+      final store = FakePreferencesStore();
+      await Repo(openStore: () async => store).save(validSettings);
+      final saved = jsonDecode(store.values[Repo.snapshotKey]! as String);
+      expect(saved, containsPair(Repo.quickStarModeKey, true));
     });
   });
 }

@@ -43,6 +43,14 @@ Version 1 ist eine Android-App für Handy und Tablet. iOS, Desktop und Web gehö
 - Erlaube einen verständlich beschriebenen Kalibrierungsoffset.
 - Alarmton ist abschaltbar; kurze Vibration sofern vorhanden. Keine Voraussetzung, dass jedes Gerät vibrieren kann.
 
+### Leise-Sterne und Sternenladen
+
+- Vergib während einer Messung nach jeweils 60 Sekunden durchgehend bestätigtem Grün einen Leise-Stern. Gelb, Rot, eine Messlücke, Stopp oder Fehler beginnen nur das angebrochene Intervall neu; bereits verdiente Sterne werden dadurch niemals abgezogen oder auf null gesetzt.
+- Speichere verdiente Sterne lokal und dauerhaft in einer Wallet. Nur die ausdrücklich bestätigte Lehrkraft-Aktion „Sterne zurücksetzen“ löscht Sterne, gekaufte Gegenstände und Ausrüstung; sie muss einen Speicherfehler sichtbar melden.
+- Biete in den Einstellungen einen verständlich bezeichneten schnellen Stern-Testmodus. Er ist standardmäßig aus und verkürzt ausschließlich das Sternintervall der nächsten Messung von 60 auf 5 Sekunden. Beim Ein- oder Ausschalten bleiben alle bereits verdienten Sterne erhalten.
+- Der Sternenladen bietet Mia rein kosmetische Gegenstände: Schleife (3), Schal (5), Partyhut (8), Kissen (10) und Spielmaus (12 Sterne). Ein Gegenstand wird nur einmal gekauft und kann danach kostenlos an- und abgelegt werden. Es gibt kein Echtgeld, keine Werbung und keine Netzverbindung.
+- Öffnen des Sternenladens stoppt die Messung wie Einstellungen/About und startet sie bei Rückkehr nicht automatisch. Solange gespeicherte Wallet-Daten nicht erfolgreich geladen wurden, bleiben Kauf-, Ausrüstungs- und Reset-Aktionen gesperrt; zwischenzeitlich verdiente Sterne werden nach erfolgreichem Laden zusammengeführt und gespeichert.
+
 ### Verbindliche Alarmregeln
 
 | Zustand/Ereignis | Verhalten |

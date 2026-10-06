@@ -326,6 +326,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsVibrationHint => 'Kurze Vibration, sofern vorhanden';
 
   @override
+  String get settingsStarTestHeading => 'Sterne testen';
+
+  @override
+  String get settingsStarTestMode => 'Schneller Stern-Testmodus';
+
+  @override
+  String get settingsStarTestModeHint =>
+      'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Standardmäßig aus; gesammelte Sterne bleiben erhalten.';
+
+  @override
   String get settingsSave => 'Speichern';
 
   @override

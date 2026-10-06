@@ -145,7 +145,7 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | --- | --- | --- | --- |
 | G | Finish pinned dependency/toolchain update | Coordinator | done, `16e84b9`; green pipeline and pushed |
 | A1 | Suppress readings across alarm-output/session boundaries | Coordinator (finished the stopped agent's diff) | done in `0.5.5` |
-| S1 | Owner-confirmed quick-star test mode (5 s) from the parked stash | Coordinator | in progress |
+| S1 | Owner-confirmed quick-star test mode (5 s) from the parked stash | Coordinator | done in `0.6.0` |
 | N1 | Detect a recorder that produces no samples | Opus sub-agent, own worktree | queued after S1 (touches the controller) |
 | L1 | Complete third-party dependency/license inventory | Sonnet sub-agent, docs only | queued |
 | R1 | Independent review of A1, S1 and N1 | Opus reviewer (read-only) | queued after N1 |
