@@ -48,7 +48,10 @@ have covered less than half of the last three seconds for at least two seconds
 (regular readings slower than one per 0.4 s); a single stall does not show it.
 The hint disappears after three seconds with at least 60 % coverage (about one
 reading per 0.33 s or faster) and on stop, reset or error, and does not change any zone or
-alarm decision (ADR 0004). Confirmed green, a confirmed zone change, a gap
+alarm decision (ADR 0004). If readings stop altogether (no valid reading
+for 3 s, or for 5 s right after the start), the measurement ends with
+"Keine Messwerte" instead of keeping the last zone on screen; the own alarm
+tone pauses this check (ADR 0003). Confirmed green, a confirmed zone change, a gap
 over one second, session stop or the app's own alarm starts a new phase. Each
 phase alarms at most once. While the alarm tone plays, readings are ignored:
 the displayed zone stays frozen and gauge and timeline do not show the tone.

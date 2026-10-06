@@ -10,6 +10,7 @@ import 'fake_alarm_output.dart';
 import 'fake_clock.dart';
 import 'fake_level_source.dart';
 import 'fake_permission.dart';
+import 'fake_scheduler.dart';
 import 'fake_screen_awake.dart';
 
 /// dBFS values that map to 50 / 70 / 90 dB without calibration correction
@@ -32,6 +33,7 @@ final class MonitorHarness {
       alarmOutput: alarm,
       screenAwake: screen,
       clock: clock,
+      scheduler: scheduler,
       settings: settings ?? AppSettings.defaults,
       onStarEarned: onStarEarned ?? ignoreStarEarned,
     );
@@ -40,6 +42,9 @@ final class MonitorHarness {
 
   /// Fake clock.
   final FakeClock clock = FakeClock(const Duration(seconds: 100));
+
+  /// Fake scheduler on [clock] (drives the no-reading watchdog).
+  late final FakeScheduler scheduler = FakeScheduler(clock);
 
   /// Fake permission.
   final FakePermission permission = FakePermission();
@@ -62,10 +67,10 @@ final class MonitorHarness {
   /// Current state.
   MonitorState get state => controller.state;
 
-  /// Advances the clock by [stepMs] and emits a reading for [session]
-  /// (default: the latest session).
+  /// Lets [stepMs] pass (running due timers, like the real event loop
+  /// would) and emits a reading for [session] (default: the latest session).
   void reading(double dbfs, {int? session, int stepMs = 100}) {
-    clock.advanceMs(stepMs);
+    scheduler.elapseMs(stepMs);
     source.emitReading(session ?? controller.lastSessionId, dbfs);
   }
 

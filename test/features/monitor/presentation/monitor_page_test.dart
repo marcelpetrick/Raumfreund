@@ -61,8 +61,29 @@ MonitorViewData _data({
   error: error,
 );
 
+void _noReadingsTest() {
+  testWidgets('a recorder without readings explains itself and can retry', (
+    tester,
+  ) async {
+    await _pumpPage(
+      tester,
+      _data(
+        phase: MonitorPhase.error,
+        zone: null,
+        error: MonitorErrorKind.noReadings,
+      ),
+    );
+    expect(find.text(l10nDe.statusError), findsOneWidget);
+    expect(find.text(l10nDe.errorNoReadingsBody), findsOneWidget);
+    expect(find.text(l10nDe.errorRetry), findsOneWidget);
+    expect(find.text(l10nDe.statusGreen), findsNothing);
+    expect(l10nDe.errorNoReadingsTitle, 'Keine Messwerte');
+  });
+}
+
 void main() {
   _accessoryTest();
+  _noReadingsTest();
   testWidgets('idle page exposes Settings, About and shop actions', (
     tester,
   ) async {

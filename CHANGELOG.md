@@ -50,3 +50,4 @@ these lines (see docs/releasing.md).
 * v0.6.0 adds an off-by-default Schneller Stern-Testmodus in Settings (one star after 5 s of green instead of 60 s), keeps earned stars across mode changes, and disables shop purchases until stored stars have loaded
 * v0.6.1 adds a third-party license inventory of everything that ships in the APK
 * v0.6.2 lists the Android libraries (Apache-2.0) and the Material Icons font (CC-BY-4.0) on the open-source licence page
+* v0.6.3 ends a measurement with a clear message when the microphone delivers no values (5 s without a first, 3 s without a further reading)

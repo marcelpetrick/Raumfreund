@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show AppLifecycleState;
 
 import '../../../core/clock.dart';
+import '../../../core/scheduler.dart';
 import '../../settings/domain/app_settings.dart';
 import '../domain/alarm_state_machine.dart';
 import '../domain/calibration.dart';
@@ -31,6 +32,10 @@ import 'ports.dart';
 /// * Going to the background stops the measurement; there is no automatic
 ///   restart on resume.
 /// * Cleanup ([stop], [dispose]) is idempotent.
+/// * A recorder that delivers no valid reading for [firstReadingTimeout]
+///   after measuring begins, or for [readingStallTimeout] afterwards, ends
+///   the session with [MonitorFailure.noReadings] (ADR 0003). Readings
+///   ignored during the own alarm output pause this watchdog.
 final class MonitorController extends ChangeNotifier {
   /// Creates a stopped controller using [settings] for the next start.
   MonitorController({
@@ -39,6 +44,7 @@ final class MonitorController extends ChangeNotifier {
     required this._alarmOutput,
     required this._screenAwake,
     required this._clock,
+    required this._scheduler,
     required AppSettings settings,
     LevelHistory? history,
     QuietStars? stars,
@@ -58,6 +64,7 @@ final class MonitorController extends ChangeNotifier {
   final AlarmOutputPort _alarmOutput;
   final ScreenAwakePort _screenAwake;
   final MonotonicClock _clock;
+  final TimerScheduler _scheduler;
   final LevelHistory _history;
   final QuietStars _stars;
   final StarEarnedSink _onStarEarned;
@@ -74,6 +81,24 @@ final class MonitorController extends ChangeNotifier {
   int? _activeSession;
   bool _alarmOutputActive = false;
   bool _disposed = false;
+  ScheduledCallback? _watchdog;
+  bool _sessionHadReading = false;
+
+  /// Longest wait for the first valid reading once measuring has begun.
+  ///
+  /// Readings arrive every ~100 ms; `AudioRecord` usually delivers its first
+  /// window within a few hundred milliseconds, but routing to a headset or
+  /// a slow device can take longer. Until the first reading the UI shows
+  /// "starting" (no zone), never a calm state, so this may be generous.
+  static const Duration firstReadingTimeout = Duration(seconds: 5);
+
+  /// Longest gap between valid readings before the session is ended.
+  ///
+  /// Thirty missed ~100 ms windows: far beyond scheduling or GC hiccups,
+  /// and as long as the zone release window (ADR 0004), so a stale zone is
+  /// shown at most as long as a real one would take to cool down. Sparser
+  /// but living recorders are covered by the "signal thin" hint instead.
+  static const Duration readingStallTimeout = Duration(seconds: 3);
 
   /// Current immutable state.
   MonitorState get state => _state;
@@ -176,6 +201,7 @@ final class MonitorController extends ChangeNotifier {
     if (_disposed) return;
     _disposed = true;
     _activeSession = null;
+    _cancelWatchdog();
     _alarm.reset();
     unawaited(_teardown());
     super.dispose();
@@ -193,6 +219,7 @@ final class MonitorController extends ChangeNotifier {
     _calibration = Calibration(correctionDb: _settings.calibrationCorrectionDb);
     _smoother.reset();
     _stars.reset();
+    _sessionHadReading = false;
     _emit(
       _state.copyWith(
         status: MonitorStatus.permissionPending,
@@ -254,6 +281,7 @@ final class MonitorController extends ChangeNotifier {
       return;
     }
     _emit(_state.copyWith(status: MonitorStatus.measuring));
+    _armWatchdog(session);
     await _guard(() => _screenAwake.setKeepScreenOn(enabled: true));
   }
 
@@ -284,7 +312,10 @@ final class MonitorController extends ChangeNotifier {
     // must still ignore the physical tone until its future completes.
     if (_alarmOutputActive) return;
     final level = _calibration.estimate(dbfs);
+    // An invalid value is no measurement and does not feed the watchdog.
     if (level == null) return;
+    _sessionHadReading = true;
+    _armWatchdog(session);
     final now = _clock.now;
     final snapshot = _alarm.onSample(timestamp: now, levelDb: level);
     // While the own alarm tone plays the microphone hears it: the machine
@@ -337,6 +368,8 @@ final class MonitorController extends ChangeNotifier {
     if (!sound && !vibrate) return;
     if (_alarmOutputActive) return;
     _alarmOutputActive = true;
+    // Readings are ignored on purpose now; their absence is no failure.
+    _cancelWatchdog();
     _alarm.onAlarmOutputStarted();
     _emit(_state.copyWith(alarmPlaying: true));
     var failed = false;
@@ -367,10 +400,39 @@ final class MonitorController extends ChangeNotifier {
         signalThin: false,
       ),
     );
+    // A session still starting arms the watchdog when it reaches measuring.
+    if (_state.status == MonitorStatus.measuring) _armWatchdog(activeSession);
+  }
+
+  /// (Re)starts the no-reading watchdog of [session]. Not armed while the
+  /// own alarm output makes the controller ignore readings; output
+  /// completion arms it again.
+  void _armWatchdog(int session) {
+    _cancelWatchdog();
+    if (_alarmOutputActive || !_isCurrent(session)) return;
+    final timeout = _sessionHadReading
+        ? readingStallTimeout
+        : firstReadingTimeout;
+    _watchdog = _scheduler.schedule(timeout, () => _onNoReadings(session));
+  }
+
+  void _cancelWatchdog() {
+    _watchdog?.cancel();
+    _watchdog = null;
+  }
+
+  void _onNoReadings(int session) {
+    _watchdog = null;
+    // A watchdog of an older session must never touch a newer one, and a
+    // session that is still starting or stopping has its own outcome.
+    if (!_isCurrent(session) || _alarmOutputActive) return;
+    if (_state.status != MonitorStatus.measuring) return;
+    unawaited(_endSession(failure: MonitorFailure.noReadings));
   }
 
   Future<void> _endSession({MonitorFailure? failure}) async {
     _activeSession = null;
+    _cancelWatchdog();
     _alarm.reset();
     _smoother.reset();
     _stars.reset();

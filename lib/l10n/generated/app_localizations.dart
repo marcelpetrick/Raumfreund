@@ -472,6 +472,18 @@ abstract class AppLocalizations {
   /// **'Auf diesem Gerät konnte kein nutzbares Mikrofon gefunden werden.'**
   String get errorUnavailableBody;
 
+  /// Error title: the running recording delivered no levels.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Messwerte'**
+  String get errorNoReadingsTitle;
+
+  /// Error body: the running recording delivered no levels, so the measurement was ended.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Mikrofon liefert gerade keine Werte, deshalb wurde die Messung beendet. Vielleicht ist der Mikrofonzugriff in den Android-Schnelleinstellungen ausgeschaltet oder eine andere App nutzt das Mikrofon. Prüfe das und starte die Messung erneut.'**
+  String get errorNoReadingsBody;
+
   /// Opens the Android app settings.
   ///
   /// In de, this message translates to:

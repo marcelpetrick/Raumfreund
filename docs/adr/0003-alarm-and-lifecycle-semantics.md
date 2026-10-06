@@ -7,7 +7,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 - Status: accepted; implemented; independent review required before release
 - Date: 2026-10-03 (alarm rules amended 2026-10-04 by ADR 0004; alarm delay
-  made configurable 2026-10-04)
+  made configurable 2026-10-04; no-reading watchdog added 2026-10-06)
 
 ## Context
 
@@ -29,14 +29,51 @@ state and id before changing state.
 - Start while anything other than stopped/error is active is ignored or joins
   the in-flight start; it never creates a second recorder.
 - Stop invalidates the active id before awaiting idempotent native cleanup.
-- Genuine backgrounding, opening Settings/About, stream failure and controller
-  disposal use the same stop path and clear alarm continuity.
+- Genuine backgrounding, opening Settings/About, stream failure, the
+  no-reading watchdog and controller disposal use the same stop path and
+  clear alarm continuity.
 - Foregrounding and returning from another page never restart automatically.
 - The Android permission dialog is tracked as an application-owned request.
   Its temporary activity pause is not treated as genuine backgrounding.
 - A granted permission result starts recording only if its request token is
   current and the activity is in the foreground. A result after stop,
   navigation, disposal or replacement is ignored.
+
+### No-reading watchdog
+
+A recorder can run without delivering anything (a stuck `AudioRecord`, a
+microphone the system silences without an error). The sparse-reading hint
+(ADR 0004) only works while readings still arrive, so the controller also
+watches for their absence:
+
+- Once a session is measuring, it must deliver a valid (finite) reading
+  within 5 s; after that, within 3 s of the previous valid reading.
+  Otherwise the session ends through the normal stop path with the failure
+  `noReadings` ("Keine Messwerte"); start/"Erneut versuchen" begins a new
+  session. Readings arrive about every 100 ms, so 3 s are 30 missed windows,
+  far beyond scheduling hiccups, and equal to the zone release window: a
+  stale zone stays visible no longer than a real one needs to cool down.
+  Before the first reading the UI shows "starting" without a zone, never a
+  calm state, so the first timeout can be more generous for slow audio
+  routing.
+- The session ends with an error instead of showing a "no signal" state
+  while still measuring: a silent recorder rarely recovers by itself, an
+  error clears zone, gauge, Mia's latch and star progress at once, stops
+  the recorder and the keep-screen-on flag, and reuses the tested error and
+  retry path. A visible-but-running state would need its own rules for
+  zone, stars and alarm and could still look calm at a glance.
+- While the own alarm output is active, readings are ignored on purpose;
+  the watchdog is paused then and does not fire. When the output completes
+  (successfully or not) and the active session is measuring, it is armed
+  again with the full timeout (5 s if that session has had no valid reading
+  yet, else 3 s). A session that is still starting arms it when it reaches
+  measuring.
+- The watchdog belongs to one session id. Stop, error and dispose cancel
+  it before awaiting cleanup, and its callback ends the session only if
+  that id is still active and measuring, so it never touches a newer
+  session. Cancelling is idempotent.
+- Time comes from an injected `TimerScheduler` (`lib/core/scheduler.dart`);
+  tests drive it with a fake scheduler on the fake clock.
 
 ### Alarm rules
 

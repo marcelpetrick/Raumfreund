@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../core/clock.dart';
+import '../core/scheduler.dart';
 import '../features/about/domain/app_info.dart';
 import '../features/about/infrastructure/platform_app_info.dart';
 import '../features/about/presentation/about_page.dart';
@@ -106,6 +107,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
         alarmOutput: platform,
         screenAwake: platform,
         clock: StopwatchClock(),
+        scheduler: const DartTimerScheduler(),
         settings: AppSettings.defaults,
         onStarEarned: onStarEarned,
       );
@@ -266,6 +268,7 @@ MonitorErrorKind? _error(MonitorFailure? failure) => switch (failure) {
   MonitorFailure.microphoneBusy => MonitorErrorKind.microphoneBusy,
   MonitorFailure.recordingAborted => MonitorErrorKind.recordingAborted,
   MonitorFailure.unavailable => MonitorErrorKind.unavailable,
+  MonitorFailure.noReadings => MonitorErrorKind.noReadings,
 };
 
 int? _seconds(Duration? duration) => duration == null

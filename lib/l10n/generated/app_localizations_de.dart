@@ -238,6 +238,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Auf diesem Gerät konnte kein nutzbares Mikrofon gefunden werden.';
 
   @override
+  String get errorNoReadingsTitle => 'Keine Messwerte';
+
+  @override
+  String get errorNoReadingsBody =>
+      'Das Mikrofon liefert gerade keine Werte, deshalb wurde die Messung beendet. Vielleicht ist der Mikrofonzugriff in den Android-Schnelleinstellungen ausgeschaltet oder eine andere App nutzt das Mikrofon. Prüfe das und starte die Messung erneut.';
+
+  @override
   String get errorOpenSettings => 'Einstellungen öffnen';
 
   @override

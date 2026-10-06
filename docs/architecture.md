@@ -19,7 +19,8 @@ The design follows these rules:
 - Domain decisions are pure Dart and do not import Flutter or Android APIs.
 - Application controllers own sessions and orchestration, not widgets.
 - Platform and persistence access happens only through narrow ports.
-- Time relevant to alarm continuity comes from an injected monotonic clock.
+- Time relevant to alarm continuity comes from an injected monotonic clock;
+  timeouts come from an injected timer scheduler.
 - Immutable state moves toward the UI; callbacks and commands move inward.
 - Cleanup is idempotent, and late events are rejected by session id.
 - Audio samples are transient input, never application data.
@@ -55,7 +56,7 @@ must never import it.
 
 | Area | Responsibility | Current state |
 | --- | --- | --- |
-| `lib/core/` | Monotonic-clock abstraction | Foundation implemented |
+| `lib/core/` | Monotonic-clock and timer-scheduler abstractions | Foundation implemented |
 | `lib/features/monitor/domain/` | Zones, zone hysteresis, validated thresholds, peak envelope, history and alarm rules | Implemented and unit-tested |
 | `lib/features/monitor/application/` | Permission/start/stop/session controller and platform ports | Implemented and unit-tested |
 | `lib/features/monitor/infrastructure/` | Channel adapters | Implemented with protocol tests |
@@ -108,6 +109,15 @@ visible. The controller records that a permission request is active and does
 not treat that pause as a genuine background stop. After the result, recording
 starts only if permission is granted, the request is still current and the app
 is foregrounded. ADR 0003 defines the race-resolution rules.
+
+A no-reading watchdog makes a silent recorder visible: a measuring session
+that receives no valid reading for 5 s after it started measuring, or for
+3 s after the previous valid reading, ends with the error "Keine
+Messwerte", which can be retried. It is paused while the own alarm output
+makes the controller ignore readings, re-armed when that output completes,
+bound to its session id and cancelled by stop, error and disposal. Its
+timer comes from the injected `TimerScheduler`, so tests control it with a
+fake scheduler (ADR 0003).
 
 ## Alarm ownership
 

@@ -40,6 +40,9 @@ enum MonitorErrorKind {
 
   /// The device cannot provide microphone levels.
   unavailable,
+
+  /// The recording delivered no levels for too long.
+  noReadings,
 }
 
 /// Immutable presentation input for the monitor page.

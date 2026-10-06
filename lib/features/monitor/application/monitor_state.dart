@@ -42,6 +42,10 @@ enum MonitorFailure {
 
   /// Microphone or audio format not available.
   unavailable,
+
+  /// Recording runs, but no valid level arrived for too long (e.g. a stuck
+  /// recorder or a microphone silenced by the system).
+  noReadings,
 }
 
 /// Immutable snapshot of the measurement for the UI.

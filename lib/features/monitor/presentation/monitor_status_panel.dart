@@ -285,6 +285,7 @@ class _ErrorBody extends StatelessWidget {
       MonitorErrorKind.permanentlyDenied => l10n.errorPermanentlyDeniedBody,
       MonitorErrorKind.microphoneBusy => l10n.errorMicrophoneBusyBody,
       MonitorErrorKind.recordingAborted => l10n.errorRecordingAbortedBody,
+      MonitorErrorKind.noReadings => l10n.errorNoReadingsBody,
       MonitorErrorKind.unavailable || null => l10n.errorUnavailableBody,
     };
     return Text(message, style: Theme.of(context).textTheme.bodyMedium);
