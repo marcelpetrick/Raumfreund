@@ -12,7 +12,7 @@ green commits (see the weekly maintenance workflow).
 | Android Gradle Plugin | 9.1.0 | `android/settings.gradle.kts` | Flutter 3.47.6 app template |
 | Kotlin Gradle Plugin | 2.4.0 | `android/settings.gradle.kts` | Flutter 3.47.6 app template |
 | Gradle | 9.3.1 | wrapper properties, distribution checksum and regenerated wrapper JAR/scripts | Flutter 3.47.6 app template |
-| JDK (build) | Temurin 21.0.12.1+1 (`setup-java` needs its SemVer form `21.0.12+101`) | `.github/actions/setup`, pinned Docker digest | AGP 9 requires JDK 17+; 21 is the current LTS supported by Gradle 9.3 |
+| JDK (build) | Temurin 21.0.12.1+1 (`setup-java` needs its exact Adoptium SemVer `21.0.12+101.0.LTS`) | `.github/actions/setup`, pinned Docker digest | AGP 9 requires JDK 17+; 21 is the current LTS supported by Gradle 9.3 |
 | Node.js (tooling) | 24.x; CI 24.21.0 | `tool/node/package.json`, `.github/actions/setup` | npm lint tools support the active Node 24 LTS line |
 | Java/Kotlin bytecode target | 17 | `android/app/build.gradle.kts` | Flutter template default |
 | compileSdk | 36 | Flutter default (`flutter.compileSdkVersion`) | Flutter 3.47.6 `FlutterExtension.kt` |
