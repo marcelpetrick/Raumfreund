@@ -3,7 +3,11 @@
 
 import 'package:flutter/material.dart';
 
+import 'app/native_licenses.dart';
 import 'app/raumfreund_app.dart';
 
 /// Entry point of the Raumfreund app.
-void main() => runApp(const RaumfreundApp());
+void main() {
+  registerNativeLicenses();
+  runApp(const RaumfreundApp());
+}

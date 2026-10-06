@@ -7,7 +7,8 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 This is the inventory of third-party software in Raumfreund `0.6.0+45` (dependencies unchanged since `0.5.4+43`)
 (Flutter `3.47.6`, Dart `3.13.5`). Raumfreund itself is GPL-3.0-only. All
-listed licenses are permissive (BSD-3-Clause, Apache-2.0) and compatible with
+listed licenses are permissive (BSD-3-Clause, Apache-2.0, CC-BY-4.0 for the
+Material Icons font) and compatible with
 distribution under GPLv3 (see [GPL compatibility](#gpl-compatibility)).
 
 How it was determined (so it can be reproduced and re-checked):
@@ -42,7 +43,7 @@ Only `dependencies` (and their transitive closure) are part of the app; the
 | Flutter framework (`flutter`, `flutter_localizations`, `sky_engine`) | 3.47.6 | BSD-3-Clause | [flutter/flutter](https://github.com/flutter/flutter), `LICENSE` of the SDK |
 | Flutter engine (`libflutter.so`, per ABI) | `692136cb6582dbfc5af3fb33c2515a069f2f66d0` | BSD-3-Clause plus bundled third-party code | [flutter/flutter `engine/`](https://github.com/flutter/flutter/tree/3.47.6/engine) |
 | Dart runtime (inside `libflutter.so` / `libapp.so`) | 3.13.5 | BSD-3-Clause | [dart-lang/sdk](https://github.com/dart-lang/sdk) |
-| Material Icons font (`MaterialIcons-Regular.otf`) | bundled with Flutter 3.47.6 | Apache-2.0 | `bin/cache/artifacts/material_fonts/MaterialIcons_LICENSE.txt` in the SDK |
+| Material Icons font (`MaterialIcons-Regular.otf`) | bundled with Flutter 3.47.6 | CC-BY-4.0 (the licence file the SDK ships with the font) | `bin/cache/artifacts/material_fonts/MaterialIcons_LICENSE.txt` in the SDK |
 | Fragment shaders `ink_sparkle.frag`, `stretch_effect.frag` | bundled with Flutter 3.47.6 | BSD-3-Clause | Flutter SDK |
 
 The engine statically bundles further third-party code (Skia, ICU, FreeType,
@@ -52,9 +53,9 @@ FreeType License, Apache-2.0 and similar). Flutter collects these notices
 itself in the APK asset `assets/flutter_assets/NOTICES.Z`
 (about 1.3 MB of text in the inspected build).
 
-The inspected release APK is a locally built, debug-signed artifact; the
-Material Icons font license text is not part of `NOTICES.Z` (see the
-open points).
+The inspected release APK is a locally built, debug-signed artifact. The
+Material Icons font license text is not part of `NOTICES.Z`; the app adds it
+itself (see below).
 
 ### Dart packages (main, ships)
 
@@ -268,18 +269,20 @@ GPL legalese. Flutter's `LicenseRegistry` is fed from the bundled
   this includes dev-only packages),
 - the app itself (`raumfreund`).
 
-This is complete for Dart packages and the Flutter engine. It is **not
-complete** for the native Android libraries: AndroidX, Kotlin stdlib,
-kotlinx.coroutines, Okio, JetBrains annotations, Guava `listenablefuture`,
-ReLinker and JSpecify do not appear in `NOTICES.Z` (a search of the inspected
-build found no match for "androidx", "kotlin", "okio" or "datastore"). The
-app does not register any additional `LicenseEntry` for them, and the Apache
-License 2.0 requires that recipients receive a copy of the license (section 4a).
-Until that is closed, this document is the repository-level notice for those
-libraries.
+`NOTICES.Z` does not contain the native Android libraries (AndroidX, Kotlin
+stdlib, kotlinx.coroutines, Okio, JetBrains annotations, Guava
+`listenablefuture`, ReLinker, JSpecify) or the Material Icons font licence.
+`lib/app/native_licenses.dart` therefore registers two extra
+`LicenseRegistry` entries at start-up: the Apache License 2.0
+(`assets/licenses/apache-2.0.txt`, satisfying section 4(a)) for those
+libraries, and the CC-BY-4.0 text the Flutter SDK ships for Material Icons
+(`assets/licenses/material-icons-cc-by-4.0.txt`). Its package list must change
+together with the Android table above.
 
 ## GPL compatibility
 
+- CC-BY-4.0 (Material Icons font) is compatible with GPLv3 according to the
+  FSF; its attribution is shown on the licence page.
 - BSD-3-Clause and the other permissive licenses of the Dart packages and the
   Flutter engine are compatible with GPL-3.0-only.
 - Apache-2.0 is compatible with GPLv3 (but not GPLv2-only; the app is GPLv3).
@@ -298,13 +301,8 @@ libraries.
 
 ## Open points
 
-1. Show Android/Kotlin library licenses in the in-app license page, for
-   example with a generated `LicenseRegistry.addLicense` entry, or add a
-   bundled Apache-2.0 notice listing these libraries.
-2. Verify Android artifact licenses from their POM files and automate this
+1. Verify Android artifact licenses from their POM files and automate this
    inventory (for example, a script that diffs this document against
    `pubspec.lock` and `sdkDependencies.txt`) so it cannot go stale.
-3. Check that the Material Icons font license text is surfaced in the app
-   (it is not in `NOTICES.Z`).
-4. Re-run this inventory for every release; `docs/releasing.md` requires a
+2. Re-run this inventory for every release; `docs/releasing.md` requires a
    license inventory in each production release.
