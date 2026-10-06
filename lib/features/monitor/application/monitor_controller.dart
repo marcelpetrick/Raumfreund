@@ -100,6 +100,15 @@ final class MonitorController extends ChangeNotifier {
   /// but living recorders are covered by the "signal thin" hint instead.
   static const Duration readingStallTimeout = Duration(seconds: 3);
 
+  /// Longest wait for the native alarm output to report its end.
+  ///
+  /// The native tone and vibration end after at most 500 ms
+  /// (`AlarmDurationPolicy`). Readings are ignored and the no-reading
+  /// watchdog is paused while output is active, and that suppression is
+  /// shared across sessions, so a lost answer must not freeze every later
+  /// measurement. After this timeout the output counts as failed.
+  static const Duration alarmOutputTimeout = Duration(seconds: 2);
+
   /// Current immutable state.
   MonitorState get state => _state;
 
@@ -373,14 +382,42 @@ final class MonitorController extends ChangeNotifier {
     _cancelWatchdog();
     _alarm.onAlarmOutputStarted();
     _emit(_state.copyWith(alarmPlaying: true));
-    var failed = false;
+    final succeeded = await _playOutput(sound: sound, vibrate: vibrate);
+    _alarmOutputActive = false;
+    _finishAlarmOutput(ownerSession: session, failed: !succeeded);
+  }
+
+  /// Plays the output and reports whether it ended normally within
+  /// [alarmOutputTimeout]. A late answer after the timeout is ignored.
+  Future<bool> _playOutput({required bool sound, required bool vibrate}) {
+    final result = Completer<bool>();
+    void complete({required bool succeeded}) {
+      if (!result.isCompleted) result.complete(succeeded);
+    }
+
+    final timeout = _scheduler.schedule(
+      alarmOutputTimeout,
+      () => complete(succeeded: false),
+    );
+    unawaited(
+      _awaitOutput(sound: sound, vibrate: vibrate).then((succeeded) {
+        timeout.cancel();
+        complete(succeeded: succeeded);
+      }),
+    );
+    return result.future;
+  }
+
+  Future<bool> _awaitOutput({
+    required bool sound,
+    required bool vibrate,
+  }) async {
     try {
       await _alarmOutput.play(sound: sound, vibrate: vibrate);
+      return true;
     } on Exception {
-      failed = true;
+      return false;
     }
-    _alarmOutputActive = false;
-    _finishAlarmOutput(ownerSession: session, failed: failed);
   }
 
   void _finishAlarmOutput({required int ownerSession, required bool failed}) {

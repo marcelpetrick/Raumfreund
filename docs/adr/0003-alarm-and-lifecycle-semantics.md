@@ -120,6 +120,11 @@ watches for their absence:
   starts a replacement measurement session before that output completes.
   When output completes, continuity is reset. The next valid sample starts a
   new phase at zero.
+- The native output ends after at most 500 ms. If its answer has not arrived
+  after 2 s, the controller treats the output as failed and finishes it
+  anyway; a later answer is ignored. Without this bound a lost answer would
+  keep readings ignored and the no-reading watchdog paused for every later
+  session, showing "measuring" with no zone indefinitely.
 
 Mia (the kitty) walks away when the alarm of a confirmed red phase fires.
 The controller latches this as `MonitorState.kittyAway`: it survives the

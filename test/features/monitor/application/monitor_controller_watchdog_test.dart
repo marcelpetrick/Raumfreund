@@ -17,6 +17,7 @@ import '../../../fakes/settle.dart';
 const _first = MonitorController.firstReadingTimeout;
 const _stall = MonitorController.readingStallTimeout;
 const _ms = Duration(milliseconds: 1);
+const _output = MonitorController.alarmOutputTimeout;
 
 void main() {
   _timeoutTests();
@@ -123,10 +124,11 @@ void _alarmOutputTests() {
       final h = await _measuring();
       h.readings(redDbfs, 101);
       expect(h.state.alarmPlaying, isTrue);
-      expect(h.scheduler.pendingCount, 0);
-      // Ignored readings and silence during a long output are both fine.
-      h.readings(redDbfs, 50);
-      h.scheduler.elapse(const Duration(seconds: 30));
+      // Only the output safety timeout is pending, no watchdog.
+      expect(h.scheduler.pendingCount, 1);
+      // Ignored readings and silence during the output are both fine.
+      h.readings(redDbfs, 15);
+      h.scheduler.elapse(_output - _ms * 1501);
       expect(h.state.status, MonitorStatus.measuring);
       h.alarm.finish();
       await settle();
@@ -155,8 +157,8 @@ void _alarmOutputTests() {
       await h.controller.stop();
       await h.controller.start();
       expect(h.state.alarmPlaying, isTrue);
-      expect(h.scheduler.pendingCount, 0);
-      h.scheduler.elapse(const Duration(seconds: 30));
+      expect(h.scheduler.pendingCount, 1);
+      h.scheduler.elapse(_output - _ms);
       expect(h.state.status, MonitorStatus.measuring);
       h.alarm.finish();
       await settle();
@@ -165,6 +167,28 @@ void _alarmOutputTests() {
       expect(h.state.status, MonitorStatus.measuring);
       h.scheduler.elapse(_ms);
       await _expectNoReadingsError(h);
+    });
+
+    test('an output that never answers ends after the timeout', () async {
+      final h = await _measuring();
+      h.readings(redDbfs, 101);
+      expect(h.state.alarmPlaying, isTrue);
+      h.scheduler.elapse(_output - _ms);
+      expect(h.state.alarmPlaying, isTrue);
+      h.scheduler.elapse(_ms);
+      await settle();
+      expect(h.state.alarmPlaying, isFalse);
+      expect(h.state.alarmOutputFailed, isTrue);
+      // Measuring and the watchdog resume.
+      expect(h.scheduler.nextDue, h.clock.now + _stall);
+      h.readings(greenDbfs, 10);
+      expect(h.state.zone, isNotNull);
+      // A very late answer of the old output changes nothing.
+      final emitted = h.statuses.length;
+      h.alarm.finish();
+      await settle();
+      expect(h.statuses, hasLength(emitted));
+      expect(h.state.status, MonitorStatus.measuring);
     });
 
     test('output ending after stop arms nothing', () async {
