@@ -312,7 +312,8 @@ final class MonitorController extends ChangeNotifier {
     // must still ignore the physical tone until its future completes.
     if (_alarmOutputActive) return;
     final level = _calibration.estimate(dbfs);
-    // An invalid value is no measurement and does not feed the watchdog.
+    // An invalid value (NaN, infinity, digital silence of a muted input) is
+    // no measurement and does not feed the watchdog.
     if (level == null) return;
     _sessionHadReading = true;
     _armWatchdog(session);

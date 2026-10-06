@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/features/monitor/application/monitor_controller.dart';
 import 'package:raumfreund/features/monitor/application/monitor_state.dart';
+import 'package:raumfreund/features/monitor/domain/calibration.dart';
 
 import '../../../fakes/monitor_harness.dart';
 import '../../../fakes/settle.dart';
@@ -97,6 +98,20 @@ void _timeoutTests() {
       h.readings(double.nan, 29);
       expect(h.state.status, MonitorStatus.measuring);
       h.reading(double.negativeInfinity);
+      await _expectNoReadingsError(h);
+    });
+
+    test('a muted microphone (digital silence) never looks calm', () async {
+      final h = await _measuring();
+      // Startup zeros are ignored; a real reading afterwards is fine.
+      h.readings(Calibration.digitalSilenceDbfs, 10);
+      h.readings(greenDbfs, 20);
+      expect(h.state.zone, isNotNull);
+      // A privacy toggle feeds zeros: no stars, then the error.
+      h.readings(Calibration.digitalSilenceDbfs, 29);
+      expect(h.state.status, MonitorStatus.measuring);
+      expect(h.state.stars, 0);
+      h.reading(Calibration.digitalSilenceDbfs);
       await _expectNoReadingsError(h);
     });
   });

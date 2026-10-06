@@ -149,7 +149,11 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | N1 | Detect a recorder that produces no samples | Opus sub-agent, own worktree | done in `0.6.3`; ends the session with "Messung nicht möglich" after 5 s without a first or 3 s without a further reading |
 | L1 | Complete third-party dependency/license inventory | Sonnet sub-agent, docs only | done in `0.6.1`, `docs/third-party-licenses.md` |
 | L2 | Show Android library and Material Icons notices in the app licence page (gap found by L1) | Coordinator | done in `0.6.2` |
-| R1 | Independent review of A1, S1, N1 and L2 | Opus reviewer (read-only) | in progress |
+| R1 | Independent review of A1, S1, N1 and L2 | Opus reviewer (read-only) | done: no blocking finding, 1 major and 4 minor findings (F1–F5) |
+| F1 | Major: an all-zero (digitally silenced) microphone reads as calm green and earns stars | Coordinator | done in `0.6.5`: windows at the -100 dBFS floor are invalid, so a muted microphone trips the no-reading watchdog |
+| F2/F3 | Error texts name the wrong cause; unused "Keine Messwerte" title vs. docs | Coordinator | done in `0.6.5`: texts name the privacy toggle, docs name the shown headline; error titles stay unused like the existing ones |
+| F4 | Quick-star mode is not visible on the monitor | Coordinator | queued |
+| F5 | Dart-side safety timeout for an alarm output that never completes | Coordinator | queued |
 | Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | queued after R1 fixes |
 | I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | blocked on this host: on 2026-10-06 the emulator again died at microphone start (see `docs/testing.md`); needs another host or real devices |
 | D1 | Reconcile plan, testing evidence and release readiness | Coordinator | in progress |

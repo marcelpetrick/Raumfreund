@@ -22,7 +22,7 @@ void main() {
     });
 
     test('clamps to the 0–130 dB scale', () {
-      expect(const Calibration().estimate(-200), Calibration.minDb);
+      expect(const Calibration().estimate(-99.9), Calibration.minDb);
       expect(const Calibration(correctionDb: 30).estimate(20), 130);
       expect(const Calibration().estimate(-90), 0);
       expect(const Calibration(correctionDb: 30).estimate(10), 130);
@@ -33,6 +33,13 @@ void main() {
       expect(calibration.estimate(double.nan), isNull);
       expect(calibration.estimate(double.infinity), isNull);
       expect(calibration.estimate(double.negativeInfinity), isNull);
+    });
+
+    test('rejects digital silence at or below the native floor', () {
+      const calibration = Calibration(correctionDb: 30);
+      expect(calibration.estimate(Calibration.digitalSilenceDbfs), isNull);
+      expect(calibration.estimate(-200), isNull);
+      expect(calibration.estimate(-99.9), closeTo(20.1, 1e-9));
     });
   });
 }

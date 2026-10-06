@@ -90,6 +90,8 @@ void main() {
     monitor.scheduler.elapse(MonitorController.firstReadingTimeout);
     await _finishWithRealAsync(tester);
     expect(find.text(l10nDe.errorNoReadingsBody), findsOneWidget);
+    // The explanation is long; on the small test screen the page scrolls.
+    await tester.ensureVisible(find.text(l10nDe.errorRetry));
     await tester.tap(find.text(l10nDe.errorRetry));
     await _finishAsyncWork(tester);
     expect(find.text(l10nDe.measureStop), findsOneWidget);

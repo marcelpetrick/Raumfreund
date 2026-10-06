@@ -26,16 +26,29 @@ final class Calibration {
   /// Highest estimated level (top of the 0–130 dB scale).
   static const double maxDb = 130;
 
+  /// Native floor for digital silence (`RmsCalculator.FLOOR_DBFS`).
+  ///
+  /// The native side reports an all-zero (or practically all-zero) window
+  /// as exactly this value. No real room is that quiet: even a silent
+  /// classroom's microphone noise floor lies tens of dB above it. Windows
+  /// at the floor come from a muted input, for example Android's
+  /// microphone privacy toggle, which feeds zeros instead of stopping the
+  /// recorder, or from the first windows after `AudioRecord` starts.
+  /// Counting them as a calm green room would earn stars while nothing is
+  /// measured, so they are invalid samples.
+  static const double digitalSilenceDbfs = -100;
+
   /// User correction in dB added after [baseOffsetDb].
   final int correctionDb;
 
   /// Estimated level in dB for a dBFS value, clamped to [minDb]..[maxDb].
   ///
-  /// Returns null for NaN or infinite input: such a sample is invalid and
-  /// must be ignored by the caller (it neither counts as measurement time
-  /// nor resets anything).
+  /// Returns null for NaN, infinite or digital-silence input (at or below
+  /// [digitalSilenceDbfs]): such a sample is invalid and must be ignored by
+  /// the caller (it neither counts as measurement time nor resets
+  /// anything; the controller's no-reading watchdog reports a lasting run).
   double? estimate(double dbfs) {
-    if (!dbfs.isFinite) return null;
+    if (!dbfs.isFinite || dbfs <= digitalSilenceDbfs) return null;
     return (dbfs + baseOffsetDb + correctionDb).clamp(minDb, maxDb);
   }
 }

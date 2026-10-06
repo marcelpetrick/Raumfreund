@@ -445,7 +445,7 @@ abstract class AppLocalizations {
   /// Error body.
   ///
   /// In de, this message translates to:
-  /// **'Eine andere App benutzt gerade das Mikrofon, z. B. ein Anruf oder eine Sprachaufnahme. Beende sie und versuche es erneut.'**
+  /// **'Eine andere App benutzt gerade das Mikrofon, z. B. ein Anruf oder eine Sprachaufnahme, oder der Mikrofonzugriff ist in den Android-Schnelleinstellungen ausgeschaltet. Beende die App oder schalte den Zugriff ein und versuche es erneut.'**
   String get errorMicrophoneBusyBody;
 
   /// Error title.
@@ -481,7 +481,7 @@ abstract class AppLocalizations {
   /// Error body: the running recording delivered no levels, so the measurement was ended.
   ///
   /// In de, this message translates to:
-  /// **'Das Mikrofon liefert gerade keine Werte, deshalb wurde die Messung beendet. Vielleicht ist der Mikrofonzugriff in den Android-Schnelleinstellungen ausgeschaltet oder eine andere App nutzt das Mikrofon. Prüfe das und starte die Messung erneut.'**
+  /// **'Das Mikrofon liefert gerade keine Werte oder nur völlige Stille, deshalb wurde die Messung beendet. Vielleicht ist der Mikrofonzugriff in den Android-Schnelleinstellungen ausgeschaltet oder das Mikrofon reagiert nicht. Prüfe das und starte die Messung erneut.'**
   String get errorNoReadingsBody;
 
   /// Opens the Android app settings.

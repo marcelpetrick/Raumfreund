@@ -145,6 +145,7 @@ void main() {
           ? l10nDe.errorOpenSettings
           : l10nDe.errorRetry;
       expect(find.text(action), findsOneWidget);
+      await tester.ensureVisible(find.text(action));
       await tester.tap(find.text(action));
     }
     await _pumpPage(tester, _data(phase: MonitorPhase.error, zone: null));

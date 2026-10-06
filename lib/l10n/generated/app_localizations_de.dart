@@ -221,7 +221,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errorMicrophoneBusyBody =>
-      'Eine andere App benutzt gerade das Mikrofon, z. B. ein Anruf oder eine Sprachaufnahme. Beende sie und versuche es erneut.';
+      'Eine andere App benutzt gerade das Mikrofon, z. B. ein Anruf oder eine Sprachaufnahme, oder der Mikrofonzugriff ist in den Android-Schnelleinstellungen ausgeschaltet. Beende die App oder schalte den Zugriff ein und versuche es erneut.';
 
   @override
   String get errorRecordingAbortedTitle => 'Messung abgebrochen';
@@ -242,7 +242,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errorNoReadingsBody =>
-      'Das Mikrofon liefert gerade keine Werte, deshalb wurde die Messung beendet. Vielleicht ist der Mikrofonzugriff in den Android-Schnelleinstellungen ausgeschaltet oder eine andere App nutzt das Mikrofon. Prüfe das und starte die Messung erneut.';
+      'Das Mikrofon liefert gerade keine Werte oder nur völlige Stille, deshalb wurde die Messung beendet. Vielleicht ist der Mikrofonzugriff in den Android-Schnelleinstellungen ausgeschaltet oder das Mikrofon reagiert nicht. Prüfe das und starte die Messung erneut.';
 
   @override
   String get errorOpenSettings => 'Einstellungen öffnen';
