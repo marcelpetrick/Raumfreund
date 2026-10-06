@@ -26,7 +26,7 @@ ENV ANDROID_HOME=/opt/android-sdk \
     PUB_CACHE=/opt/pub-cache \
     FLUTTER_SUPPRESS_ANALYTICS=true \
     LANG=C.UTF-8
-ENV PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}"
+ENV PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl git unzip xz-utils \
@@ -40,7 +40,7 @@ RUN curl -sSfL -o /tmp/tools.zip \
     && mv "${ANDROID_HOME}/cmdline-tools/cmdline-tools" "${ANDROID_HOME}/cmdline-tools/latest" \
     && rm /tmp/tools.zip \
     && yes | sdkmanager --licenses >/dev/null \
-    && sdkmanager --install "platform-tools" "platforms;android-36" "build-tools;36.0.0" \
+    && sdkmanager --install "platforms;android-36" "build-tools;36.0.0" \
         "ndk;28.2.13676358" >/dev/null
 
 WORKDIR /src

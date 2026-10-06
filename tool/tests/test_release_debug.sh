@@ -12,7 +12,7 @@ trap 'rm -rf "${work}"' EXIT
 script="${root_dir}/tool/release_debug.sh"
 fake="${work}/repo"
 shims="${work}/shims"
-sdk="${work}/sdk/build-tools/9.0.0"
+sdk="${work}/sdk/build-tools/36.0.0"
 calls="${work}/calls.log"
 mkdir -p "${fake}/tool" "${shims}" "${sdk}"
 

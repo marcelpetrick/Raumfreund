@@ -36,8 +36,8 @@ tool/install_tools.sh
 tool/check_function_length.sh
 ```
 
-`lib/android_sdk.sh` is a sourced helper (not executable) that finds the newest
-Android build-tools; `release_debug.sh` and `check_privacy.sh` share it.
+`lib/android_sdk.sh` is a sourced helper (not executable) that requires pinned
+Android build-tools 36.0.0; `release_debug.sh` and `check_privacy.sh` share it.
 
 ## Pinned binary tools
 

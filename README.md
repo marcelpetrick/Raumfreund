@@ -7,12 +7,12 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 [![CI](https://github.com/marcelpetrick/Raumfreund/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marcelpetrick/Raumfreund/actions/workflows/ci.yml)
 [![Docker](https://github.com/marcelpetrick/Raumfreund/actions/workflows/docker.yml/badge.svg?branch=main)](https://github.com/marcelpetrick/Raumfreund/actions/workflows/docker.yml)
-[![Debug APK: 0.3.0+25](https://img.shields.io/badge/debug%20APK-0.3.0%2B25-brightgreen.svg)](https://github.com/marcelpetrick/Raumfreund/releases/latest)
+[![Latest debug APK](https://img.shields.io/badge/debug%20APK-latest-brightgreen.svg)](https://github.com/marcelpetrick/Raumfreund/releases/latest)
 [![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg)](LICENSE)
 [![Flutter 3.47.6](https://img.shields.io/badge/Flutter-3.47.6-02569B.svg)](https://docs.flutter.dev/release/archive)
 [![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2.svg)](https://dart.dev/)
 [![Android 7+](https://img.shields.io/badge/Android-7.0%2B-3DDC84.svg)](docs/toolchain.md)
-[![Coverage: 98.54%](https://img.shields.io/badge/coverage-98.54%25-brightgreen.svg)](docs/testing.md)
+[![Coverage gate: 95%](https://img.shields.io/badge/coverage%20gate-95%25-brightgreen.svg)](docs/testing.md)
 [![Status: release candidate](https://img.shields.io/badge/status-release%20candidate-blue.svg)](plan.md)
 
 Raumfreund is a child-friendly Android noise traffic light for shared rooms.
@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.5.3+42` — code-complete release candidate**
+Current version: **`0.5.4+43` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -78,7 +78,8 @@ build.
   vibration, persisted locally with validated schema migration.
 - Dedicated Settings and About views; navigating away safely stops measurement.
 - German localization, reduced-motion support and responsive phone/tablet UI.
-- Reproducible pinned toolchain, 467 automated tests, 98.54% Dart coverage,
+- Reproducible pinned toolchain, hundreds of automated tests, a 95% Dart
+  coverage gate,
   Android lint, secret/vulnerability scans, Docker packaging and tag releases.
 
 ## Interaction

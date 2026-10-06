@@ -23,7 +23,7 @@
 #   be in an explicit allowlist (RECORD_AUDIO, VIBRATE and the
 #   <package>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION that AndroidX adds);
 #   network, storage and radio features are rejected as well.
-# Without a mode flag both checks run. aapt2 is taken from the newest Android
+# Without a mode flag both checks run. aapt2 is taken from the pinned Android
 # build-tools (see tool/lib/android_sdk.sh) unless RAUMFREUND_AAPT2 is set.
 #
 # Environment: RAUMFREUND_ROOT overrides the repository root (tests).
@@ -122,7 +122,7 @@ check_source() {
 dump_badging() {
 	local aapt2="${RAUMFREUND_AAPT2:-}" tools
 	if [[ -z "${aapt2}" ]]; then
-		tools="$(newest_build_tools)" || exit 2
+		tools="$(pinned_build_tools)" || exit 2
 		aapt2="${tools}/aapt2"
 	fi
 	[[ -x "${aapt2}" ]] || die_usage "aapt2 not executable: ${aapt2}"

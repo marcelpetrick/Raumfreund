@@ -2,19 +2,20 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 #
-# android_sdk.sh – sourced helper that finds the newest Android build-tools.
+# android_sdk.sh – sourced helper that finds the pinned Android build-tools.
 #
-# Usage:   source tool/lib/android_sdk.sh; dir="$(newest_build_tools)" || exit 2
+# Usage:   source tool/lib/android_sdk.sh; dir="$(pinned_build_tools)" || exit 2
 # Looks below ANDROID_HOME, else ANDROID_SDK_ROOT, else ~/Android/Sdk. Prints
-# the newest build-tools directory; returns 1 (message on stderr) if none exists.
+# build-tools 36.0.0; returns 1 (message on stderr) if it is absent.
 
-newest_build_tools() {
-	local sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-${HOME}/Android/Sdk}}" newest
-	newest="$(find "${sdk}/build-tools" -mindepth 1 -maxdepth 1 -type d 2>/dev/null |
-		sort -V | tail -n 1)"
-	if [[ -z "${newest}" ]]; then
-		echo "no Android build-tools below ${sdk}" >&2
+android_build_tools_version="36.0.0"
+
+pinned_build_tools() {
+	local sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-${HOME}/Android/Sdk}}"
+	local pinned="${sdk}/build-tools/${android_build_tools_version}"
+	if [[ ! -d "${pinned}" ]]; then
+		echo "Android build-tools ${android_build_tools_version} missing below ${sdk}" >&2
 		return 1
 	fi
-	printf '%s\n' "${newest}"
+	printf '%s\n' "${pinned}"
 }

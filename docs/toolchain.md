@@ -1,6 +1,6 @@
 # Toolchain
 
-Verified on **2026-10-03**. Versions are pinned; updates arrive as reviewed,
+Verified on **2026-10-06**. Versions are pinned; updates arrive as reviewed,
 green commits (see the weekly maintenance workflow).
 
 ## Versions
@@ -11,8 +11,9 @@ green commits (see the weekly maintenance workflow).
 | Dart | 3.13.5 (bundled with Flutter 3.47.6) | `pubspec.yaml` `environment.sdk` | same |
 | Android Gradle Plugin | 9.1.0 | `android/settings.gradle.kts` | Flutter 3.47.6 app template |
 | Kotlin Gradle Plugin | 2.4.0 | `android/settings.gradle.kts` | Flutter 3.47.6 app template |
-| Gradle | 9.3.1 | `android/gradle/wrapper/gradle-wrapper.properties` | Flutter 3.47.6 app template |
-| JDK (build) | 21 (Temurin in CI/Docker) | `.github/actions/setup`, `Dockerfile` | AGP 9 requires JDK 17+; 21 is the current LTS supported by Gradle 9.3 |
+| Gradle | 9.3.1 | wrapper properties, distribution checksum and regenerated wrapper JAR/scripts | Flutter 3.47.6 app template |
+| JDK (build) | Temurin 21.0.12.1+1 | `.github/actions/setup`, pinned Docker digest | AGP 9 requires JDK 17+; 21 is the current LTS supported by Gradle 9.3 |
+| Node.js (tooling) | 24.x; CI 24.21.0 | `tool/node/package.json`, `.github/actions/setup` | npm lint tools support the active Node 24 LTS line |
 | Java/Kotlin bytecode target | 17 | `android/app/build.gradle.kts` | Flutter template default |
 | compileSdk | 36 | Flutter default (`flutter.compileSdkVersion`) | Flutter 3.47.6 `FlutterExtension.kt` |
 | targetSdk | 36 (Android 16) | Flutter default | meets Play requirement "new apps and updates must target API 36 from 2026-08-31" ([target-sdk](https://developer.android.com/google/play/requirements/target-sdk)) |
@@ -23,6 +24,16 @@ green commits (see the weekly maintenance workflow).
 AGP, Kotlin and Gradle are taken exactly from the template that Flutter 3.47.6
 generates, because that is the combination the Flutter team tests; newer single
 releases of AGP or Kotlin are not adopted ahead of Flutter.
+
+The Gradle distribution has a pinned SHA-256 and CI validates the committed
+wrapper before executing it. Android release verification uses exactly
+build-tools 36.0.0 instead of whichever SDK directory sorts newest.
+
+The Docker base images and downloaded Android command-line-tools are fixed by
+digests/checksums. Ubuntu packages installed inside the already digest-pinned
+base remain repository-resolved security packages; pinning their versions would
+block patched rebuilds. Docker does not install the floating `platform-tools`
+package because APK builds and verification do not need `adb`.
 
 ## Why a project-local Flutter SDK
 

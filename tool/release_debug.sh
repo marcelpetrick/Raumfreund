@@ -89,14 +89,14 @@ check_preconditions() {
 	fi
 }
 
-# Sets aapt2 and apksigner from the newest build-tools directory.
+# Sets aapt2 and apksigner from the pinned build-tools directory.
 locate_sdk_tools() {
-	local newest
-	newest="$(newest_build_tools)" || exit 2
-	aapt2="${newest}/aapt2"
-	apksigner="${newest}/apksigner"
+	local pinned
+	pinned="$(pinned_build_tools)" || exit 2
+	aapt2="${pinned}/aapt2"
+	apksigner="${pinned}/apksigner"
 	[[ -x "${aapt2}" && -x "${apksigner}" ]] || {
-		echo "release_debug: aapt2/apksigner missing in ${newest}" >&2
+		echo "release_debug: aapt2/apksigner missing in ${pinned}" >&2
 		exit 2
 	}
 }

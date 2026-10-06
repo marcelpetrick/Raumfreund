@@ -46,7 +46,8 @@ tool/release_debug.sh             # same, then tags debug-vX.Y.Z-buildN and publ
    `SHA256SUMS`, the package name, `versionName`/`versionCode` against
    `pubspec.yaml`, the absence of `android.permission.INTERNET` (`aapt2`) and the
    `CN=Android Debug` signature (`apksigner`). The tools come from
-   `$ANDROID_HOME`, `$ANDROID_SDK_ROOT` or `~/Android/Sdk/build-tools/<newest>`.
+   `$ANDROID_HOME`, `$ANDROID_SDK_ROOT` or
+   `~/Android/Sdk/build-tools/36.0.0`.
 4. It renders release notes (debug warning, installation, commit, version,
    API levels, certificate and APK SHA-256, permissions, the `CHANGELOG.md`
    entry), creates and pushes the annotated tag and runs `gh release create
