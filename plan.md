@@ -143,7 +143,7 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 
 | ID | Package | Owner | Status |
 | --- | --- | --- | --- |
-| G | Finish pinned dependency/toolchain update | Coordinator | done, `16e84b9`; green pipeline and pushed |
+| G | Finish pinned dependency/toolchain update | Coordinator | done, `16e84b9`; local pipeline green, GitHub CI red until CI1 |
 | A1 | Suppress readings across alarm-output/session boundaries | Coordinator (finished the stopped agent's diff) | done in `0.5.5` |
 | S1 | Owner-confirmed quick-star test mode (5 s) from the parked stash | Coordinator | done in `0.6.0` |
 | N1 | Detect a recorder that produces no samples | Opus sub-agent, own worktree | done in `0.6.3`; ends the session with "Messung nicht möglich" after 5 s without a first or 3 s without a further reading |
@@ -154,7 +154,8 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | F2/F3 | Error texts name the wrong cause; unused "Keine Messwerte" title vs. docs | Coordinator | done in `0.6.5`: texts name the privacy toggle, docs name the shown headline; error titles stay unused like the existing ones |
 | F4 | Quick-star mode is not visible on the monitor | Coordinator | done in `0.6.6`: the star hint reads "Stern-Testmodus: alle 5 ruhigen Sekunden ein Stern" |
 | F5 | Dart-side safety timeout for an alarm output that never completes | Coordinator | done in `0.6.7`: 2 s timeout, then the output counts as failed |
-| Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | queued after R1 fixes |
+| CI1 | GitHub CI red since `16e84b9`: `setup-java` rejects the JDK pin `21.0.12.1+1` (the local pipeline does not run `setup-java`) | Coordinator | in progress |
+| Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | queued after CI1 |
 | I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | blocked on this host: on 2026-10-06 the emulator again died at microphone start (see `docs/testing.md`); needs another host or real devices |
 | D1 | Reconcile plan, testing evidence and release readiness | Coordinator | in progress |
 

@@ -55,3 +55,4 @@ these lines (see docs/releasing.md).
 * v0.6.5 treats an all-silent (muted) microphone as no measurement, so it ends with a clear message instead of a calm green room that earns stars, and names the Android microphone toggle in the error texts
 * v0.6.6 shows on the monitor when the Stern-Testmodus is on
 * v0.6.7 bounds the wait for the alarm output to 2 s so a lost answer can never freeze later measurements
+* v0.6.8 fixes the JDK pin of the GitHub CI setup, which had kept CI red since 0.5.4
