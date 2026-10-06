@@ -33,11 +33,12 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   without auto-restart. About lists author, email `mail@marcelpetrick.it`,
   version/build/commit, project link, privacy and licences.
 
-## Verified state (2026-10-06, `0.5.4+43`, commit `16e84b9`)
+## Verified state (2026-10-07, `0.6.10+55`)
 
 - [x] Domain, controller, native `AudioRecord` recorder, platform channels,
   localized UI, Settings, About, persistence, docs and ADRs 0001–0003 exist.
-- [x] GitHub Actions CI and Docker workflows are green on `c40ec1a`.
+- [x] GitHub Actions CI and Docker workflows are green on `4755d27` (CI was
+  red from `16e84b9` to `0f7529b` because of the JDK pin, fixed in CI1).
 - [x] Dependabot PRs #1–#3 are closed; the pinned tooling was updated by hand.
 - [x] Debug release `debug-v0.1.2-build14` is GitHub's latest release. Its APK
   checksum matches, the signature is Android Debug
@@ -54,9 +55,10 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   (SIGSEGV) twice around microphone start/stop, once with `-no-audio` and
   once with audio; a guest app cannot do that, so it is treated as an
   emulator audio-backend defect. Real-device microphone tests remain open.
-- [ ] Eighteen parked agent worktrees under `.claude/worktrees/` and one stash
-  predate this acceptance pass. Several contain uncommitted or not
-  graph-merged work, so archive or remove them only after content review.
+- [ ] Eighteen parked agent worktrees under `.claude/worktrees/` predate this
+  acceptance pass. Several contain uncommitted or not graph-merged work, so
+  archive or remove them only after owner confirmation. The quick-star stash
+  was integrated as S1 and dropped; the worktrees of this pass were removed.
 
 ## Completed feature packages
 
@@ -105,13 +107,13 @@ Four review rounds with probe tests shaped the rule; details are in
 - Pauses of up to about 2.5 s inside a loud phase count towards the delay.
 - The countdown may wait just above zero until the next loud sample.
 
-### Latest release check (2026-10-06)
+### Latest release check (2026-10-07)
 
-`debug-v0.5.3-build42` (commit `4e5527f`) is the latest published debug
-release. Its downloaded APK and local copy have the same SHA-256, CI and Docker
-are green for the exact commit, and its release notes identify the Android
-debug certificate and source commit. `0.5.4+43` is committed and pushed after
-a green local pipeline, but has not been published as a debug release.
+`debug-v0.6.9-build54` (commit `4755d27`) is GitHub's latest release,
+published with `tool/release_debug.sh` after green local pipeline, CI and
+Docker runs for that exact commit. The downloaded APK matches the local build
+and `SHA256SUMS`. It contains A1, S1, N1, L1, L2 and the review fixes F1–F5.
+Device tests of these changes are still open (see `docs/testing.md`).
 
 ## Star shop (implemented 2026-10-05)
 
@@ -154,10 +156,10 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | F2/F3 | Error texts name the wrong cause; unused "Keine Messwerte" title vs. docs | Coordinator | done in `0.6.5`: texts name the privacy toggle, docs name the shown headline; error titles stay unused like the existing ones |
 | F4 | Quick-star mode is not visible on the monitor | Coordinator | done in `0.6.6`: the star hint reads "Stern-Testmodus: alle 5 ruhigen Sekunden ein Stern" |
 | F5 | Dart-side safety timeout for an alarm output that never completes | Coordinator | done in `0.6.7`: 2 s timeout, then the output counts as failed |
-| CI1 | GitHub CI red since `16e84b9`: `setup-java` rejects the JDK pin `21.0.12.1+1` (the local pipeline does not run `setup-java`) | Coordinator | in progress |
-| Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | queued after CI1 |
+| CI1 | GitHub CI red since `16e84b9`: `setup-java` rejects the JDK pin `21.0.12.1+1` (the local pipeline does not run `setup-java`) | Coordinator | done in `0.6.9`: pinned as `21.0.12+101.0.LTS`; CI green on `4755d27` |
+| Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.6.9-build54`, checksum verified after download |
 | I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | blocked on this host: on 2026-10-06 the emulator again died at microphone start (see `docs/testing.md`); needs another host or real devices |
-| D1 | Reconcile plan, testing evidence and release readiness | Coordinator | in progress |
+| D1 | Reconcile plan, testing evidence and release readiness | Coordinator | done in `0.6.10` |
 
 - [ ] Emulator tests for grant/deny/permanent deny, settings redirect, dialog
   lifecycle, background stop, rapid start/stop, stale events, stream failures,

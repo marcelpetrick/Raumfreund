@@ -57,3 +57,4 @@ these lines (see docs/releasing.md).
 * v0.6.7 bounds the wait for the alarm output to 2 s so a lost answer can never freeze later measurements
 * v0.6.8 fixes the JDK pin of the GitHub CI setup, which had kept CI red since 0.5.4
 * v0.6.9 uses the exact Adoptium version string for the pinned CI JDK
+* v0.6.10 records the debug-v0.6.9-build54 release check and the completed acceptance-pass packages
