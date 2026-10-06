@@ -146,8 +146,9 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | G | Finish pinned dependency/toolchain update | Coordinator | done, `16e84b9`; green pipeline and pushed |
 | A1 | Suppress readings across alarm-output/session boundaries | Coordinator (finished the stopped agent's diff) | done in `0.5.5` |
 | S1 | Owner-confirmed quick-star test mode (5 s) from the parked stash | Coordinator | done in `0.6.0` |
-| N1 | Detect a recorder that produces no samples | Opus sub-agent, own worktree | queued after S1 (touches the controller) |
-| L1 | Complete third-party dependency/license inventory | Sonnet sub-agent, docs only | queued |
+| N1 | Detect a recorder that produces no samples | Opus sub-agent, own worktree | in progress |
+| L1 | Complete third-party dependency/license inventory | Sonnet sub-agent, docs only | done in `0.6.1`, `docs/third-party-licenses.md` |
+| L2 | Show Android library and Material Icons notices in the app licence page (gap found by L1) | Coordinator | in progress |
 | R1 | Independent review of A1, S1 and N1 | Opus reviewer (read-only) | queued after N1 |
 | Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | queued after R1 fixes |
 | I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | open; emulator audio backend crashed before |

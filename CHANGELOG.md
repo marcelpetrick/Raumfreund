@@ -48,3 +48,4 @@ these lines (see docs/releasing.md).
 * v0.5.4 updates shared_preferences and pinned Node transitive dependencies, repairs the Gradle 9.3.1 wrapper with checksum validation, and pins the CI JDK and Android build tools
 * v0.5.5 keeps ignoring microphone readings while an earlier alarm tone still plays, even after a quick stop and restart
 * v0.6.0 adds an off-by-default Schneller Stern-Testmodus in Settings (one star after 5 s of green instead of 60 s), keeps earned stars across mode changes, and disables shop purchases until stored stars have loaded
+* v0.6.1 adds a third-party license inventory of everything that ships in the APK

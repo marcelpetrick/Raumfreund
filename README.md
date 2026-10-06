@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.6.0+45` — code-complete release candidate**
+Current version: **`0.6.1+46` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -159,6 +159,8 @@ evidence; the presence of this script is not proof of a green result.
 - [`docs/building.md`](docs/building.md) — local and Docker builds
 - [`docs/releasing.md`](docs/releasing.md) — signing, tags, artifacts and rollback
 - [`docs/play-store.md`](docs/play-store.md) — late-stage Play readiness
+- [`docs/third-party-licenses.md`](docs/third-party-licenses.md) — inventory of
+  third-party dependencies and their licenses
 - [`docs/adr/`](docs/adr/) — accepted architecture decisions
 
 Contributor workflow and security reporting are documented in

@@ -25,6 +25,10 @@ The keystore and `android/key.properties` are ignored and removed after the
 build. Missing secrets deliberately fail the workflow. Never upload a
 debug-signed artifact as a production release.
 
+The license inventory required for every production release starts from
+[`docs/third-party-licenses.md`](third-party-licenses.md); refresh it when
+dependencies change.
+
 ## Debug APK release
 
 A debug release follows the AndroidCatEars precedent and needs no production
