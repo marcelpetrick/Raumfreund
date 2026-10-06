@@ -44,3 +44,11 @@ audio. Core dumps show a smashed host stack, and the crash during boot rules
 out the app as the cause. Longer emulator sessions (earning stars, the red
 zone, alarms) are therefore not possible on this host; they belong to the
 real-device checks above.
+
+On 2026-10-06 the `0.6.3+48` debug build installed over the previous build on
+the Android 16 image (`ForkApi36`, headless, `-no-audio`,
+`swiftshader_indirect`) and launched to the monitor page with the
+Sternenladen total; no app exception was logged. Pressing **Messung starten**
+again killed the emulator process itself within two seconds, so the
+no-reading watchdog, the quick-star mode and the in-app licence page remain
+covered by unit, widget and app tests only and are **open** on devices.

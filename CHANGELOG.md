@@ -51,3 +51,4 @@ these lines (see docs/releasing.md).
 * v0.6.1 adds a third-party license inventory of everything that ships in the APK
 * v0.6.2 lists the Android libraries (Apache-2.0) and the Material Icons font (CC-BY-4.0) on the open-source licence page
 * v0.6.3 ends a measurement with a clear message when the microphone delivers no values (5 s without a first, 3 s without a further reading)
+* v0.6.4 records the 0.6.3 emulator smoke test and the repeated emulator crash at microphone start

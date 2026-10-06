@@ -151,7 +151,7 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | L2 | Show Android library and Material Icons notices in the app licence page (gap found by L1) | Coordinator | done in `0.6.2` |
 | R1 | Independent review of A1, S1, N1 and L2 | Opus reviewer (read-only) | in progress |
 | Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | queued after R1 fixes |
-| I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | open; emulator audio backend crashed before |
+| I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | blocked on this host: on 2026-10-06 the emulator again died at microphone start (see `docs/testing.md`); needs another host or real devices |
 | D1 | Reconcile plan, testing evidence and release readiness | Coordinator | in progress |
 
 - [ ] Emulator tests for grant/deny/permanent deny, settings redirect, dialog
