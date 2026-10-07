@@ -52,3 +52,26 @@ Sternenladen total; no app exception was logged. Pressing **Messung starten**
 again killed the emulator process itself within two seconds, so the
 no-reading watchdog, the quick-star mode and the in-app licence page remain
 covered by unit, widget and app tests only and are **open** on devices.
+
+On 2026-10-07 the emulator ran stably with the host GPU (`-gpu host`); the
+crashes above occurred with the software renderer. Results on the Android 16
+image (`ForkApi36`):
+
+- With `-no-audio` the emulator microphone delivers digital silence. The
+  debug build ended the measurement after about five seconds with the
+  headline "Keine Messwerte" and its explanation, which confirms the
+  digital-silence rule and the no-reading watchdog end to end.
+- With host audio, the release build (`0.6.15+60`, AOT) measured real input
+  (about 12 dB, green) for a **30-minute soak**: the same process throughout,
+  memory (total PSS) flat between 86.8 and 88.5 MB without growth, a constant
+  29 threads, no crash or ANR in logcat, exactly 30 quiet-minute stars, all
+  kept in the wallet after stopping, and AudioService logged `rec stop` for
+  the app's recording right after **Messung stoppen**.
+- A local JIT debug build failed to start after an emulator reboot ("Could
+  not prepare isolate"); a fresh install of the AOT release build started
+  normally. Published debug releases are AOT release builds signed with the
+  debug key (`tool/build_apk.sh`), so they are not affected.
+
+Still open on the emulator: the permission grant/deny/permanent-deny matrix,
+the settings redirect, background stop and rapid start/stop. Real-device
+tests remain open as listed above.

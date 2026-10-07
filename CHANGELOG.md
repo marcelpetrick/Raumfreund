@@ -63,3 +63,4 @@ these lines (see docs/releasing.md).
 * v0.6.13 adds a demo entry point with scripted noise levels for screen recordings (never part of a release)
 * v0.6.14 adds the scripts that record and cut the demo video
 * v0.6.15 checks the Android libraries of the license inventory against the release build
+* v0.6.16 records the 30-minute emulator soak and the end-to-end check of the muted-microphone error
