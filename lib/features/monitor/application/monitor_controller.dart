@@ -102,7 +102,7 @@ final class MonitorController extends ChangeNotifier {
 
   /// Longest wait for the native alarm output to report its end.
   ///
-  /// The native tone and vibration end after at most 500 ms
+  /// The native tone and vibration end after at most about 1.1 s
   /// (`AlarmDurationPolicy`). Readings are ignored and the no-reading
   /// watchdog is paused while output is active, and that suppression is
   /// shared across sessions, so a lost answer must not freeze every later

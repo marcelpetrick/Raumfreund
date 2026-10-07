@@ -69,3 +69,4 @@ these lines (see docs/releasing.md).
 * v0.6.19 runs the license inventory check with the system python3, which fixes the CI Android job
 * v0.6.20 records the debug-v0.6.19-build64 release check
 * v0.6.21 adds the two 4:5 demo videos to docs/video
+* v0.6.22 makes the alarm vibration noticeable: three pulses with alarm usage, so silent mode and the system's vibration handling no longer swallow it

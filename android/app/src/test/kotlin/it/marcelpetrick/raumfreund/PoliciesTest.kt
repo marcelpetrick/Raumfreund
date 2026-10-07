@@ -57,12 +57,22 @@ class AlarmDurationPolicyTest {
 
     @Test
     fun `vibration only waits for the vibration`() {
-        assertEquals(300L, AlarmDurationPolicy.completionDelayMs(sound = false, vibrate = true))
+        assertEquals(1140L, AlarmDurationPolicy.completionDelayMs(sound = false, vibrate = true))
+    }
+
+    @Test
+    fun `vibration is three noticeable pulses that start at once`() {
+        val pattern = AlarmDurationPolicy.VIBRATION_PATTERN_MS
+        assertEquals(0L, pattern.first())
+        val pulses = pattern.filterIndexed { index, _ -> index % 2 == 1 }
+        assertEquals(3, pulses.size)
+        assertEquals(true, pulses.all { it >= 250L })
+        assertEquals(pattern.sum(), AlarmDurationPolicy.VIBRATION_MS)
     }
 
     @Test
     fun `both wait for the longer output`() {
-        assertEquals(500L, AlarmDurationPolicy.completionDelayMs(sound = true, vibrate = true))
+        assertEquals(1140L, AlarmDurationPolicy.completionDelayMs(sound = true, vibrate = true))
     }
 }
 

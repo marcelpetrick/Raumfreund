@@ -10,8 +10,26 @@ object AlarmDurationPolicy {
     /** Length of the beep. */
     const val TONE_MS = 400
 
-    /** Length of the vibration. */
-    const val VIBRATION_MS = 300L
+    /**
+     * Vibration as off/on timings in ms: three pulses. A single 300 ms pulse
+     * was easy to miss with the phone lying on a desk; three distinct pulses
+     * are noticeable and still end quickly, because the microphone is ignored
+     * while the motor runs.
+     */
+    val VIBRATION_PATTERN_MS =
+        longArrayOf(0L, PULSE_MS, PAUSE_MS, PULSE_MS, PAUSE_MS, LAST_PULSE_MS)
+
+    /** One short vibration pulse. */
+    const val PULSE_MS = 250L
+
+    /** Pause between pulses; long enough to feel them as separate. */
+    const val PAUSE_MS = 120L
+
+    /** The last pulse is longer, so the pattern ends clearly. */
+    const val LAST_PULSE_MS = 400L
+
+    /** Length of the whole vibration pattern. */
+    val VIBRATION_MS = VIBRATION_PATTERN_MS.sum()
 
     /**
      * ToneGenerator.startTone returns before the audio reaches the speaker.

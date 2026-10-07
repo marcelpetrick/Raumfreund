@@ -28,6 +28,21 @@ Open device acceptance work:
 
 These checks are never claimed from an emulator-only run.
 
+## Checking the alarm vibration on a device
+
+The alarm vibrates in three pulses (about 1.1 s) with alarm usage, so it
+follows the phone's alarm-vibration setting, also in silent mode.
+
+1. In **Einstellungen**, lower **Rot ab** to about 55 dB, set **Alarm nach**
+   to 3 seconds, switch **Vibration** on (optionally **Alarmton** off to feel
+   only the vibration) and save.
+2. Start the measurement and speak loudly or clap for more than three
+   seconds until "Alarm!" appears and Mia hides.
+3. Expected: three distinct pulses. If nothing vibrates, check the Android
+   setting for alarm vibration (Settings, Sound and vibration, Vibration and
+   haptics) and whether the device has a vibrator at all.
+4. Restore the thresholds with **Standardwerte**.
+
 ## Emulator smoke tests and a known emulator defect
 
 Manual emulator checks on 2026-10-04/05 (Android 16 / API 36 and Android 14 /

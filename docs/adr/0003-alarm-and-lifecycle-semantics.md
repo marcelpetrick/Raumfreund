@@ -120,7 +120,8 @@ watches for their absence:
   starts a replacement measurement session before that output completes.
   When output completes, continuity is reset. The next valid sample starts a
   new phase at zero.
-- The native output ends after at most 500 ms. If its answer has not arrived
+- The native output ends after at most about 1.1 s (tone 0.5 s, three
+  vibration pulses 1.14 s). If its answer has not arrived
   after 2 s, the controller treats the output as failed and finishes it
   anyway; a later answer is ignored. Without this bound a lost answer would
   keep readings ignored and the no-reading watchdog paused for every later

@@ -165,6 +165,7 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | V2 | Commit the video tooling (`tool/demo/record_demo.sh`, `tool/demo/cut_demo_video.py`) so candidates can be re-cut, e.g. in English or after owner references | Coordinator | done in `0.6.14`; reproduces both candidates from the recorded take |
 | L4 | Pipeline check of the Android license rows against the release build's `sdkDependencies.txt` | Coordinator | done in `0.6.15` (step `privacy`) |
 | CI2 | CI Android job red since `2384ae8`: the license check called the venv Python, which that job never creates | Coordinator | done in `0.6.19`: system `python3` (stdlib-only checker) |
+| VB1 | Owner never noticed the alarm vibration: single 300 ms pulse without usage attributes | Coordinator | done in `0.6.22`: three pulses (1.14 s) with alarm usage (`VibrationAttributes` API 33+, `AudioAttributes` API 26-32); device check recipe in `docs/testing.md`; on-device confirmation open |
 | W1 | Remove all parked agent worktrees and their branches (owner request 2026-10-07), after archiving their unmerged work | Coordinator | done: 19 worktrees and 20 local branches removed; only `main` remains locally and on GitHub |
 
 - [ ] Emulator tests for grant/deny/permanent deny, settings redirect, dialog
