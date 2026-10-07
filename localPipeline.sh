@@ -118,8 +118,10 @@ step_docs() {
 	run_logged docs "${ROOT_DIR}/tool/node/node_modules/.bin/markdownlint" '**/*.md'
 }
 
+# The inventory checker uses only the standard library, so it runs with the
+# system python3: CI jobs without the "tools" step have no venv.
 step_licenses() {
-	run_logged licenses "${VENV}/python" "${ROOT_DIR}/tool/license_inventory/check_license_inventory.py" \
+	run_logged licenses python3 "${ROOT_DIR}/tool/license_inventory/check_license_inventory.py" \
 		--root "${ROOT_DIR}"
 }
 
@@ -196,7 +198,7 @@ step_privacy() {
 	run_logged privacy "${ROOT_DIR}/tool/check_privacy.sh" --source-only &&
 		run_logged privacy "${FLUTTER}" build apk --release &&
 		run_logged privacy "${ROOT_DIR}/tool/check_privacy.sh" --apk-only &&
-		run_logged privacy "${VENV}/python" "${ROOT_DIR}/tool/license_inventory/check_license_inventory.py" \
+		run_logged privacy python3 "${ROOT_DIR}/tool/license_inventory/check_license_inventory.py" \
 			--root "${ROOT_DIR}" \
 			--sdk-dependencies "${ROOT_DIR}/build/app/outputs/sdk-dependencies/release/sdkDependencies.txt"
 }
