@@ -22,6 +22,8 @@ globally. Supported platform for downloads: **Linux x86_64** only.
 | `check_privacy.sh` | Privacy gate: release APK permissions against an allowlist (`aapt2 dump badging`), forbidden audio-persisting/network APIs in Kotlin and Dart, network/analytics dependencies in `pubspec.yaml`. `--source-only`, `--apk-only`, `--apk FILE`. Pipeline step `privacy`. | 0 ok; 1 violation; 2 usage/missing APK or aapt2 |
 | `license_inventory/check_license_inventory.py` | Checks that `docs/third-party-licenses.md` lists every package of `pubspec.lock` with the locked version, no stale package, and the Flutter version of `.flutter-version`. `--root DIR`. Pipeline step `licenses`. | 0 consistent; 1 mismatches; 2 usage or missing input |
 | `demo/demo_main.dart` | Demo entry point for screen recordings: the real app with scripted noise levels (no microphone, no sound, wallet in RAM, pre-filled 10-minute timeline). Never released; build with `tool/flutter.sh build apk --debug -t tool/demo/demo_main.dart`. | – |
+| `demo/record_demo.sh` | Drives the demo build on a booted emulator through the video storyboard while `screenrecord` captures it; writes `take.mp4` and `events.log`. Usage: `tool/demo/record_demo.sh <output-dir>`. | 0 recorded; 1 recording/pull failed; 2 usage |
+| `demo/cut_demo_video.py` | Cuts the two 4:5 social-media candidates (1080x1350, 30 fps, at most 29.9 s) from a take, using offsets from its scene marks. Usage: `cut_demo_video.py <take.mp4> <events.log> <output-dir>`. | 0 written; 1 ffmpeg/ImageMagick failed; 2 usage or missing input |
 | `build_apk.sh` | Builds named release-mode APK/AAB artifacts, checksums and version metadata in `dist/`; unsigned local builds are explicitly `-debugsigned`. | 0 success; 1 build failure; 2 usage |
 | `release_debug.sh` | One-command public debug APK release: preconditions, local build with this machine's debug keystore (CI keystores differ per run and could not update installs), verification, notes, tag and `gh release create --latest`; `--dry-run` skips tag/push/publish. | 0 success; 1 precondition/build/verification failure; 2 usage/tool missing |
 | `write_signing_config.sh` | Materializes/removes ignored Android signing files from CI secrets. | 0 success; 1 missing/invalid secret |
@@ -83,7 +85,7 @@ To update a tool: change version, URL and SHA-256 in the `tools` array of
 ```sh
 .toolchain/venv/bin/ruff check tool
 .toolchain/venv/bin/ruff format --check tool
-.toolchain/venv/bin/mypy --config-file tool/pyproject.toml tool/function_length tool/license_inventory
+.toolchain/venv/bin/mypy --config-file tool/pyproject.toml tool/function_length tool/demo tool/license_inventory
 .toolchain/venv/bin/pytest -c tool/pyproject.toml
 ```
 

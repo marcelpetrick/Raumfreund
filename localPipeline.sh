@@ -108,7 +108,7 @@ step_fnlen() { run_logged fnlen "${ROOT_DIR}/tool/check_function_length.sh"; }
 step_python() {
 	run_logged python "${VENV}/ruff" check tool &&
 		run_logged python "${VENV}/ruff" format --check tool &&
-		run_logged python "${VENV}/mypy" --config-file tool/pyproject.toml tool/function_length \
+		run_logged python "${VENV}/mypy" --config-file tool/pyproject.toml tool/function_length tool/demo \
 			tool/license_inventory &&
 		run_logged python "${VENV}/pytest" -q -c tool/pyproject.toml
 }

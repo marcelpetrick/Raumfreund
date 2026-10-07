@@ -161,6 +161,7 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | L3 | Pipeline check: license inventory vs. `pubspec.lock` and `.flutter-version` | Coordinator | done in `0.6.11`: pipeline step `licenses` |
 | U1 | Error headline names the cause ("Mikrofon belegt", "Keine Messwerte", …) instead of the generic "Messung nicht möglich"; uses the so far unused error titles | Coordinator | done in `0.6.12` |
 | V1 | LinkedIn demo video (owner request 2026-10-07): two 4:5 candidates, max. 30 s, from the emulator with scripted (fake) noise input; Settings, measuring, stars, alarm, shop purchase, rerun with accessory, graph, About | Coordinator | done: `tool/demo/demo_main.dart` (scripted levels, never released); candidates A "Story" (29.9 s) and B "Hook" (28.0 s), 1080x1350, 30 fps, delivered outside the repository; recorded with the emulator's host GPU, which stayed stable where the software renderer crashed |
+| V2 | Commit the video tooling (`tool/demo/record_demo.sh`, `tool/demo/cut_demo_video.py`) so candidates can be re-cut, e.g. in English or after owner references | Coordinator | done in `0.6.14`; reproduces both candidates from the recorded take |
 | W1 | Remove all parked agent worktrees and their branches (owner request 2026-10-07), after archiving their unmerged work | Coordinator | done: 19 worktrees and 20 local branches removed; only `main` remains locally and on GitHub |
 
 - [ ] Emulator tests for grant/deny/permanent deny, settings redirect, dialog
