@@ -62,3 +62,4 @@ these lines (see docs/releasing.md).
 * v0.6.12 names the cause in the headline of every measurement error, for example Mikrofon belegt or Keine Messwerte
 * v0.6.13 adds a demo entry point with scripted noise levels for screen recordings (never part of a release)
 * v0.6.14 adds the scripts that record and cut the demo video
+* v0.6.15 checks the Android libraries of the license inventory against the release build

@@ -28,7 +28,8 @@
 #   test        flutter test with coverage
 #   coverage    line coverage gate (>= 95 %) on own Dart code
 #   apk         flutter build apk --debug
-#   privacy     privacy gate: source scan + release APK permissions (tool/check_privacy.sh)
+#   privacy     privacy gate: source scan + release APK permissions (tool/check_privacy.sh),
+#               then the Android rows of the license inventory vs. the release build
 #   docker      build the Docker image and verify it (tool/docker_check.sh)
 #
 # Usage:
@@ -194,7 +195,10 @@ step_apk() { run_logged apk "${FLUTTER}" build apk --debug; }
 step_privacy() {
 	run_logged privacy "${ROOT_DIR}/tool/check_privacy.sh" --source-only &&
 		run_logged privacy "${FLUTTER}" build apk --release &&
-		run_logged privacy "${ROOT_DIR}/tool/check_privacy.sh" --apk-only
+		run_logged privacy "${ROOT_DIR}/tool/check_privacy.sh" --apk-only &&
+		run_logged privacy "${VENV}/python" "${ROOT_DIR}/tool/license_inventory/check_license_inventory.py" \
+			--root "${ROOT_DIR}" \
+			--sdk-dependencies "${ROOT_DIR}/build/app/outputs/sdk-dependencies/release/sdkDependencies.txt"
 }
 
 step_docker() { run_logged docker "${ROOT_DIR}/tool/docker_check.sh"; }

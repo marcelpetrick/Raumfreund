@@ -30,7 +30,9 @@ How it was determined (so it can be reproduced and re-checked):
   from the POM/jar files in this pass.
 - The inventory must be regenerated whenever `pubspec.lock`, the Flutter pin
   or an Android dependency changes; the pipeline step `licenses` fails when
-  the Dart tables or the Flutter version drift from the lockfile and pin.
+  the Dart tables or the Flutter version drift from the lockfile and pin, and
+  the `privacy` step fails when the Android table drifts from the release
+  build's `sdkDependencies.txt`.
 
 ## What ships in the release APK
 
@@ -302,9 +304,7 @@ together with the Android table above.
 
 ## Open points
 
-1. Verify Android artifact licenses from their POM files and extend the
-   automated check to the Android table (`sdkDependencies.txt`). The Dart
-   tables and the Flutter version are checked by the pipeline step
-   `licenses` (`tool/license_inventory/check_license_inventory.py`).
+1. Verify Android artifact licenses from their POM files; the pipeline checks
+   artifacts and versions, not the licenses themselves.
 2. Re-run this inventory for every release; `docs/releasing.md` requires a
    license inventory in each production release.

@@ -109,3 +109,61 @@ def test_runs_as_a_script(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
 def test_real_repository_is_consistent() -> None:
     root = Path(__file__).resolve().parents[3]
     assert inventory.check(root) == []
+
+
+SDK = """library {
+  maven_library {
+    groupId: "androidx.core"
+    artifactId: "core"
+    version: "1.13.1"
+  }
+}
+library {
+  maven_library {
+    groupId: "com.squareup.okio"
+    artifactId: "okio"
+    version: "3.4.0"
+  }
+}
+"""
+
+ANDROID_DOC = """| Group | Artifact | Version | License |
+| --- | --- | --- | --- |
+| `androidx.core` | `core` | 1.13.1 | Apache-2.0 |
+| `com.squareup.okio` | `okio` | 3.4.0 | Apache-2.0 |
+"""
+
+
+def test_android_rows_match_the_sdk_report() -> None:
+    assert inventory.compare_android(SDK, ANDROID_DOC) == []
+
+
+def sdk_entry(group: str, artifact: str, version: str) -> str:
+    """One library block of an AGP sdkDependencies.txt."""
+    return (
+        f'library {{\n  maven_library {{\n    groupId: "{group}"\n'
+        f'    artifactId: "{artifact}"\n    version: "{version}"\n  }}\n}}\n'
+    )
+
+
+def test_android_reports_missing_stale_and_changed_libraries() -> None:
+    sdk = sdk_entry("androidx.core", "core", "1.13.1") + sdk_entry(
+        "com.squareup.okio", "okio", "3.9.0"
+    )
+    sdk += sdk_entry("androidx.activity", "activity", "1.9.0")
+    doc = ANDROID_DOC + "| `org.gone` | `gone` | 1.0 | MIT |\n"
+    assert inventory.compare_android(sdk, doc) == [
+        "androidx.activity:activity 1.9.0: Android library missing",
+        "org.gone:gone: listed but not shipped",
+        "com.squareup.okio:okio: listed as 3.4.0, shipped 3.9.0",
+    ]
+
+
+def test_cli_checks_the_sdk_report(tmp_path: Path) -> None:
+    root = repo(tmp_path, doc=DOC + "\n" + ANDROID_DOC)
+    report = tmp_path / "sdkDependencies.txt"
+    embedding = sdk_entry("io.flutter", "flutter_embedding_release", "1.0.0")
+    report.write_text(SDK + embedding, encoding="utf-8")
+    assert inventory.main(["--root", str(root), "--sdk-dependencies", str(report)]) == 0
+    report.write_text(SDK, encoding="utf-8")
+    assert inventory.main(["--root", str(root), "--sdk-dependencies", str(report)]) == 1
