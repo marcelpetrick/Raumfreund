@@ -71,3 +71,4 @@ these lines (see docs/releasing.md).
 * v0.6.21 adds the two 4:5 demo videos to docs/video
 * v0.6.22 makes the alarm vibration noticeable: three pulses with alarm usage, so silent mode and the system's vibration handling no longer swallow it
 * v0.6.23 records the debug-v0.6.22-build67 release check
+* v0.6.24 adds ten facts for a LinkedIn post next to the demo videos
