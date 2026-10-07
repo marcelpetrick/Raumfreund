@@ -87,6 +87,13 @@ used as evidence):
 - Twelve rapid taps on the start/stop button end stopped; eleven end
   measuring with live readings. No crash or ANR in logcat.
 
-Still open on the emulator: rotating while the permission dialog is open,
-a missing vibrator and an occupied microphone. Real-device tests remain open
+- Rotating to landscape and back while the permission dialog is open keeps
+  the dialog and the waiting state; allowing then starts measuring. Rotating
+  while measuring keeps the session in both orientations. One earlier run of
+  the dialog case ended with "Keine Messwerte" after allowing, and a retry in
+  the same process did too; a repeat of the same steps worked. It is a watch
+  item for the device tests, not a confirmed defect.
+
+Still open on the emulator: a missing vibrator during an alarm and an
+occupied microphone; both need input this host cannot provide. Real-device tests remain open
 as listed above.

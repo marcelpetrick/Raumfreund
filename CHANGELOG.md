@@ -65,3 +65,4 @@ these lines (see docs/releasing.md).
 * v0.6.15 checks the Android libraries of the license inventory against the release build
 * v0.6.16 records the 30-minute emulator soak and the end-to-end check of the muted-microphone error
 * v0.6.17 offers Erneut versuchen next to Einstellungen öffnen after a permanent microphone denial, so measuring can start once access was granted
+* v0.6.18 records the emulator rotation checks
