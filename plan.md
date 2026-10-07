@@ -156,7 +156,7 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | F5 | Dart-side safety timeout for an alarm output that never completes | Coordinator | done in `0.6.7`: 2 s timeout, then the output counts as failed |
 | CI1 | GitHub CI red since `16e84b9`: `setup-java` rejects the JDK pin `21.0.12.1+1` (the local pipeline does not run `setup-java`) | Coordinator | done in `0.6.9`: pinned as `21.0.12+101.0.LTS`; CI green on `4755d27` |
 | Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.6.9-build54`, checksum verified after download |
-| I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | soak done 2026-10-07 (host GPU emulator, release build, 30 min, stable memory, no crash, recorder released); muted-microphone error verified; permission/lifecycle matrix still open |
+| I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | soak and permission/lifecycle matrix done 2026-10-07 (see `docs/testing.md`); found and fixed: no retry after a permanent denial (`0.6.17`); open: rotation during the dialog, missing vibrator, occupied microphone |
 | D1 | Reconcile plan, testing evidence and release readiness | Coordinator | done in `0.6.10` |
 | L3 | Pipeline check: license inventory vs. `pubspec.lock` and `.flutter-version` | Coordinator | done in `0.6.11`: pipeline step `licenses` |
 | U1 | Error headline names the cause ("Mikrofon belegt", "Keine Messwerte", …) instead of the generic "Messung nicht möglich"; uses the so far unused error titles | Coordinator | done in `0.6.12` |

@@ -72,6 +72,21 @@ image (`ForkApi36`):
   normally. Published debug releases are AOT release builds signed with the
   debug key (`tool/build_apk.sh`), so they are not affected.
 
-Still open on the emulator: the permission grant/deny/permanent-deny matrix,
-the settings redirect, background stop and rapid start/stop. Real-device
-tests remain open as listed above.
+Permission and lifecycle matrix on the same emulator (release build, judged
+by screenshots; uiautomator dumps of the Flutter tree went stale and are not
+used as evidence):
+
+- Deny once: "Mikrofon nicht erlaubt" with **Erneut versuchen**, which shows
+  the system dialog again.
+- Deny twice: "Mikrofon dauerhaft gesperrt"; **Einstellungen öffnen** opens
+  the Android app settings. After granting there and returning, nothing
+  starts by itself. This pass found that the panel then offered no way to
+  start; it now also offers **Erneut versuchen**, which starts measuring.
+- Background (Home) while measuring: stopped, no restart on return, stars
+  kept.
+- Twelve rapid taps on the start/stop button end stopped; eleven end
+  measuring with live readings. No crash or ANR in logcat.
+
+Still open on the emulator: rotating while the permission dialog is open,
+a missing vibrator and an occupied microphone. Real-device tests remain open
+as listed above.

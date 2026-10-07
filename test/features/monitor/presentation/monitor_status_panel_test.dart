@@ -105,6 +105,30 @@ void _totalTests() {
 
 /// Tests for the cause-specific error headline.
 void _errorHeadlineTests() {
+  testWidgets('a permanent denial offers settings and a retry', (tester) async {
+    var settings = 0;
+    var retries = 0;
+    setScreenSize(tester, const Size(400, 1200));
+    await tester.pumpWidget(
+      testApp(
+        MonitorStatusPanel(
+          data: MonitorViewData(
+            phase: MonitorPhase.error,
+            thresholds: Thresholds.defaults,
+            error: MonitorErrorKind.permanentlyDenied,
+          ),
+          onToggleMeasurement: () {},
+          onRetry: () => retries++,
+          onOpenAndroidSettings: () => settings++,
+        ),
+        disableAnimations: true,
+      ),
+    );
+    await tester.tap(find.text(l10nDe.errorOpenSettings));
+    await tester.tap(find.text(l10nDe.errorRetry));
+    expect((settings, retries), (1, 1));
+  });
+
   testWidgets('the error headline names the cause', (tester) async {
     final titles = {
       MonitorErrorKind.permissionDenied: l10nDe.errorPermissionDeniedTitle,

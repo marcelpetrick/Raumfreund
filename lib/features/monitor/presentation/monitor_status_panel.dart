@@ -115,16 +115,29 @@ class MonitorStatusPanel extends StatelessWidget {
 
   Widget _action(AppLocalizations l10n) {
     if (data.phase == MonitorPhase.error) {
-      final permanentlyDenied =
-          data.error == MonitorErrorKind.permanentlyDenied;
-      return FilledButton.icon(
-        onPressed: permanentlyDenied ? onOpenAndroidSettings : onRetry,
-        icon: Icon(
-          permanentlyDenied ? Icons.settings_rounded : Icons.refresh_rounded,
-        ),
-        label: Text(
-          permanentlyDenied ? l10n.errorOpenSettings : l10n.errorRetry,
-        ),
+      final retry = FilledButton.icon(
+        onPressed: onRetry,
+        icon: const Icon(Icons.refresh_rounded),
+        label: Text(l10n.errorRetry),
+      );
+      if (data.error != MonitorErrorKind.permanentlyDenied) return retry;
+      // After granting access in the Android settings the teacher returns
+      // here; there is no automatic start, so retrying must stay possible.
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FilledButton.icon(
+            onPressed: onOpenAndroidSettings,
+            icon: const Icon(Icons.settings_rounded),
+            label: Text(l10n.errorOpenSettings),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded),
+            label: Text(l10n.errorRetry),
+          ),
+        ],
       );
     }
     return FilledButton.icon(
