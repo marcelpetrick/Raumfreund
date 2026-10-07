@@ -54,7 +54,7 @@ watches for their absence:
   look like a calm green room nor earn stars. Short runs of them (for
   example right after `AudioRecord` starts) are simply ignored.
   Otherwise the session ends through the normal stop path with the failure
-  `noReadings` ("Messung nicht möglich" with an explanation); start/"Erneut versuchen" begins a new
+  `noReadings` (headline "Keine Messwerte" with an explanation); start/"Erneut versuchen" begins a new
   session. Readings arrive about every 100 ms, so 3 s are 30 missed windows,
   far beyond scheduling hiccups, and equal to the zone release window: a
   stale zone stays visible no longer than a real one needs to cool down.

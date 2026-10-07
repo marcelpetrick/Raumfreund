@@ -59,3 +59,4 @@ these lines (see docs/releasing.md).
 * v0.6.9 uses the exact Adoptium version string for the pinned CI JDK
 * v0.6.10 records the debug-v0.6.9-build54 release check and the completed acceptance-pass packages
 * v0.6.11 adds the pipeline step licenses, which fails when the license inventory drifts from pubspec.lock or the Flutter pin
+* v0.6.12 names the cause in the headline of every measurement error, for example Mikrofon belegt or Keine Messwerte

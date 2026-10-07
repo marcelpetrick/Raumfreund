@@ -103,6 +103,31 @@ void _totalTests() {
   });
 }
 
+/// Tests for the cause-specific error headline.
+void _errorHeadlineTests() {
+  testWidgets('the error headline names the cause', (tester) async {
+    final titles = {
+      MonitorErrorKind.permissionDenied: l10nDe.errorPermissionDeniedTitle,
+      MonitorErrorKind.permanentlyDenied: l10nDe.errorPermanentlyDeniedTitle,
+      MonitorErrorKind.microphoneBusy: l10nDe.errorMicrophoneBusyTitle,
+      MonitorErrorKind.recordingAborted: l10nDe.errorRecordingAbortedTitle,
+      MonitorErrorKind.noReadings: l10nDe.errorNoReadingsTitle,
+      MonitorErrorKind.unavailable: l10nDe.errorUnavailableTitle,
+    };
+    expect(titles.keys, containsAll(MonitorErrorKind.values));
+    for (final MapEntry(key: error, value: title) in titles.entries) {
+      final data = MonitorViewData(
+        phase: MonitorPhase.error,
+        thresholds: Thresholds.defaults,
+        error: error,
+      );
+      await _panelHeight(tester, data, 1);
+      expect(find.text(title), findsOneWidget, reason: '$error');
+      expect(find.text(l10nDe.statusError), findsNothing);
+    }
+  });
+}
+
 void main() {
   for (final scale in [1.0, 2.0]) {
     testWidgets('panel height is stable across zones at scale $scale', (
@@ -135,6 +160,7 @@ void main() {
   }
 
   _totalTests();
+  _errorHeadlineTests();
 
   testWidgets('only the visible variant is exposed to semantics', (
     tester,

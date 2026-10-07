@@ -51,7 +51,7 @@ reading per 0.33 s or faster) and on stop, reset or error, and does not change a
 alarm decision (ADR 0004). If readings stop altogether, or only digital
 silence at the -100 dBFS floor arrives (a muted microphone), for 3 s (5 s
 right after the start), the measurement ends with
-"Messung nicht möglich" with an explanation instead of keeping the last zone on screen; the own alarm
+the headline "Keine Messwerte" and an explanation instead of keeping the last zone on screen; the own alarm
 tone pauses this check (ADR 0003). Confirmed green, a confirmed zone change, a gap
 over one second, session stop or the app's own alarm starts a new phase. Each
 phase alarms at most once. While the alarm tone plays, readings are ignored:

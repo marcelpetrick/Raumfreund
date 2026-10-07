@@ -246,6 +246,7 @@ class _StatusHeadline extends StatelessWidget {
               l10n.statusYellow,
               l10n.statusRed,
               l10n.statusError,
+              ..._errorTitles(l10n),
             ],
             style: Theme.of(context).textTheme.titleLarge,
           ),
@@ -265,7 +266,7 @@ class _StatusHeadline extends StatelessWidget {
     MonitorPhase.idle => l10n.statusIdle,
     MonitorPhase.starting => l10n.statusStarting,
     MonitorPhase.stopping => l10n.statusStopping,
-    MonitorPhase.error => l10n.statusError,
+    MonitorPhase.error => _errorTitle(l10n, data.error),
     MonitorPhase.measuring => switch (data.zone) {
       null => l10n.statusStarting,
       Zone.green => l10n.statusGreen,
@@ -274,6 +275,23 @@ class _StatusHeadline extends StatelessWidget {
     },
   };
 }
+
+/// Headline of an error: names the cause, so the teacher sees at a glance
+/// what to fix; the body below explains how.
+String _errorTitle(AppLocalizations l10n, MonitorErrorKind? error) =>
+    switch (error) {
+      MonitorErrorKind.permissionDenied => l10n.errorPermissionDeniedTitle,
+      MonitorErrorKind.permanentlyDenied => l10n.errorPermanentlyDeniedTitle,
+      MonitorErrorKind.microphoneBusy => l10n.errorMicrophoneBusyTitle,
+      MonitorErrorKind.recordingAborted => l10n.errorRecordingAbortedTitle,
+      MonitorErrorKind.noReadings => l10n.errorNoReadingsTitle,
+      MonitorErrorKind.unavailable => l10n.errorUnavailableTitle,
+      null => l10n.statusError,
+    };
+
+/// Every error headline, so the reserved headline height covers them all.
+Iterable<String> _errorTitles(AppLocalizations l10n) =>
+    MonitorErrorKind.values.map((error) => _errorTitle(l10n, error));
 
 class _ErrorBody extends StatelessWidget {
   const _ErrorBody({required this.error});

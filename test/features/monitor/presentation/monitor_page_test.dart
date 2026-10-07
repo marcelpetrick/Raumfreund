@@ -73,11 +73,10 @@ void _noReadingsTest() {
         error: MonitorErrorKind.noReadings,
       ),
     );
-    expect(find.text(l10nDe.statusError), findsOneWidget);
+    expect(find.text(l10nDe.errorNoReadingsTitle), findsOneWidget);
     expect(find.text(l10nDe.errorNoReadingsBody), findsOneWidget);
     expect(find.text(l10nDe.errorRetry), findsOneWidget);
     expect(find.text(l10nDe.statusGreen), findsNothing);
-    expect(l10nDe.errorNoReadingsTitle, 'Keine Messwerte');
   });
 }
 
@@ -149,6 +148,8 @@ void main() {
       await tester.tap(find.text(action));
     }
     await _pumpPage(tester, _data(phase: MonitorPhase.error, zone: null));
+    // Without a known cause the generic headline remains.
+    expect(find.text(l10nDe.statusError), findsOneWidget);
     expect(find.text(l10nDe.errorUnavailableBody), findsOneWidget);
   });
 

@@ -159,6 +159,7 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | blocked on this host: on 2026-10-06 the emulator again died at microphone start (see `docs/testing.md`); needs another host or real devices |
 | D1 | Reconcile plan, testing evidence and release readiness | Coordinator | done in `0.6.10` |
 | L3 | Pipeline check: license inventory vs. `pubspec.lock` and `.flutter-version` | Coordinator | done in `0.6.11`: pipeline step `licenses` |
+| U1 | Error headline names the cause ("Mikrofon belegt", "Keine Messwerte", …) instead of the generic "Messung nicht möglich"; uses the so far unused error titles | Coordinator | done in `0.6.12` |
 | W1 | Remove all parked agent worktrees and their branches (owner request 2026-10-07), after archiving their unmerged work | Coordinator | done: 19 worktrees and 20 local branches removed; only `main` remains locally and on GitHub |
 
 - [ ] Emulator tests for grant/deny/permanent deny, settings redirect, dialog
