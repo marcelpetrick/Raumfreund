@@ -33,12 +33,13 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   without auto-restart. About lists author, email `mail@marcelpetrick.it`,
   version/build/commit, project link, privacy and licences.
 
-## Verified state (2026-10-07, `0.6.10+55`)
+## Verified state (2026-10-07, `0.6.20+65`)
 
 - [x] Domain, controller, native `AudioRecord` recorder, platform channels,
   localized UI, Settings, About, persistence, docs and ADRs 0001–0003 exist.
-- [x] GitHub Actions CI and Docker workflows are green on `4755d27` (CI was
-  red from `16e84b9` to `0f7529b` because of the JDK pin, fixed in CI1).
+- [x] GitHub Actions CI and Docker workflows are green on `87e18eb` (CI was
+  red from `16e84b9` to `0f7529b` because of the JDK pin, fixed in CI1, and
+  from `2384ae8` to `0ee855f` because of the venv Python, fixed in CI2).
 - [x] Dependabot PRs #1–#3 are closed; the pinned tooling was updated by hand.
 - [x] Debug release `debug-v0.1.2-build14` is GitHub's latest release. Its APK
   checksum matches, the signature is Android Debug
@@ -107,11 +108,11 @@ Four review rounds with probe tests shaped the rule; details are in
 
 ### Latest release check (2026-10-07)
 
-`debug-v0.6.9-build54` (commit `4755d27`) is GitHub's latest release,
+`debug-v0.6.19-build64` (commit `87e18eb`) is GitHub's latest release,
 published with `tool/release_debug.sh` after green local pipeline, CI and
-Docker runs for that exact commit. The downloaded APK matches the local build
-and `SHA256SUMS`. It contains A1, S1, N1, L1, L2 and the review fixes F1–F5.
-Device tests of these changes are still open (see `docs/testing.md`).
+Docker runs for that exact commit; the downloaded APK matches `SHA256SUMS`.
+It adds the cause-specific error headlines, the retry after a permanent
+denial and the license checks to `debug-v0.6.12-build57`.
 
 ## Star shop (implemented 2026-10-05)
 

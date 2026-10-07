@@ -67,3 +67,4 @@ these lines (see docs/releasing.md).
 * v0.6.17 offers Erneut versuchen next to Einstellungen öffnen after a permanent microphone denial, so measuring can start once access was granted
 * v0.6.18 records the emulator rotation checks
 * v0.6.19 runs the license inventory check with the system python3, which fixes the CI Android job
+* v0.6.20 records the debug-v0.6.19-build64 release check
