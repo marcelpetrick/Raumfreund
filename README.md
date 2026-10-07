@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.6.20+65` — code-complete release candidate**
+Current version: **`0.6.21+66` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -45,6 +45,13 @@ requirement is already covered. Real microphone and lifecycle tests on two
 Android devices remain mandatory before a production release.
 
 ![Raumfreund in green, yellow and red, and Mia hiding after the alarm](docs/screenshots/overview.png)
+
+Demo videos (4:5, 1080x1350, under 30 s, for social media): a chronological
+[walkthrough](docs/video/raumfreund_A_story_4x5.mp4) and a
+[hook-first cut](docs/video/raumfreund_B_hook_4x5.mp4). They show the real
+app with scripted noise levels instead of the microphone
+(`tool/demo/demo_main.dart`) and were recorded and cut with
+`tool/demo/record_demo.sh` and `tool/demo/cut_demo_video.py`.
 
 From left to right: quiet room (screenshot from an Android 16 emulator),
 "please be quieter" with the alarm countdown, too loud with Mia scared, and
