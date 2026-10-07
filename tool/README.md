@@ -20,6 +20,7 @@ globally. Supported platform for downloads: **Linux x86_64** only.
 | `check_secrets.sh` | Scans Git history and the source worktree with gitleaks without copying ignored SDK/build caches. | gitleaks status; 2 if the pinned tool is absent |
 | `kotlin_lint.sh` | Runs pinned ktlint and detekt over the Android Kotlin sources. | tool status; 2 if a tool is absent |
 | `check_privacy.sh` | Privacy gate: release APK permissions against an allowlist (`aapt2 dump badging`), forbidden audio-persisting/network APIs in Kotlin and Dart, network/analytics dependencies in `pubspec.yaml`. `--source-only`, `--apk-only`, `--apk FILE`. Pipeline step `privacy`. | 0 ok; 1 violation; 2 usage/missing APK or aapt2 |
+| `license_inventory/check_license_inventory.py` | Checks that `docs/third-party-licenses.md` lists every package of `pubspec.lock` with the locked version, no stale package, and the Flutter version of `.flutter-version`. `--root DIR`. Pipeline step `licenses`. | 0 consistent; 1 mismatches; 2 usage or missing input |
 | `build_apk.sh` | Builds named release-mode APK/AAB artifacts, checksums and version metadata in `dist/`; unsigned local builds are explicitly `-debugsigned`. | 0 success; 1 build failure; 2 usage |
 | `release_debug.sh` | One-command public debug APK release: preconditions, local build with this machine's debug keystore (CI keystores differ per run and could not update installs), verification, notes, tag and `gh release create --latest`; `--dry-run` skips tag/push/publish. | 0 success; 1 precondition/build/verification failure; 2 usage/tool missing |
 | `write_signing_config.sh` | Materializes/removes ignored Android signing files from CI secrets. | 0 success; 1 missing/invalid secret |
@@ -81,7 +82,7 @@ To update a tool: change version, URL and SHA-256 in the `tools` array of
 ```sh
 .toolchain/venv/bin/ruff check tool
 .toolchain/venv/bin/ruff format --check tool
-.toolchain/venv/bin/mypy --config-file tool/pyproject.toml tool/function_length
+.toolchain/venv/bin/mypy --config-file tool/pyproject.toml tool/function_length tool/license_inventory
 .toolchain/venv/bin/pytest -c tool/pyproject.toml
 ```
 

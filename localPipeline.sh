@@ -19,6 +19,7 @@
 #   python      ruff lint/format, mypy --strict, pytest (tooling code)
 #   tooltests   tests of the repository scripts and the Dart checker
 #   docs        markdownlint for all Markdown files
+#   licenses    license inventory matches pubspec.lock and .flutter-version
 #   yaml        yamllint (strict) + actionlint for GitHub workflows
 #   kotlin      ktlint + detekt for native Android sources
 #   native      JVM unit tests + Android lint
@@ -49,7 +50,7 @@ TOOLS="${ROOT_DIR}/.toolchain/bin"
 VENV="${ROOT_DIR}/.toolchain/venv/bin"
 CHECKER_DIR="${ROOT_DIR}/tool/function_length/dart"
 COVERAGE_MIN_LINE_PERCENT="95.0"
-ALL_STEPS=(toolchain tools deps format analyze fnlen shell python tooltests docs yaml secrets vulns kotlin native test coverage apk privacy docker)
+ALL_STEPS=(toolchain tools deps format analyze fnlen shell python tooltests docs licenses yaml secrets vulns kotlin native test coverage apk privacy docker)
 VERBOSE=0
 ONLY=""
 SKIP=""
@@ -107,12 +108,18 @@ step_fnlen() { run_logged fnlen "${ROOT_DIR}/tool/check_function_length.sh"; }
 step_python() {
 	run_logged python "${VENV}/ruff" check tool &&
 		run_logged python "${VENV}/ruff" format --check tool &&
-		run_logged python "${VENV}/mypy" --config-file tool/pyproject.toml tool/function_length &&
+		run_logged python "${VENV}/mypy" --config-file tool/pyproject.toml tool/function_length \
+			tool/license_inventory &&
 		run_logged python "${VENV}/pytest" -q -c tool/pyproject.toml
 }
 
 step_docs() {
 	run_logged docs "${ROOT_DIR}/tool/node/node_modules/.bin/markdownlint" '**/*.md'
+}
+
+step_licenses() {
+	run_logged licenses "${VENV}/python" "${ROOT_DIR}/tool/license_inventory/check_license_inventory.py" \
+		--root "${ROOT_DIR}"
 }
 
 step_yaml() {
@@ -206,6 +213,7 @@ dispatch_step() {
 	python) step_python ;;
 	tooltests) step_tooltests ;;
 	docs) step_docs ;;
+	licenses) step_licenses ;;
 	yaml) step_yaml ;;
 	secrets) step_secrets ;;
 	vulns) step_vulns ;;

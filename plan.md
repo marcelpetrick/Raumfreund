@@ -55,10 +55,8 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   (SIGSEGV) twice around microphone start/stop, once with `-no-audio` and
   once with audio; a guest app cannot do that, so it is treated as an
   emulator audio-backend defect. Real-device microphone tests remain open.
-- [ ] Eighteen parked agent worktrees under `.claude/worktrees/` predate this
-  acceptance pass. Several contain uncommitted or not graph-merged work, so
-  archive or remove them only after owner confirmation. The quick-star stash
-  was integrated as S1 and dropped; the worktrees of this pass were removed.
+- [x] All parked agent worktrees, their branches and the old stash are removed
+  (W1); the repository has only `main`.
 
 ## Completed feature packages
 
@@ -160,6 +158,8 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.6.9-build54`, checksum verified after download |
 | I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | blocked on this host: on 2026-10-06 the emulator again died at microphone start (see `docs/testing.md`); needs another host or real devices |
 | D1 | Reconcile plan, testing evidence and release readiness | Coordinator | done in `0.6.10` |
+| L3 | Pipeline check: license inventory vs. `pubspec.lock` and `.flutter-version` | Coordinator | done in `0.6.11`: pipeline step `licenses` |
+| W1 | Remove all parked agent worktrees and their branches (owner request 2026-10-07), after archiving their unmerged work | Coordinator | done: 19 worktrees and 20 local branches removed; only `main` remains locally and on GitHub |
 
 - [ ] Emulator tests for grant/deny/permanent deny, settings redirect, dialog
   lifecycle, background stop, rapid start/stop, stale events, stream failures,

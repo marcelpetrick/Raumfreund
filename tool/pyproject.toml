@@ -5,7 +5,7 @@
 # coverage). Tool versions are pinned in requirements-dev.in/.txt.
 # Run from the repository root, e.g.:
 #   .toolchain/venv/bin/ruff check tool
-#   .toolchain/venv/bin/mypy --config-file tool/pyproject.toml tool/function_length
+#   .toolchain/venv/bin/mypy --config-file tool/pyproject.toml tool/function_length tool/license_inventory
 #   .toolchain/venv/bin/pytest -c tool/pyproject.toml
 
 [tool.ruff]
@@ -22,25 +22,27 @@ select = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["fixtures", "fnlen"]
+known-first-party = ["check_license_inventory", "fixtures", "fnlen"]
 
 [tool.ruff.lint.per-file-ignores]
 # pytest's idiom is the bare assert statement (bandit S101 targets
 # production code that may run with -O) and tests use literal expected values.
 "function_length/tests/*.py" = ["S101", "PLR2004"]
+"license_inventory/tests/*.py" = ["S101", "PLR2004"]
 
 [tool.mypy]
 strict = true
 python_version = "3.13"
-mypy_path = "$MYPY_CONFIG_FILE_DIR/function_length"
+mypy_path = "$MYPY_CONFIG_FILE_DIR/function_length:$MYPY_CONFIG_FILE_DIR/license_inventory"
 warn_unreachable = true
 
 [tool.pytest.ini_options]
-testpaths = ["function_length/tests"]
-pythonpath = ["function_length"]
+testpaths = ["function_length/tests", "license_inventory/tests"]
+pythonpath = ["function_length", "license_inventory"]
 addopts = [
   "--strict-markers",
   "--cov=fnlen",
+  "--cov=check_license_inventory",
   "--cov-report=term-missing",
   "--cov-fail-under=95",
 ]
