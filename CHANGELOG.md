@@ -73,3 +73,4 @@ these lines (see docs/releasing.md).
 * v0.6.23 records the debug-v0.6.22-build67 release check
 * v0.6.24 adds ten facts for a LinkedIn post next to the demo videos
 * v0.6.25 makes the LinkedIn post draft pass the Markdown lint
+* v0.6.26 records the debug-v0.6.25-build70 release

@@ -33,11 +33,11 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   without auto-restart. About lists author, email `mail@marcelpetrick.it`,
   version/build/commit, project link, privacy and licences.
 
-## Verified state (2026-10-07, `0.6.23+68`)
+## Verified state (2026-10-08, `0.6.26+71`)
 
 - [x] Domain, controller, native `AudioRecord` recorder, platform channels,
   localized UI, Settings, About, persistence, docs and ADRs 0001–0003 exist.
-- [x] GitHub Actions CI and Docker workflows are green on `075127f` (CI was
+- [x] GitHub Actions CI and Docker workflows are green on `85ae64a` (CI was
   red from `16e84b9` to `0f7529b` because of the JDK pin, fixed in CI1, and
   from `2384ae8` to `0ee855f` because of the venv Python, fixed in CI2).
 - [x] Dependabot PRs #1–#3 are closed; the pinned tooling was updated by hand.
@@ -108,12 +108,14 @@ Four review rounds with probe tests shaped the rule; details are in
 
 ### Latest release check (2026-10-07)
 
-`debug-v0.6.22-build67` (commit `075127f`) is GitHub's latest release,
+`debug-v0.6.25-build70` (commit `85ae64a`) is GitHub's latest release,
 published with `tool/release_debug.sh` after green local pipeline, CI and
 Docker runs for that exact commit; the downloaded APK matches `SHA256SUMS`.
 It adds the cause-specific error headlines, the retry after a permanent
-denial, the license checks and the noticeable alarm vibration to
-`debug-v0.6.12-build57`.
+denial, the license checks, the noticeable alarm vibration, the demo
+videos and the LinkedIn notes to `debug-v0.6.12-build57`. A production
+`v*` release stays blocked: no production keystore and no signing secrets
+exist (checked 2026-10-08).
 
 ## Star shop (implemented 2026-10-05)
 
