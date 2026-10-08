@@ -169,6 +169,7 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | L4 | Pipeline check of the Android license rows against the release build's `sdkDependencies.txt` | Coordinator | done in `0.6.15` (step `privacy`) |
 | CI2 | CI Android job red since `2384ae8`: the license check called the venv Python, which that job never creates | Coordinator | done in `0.6.19`: system `python3` (stdlib-only checker) |
 | VB1 | Owner never noticed the alarm vibration: single 300 ms pulse without usage attributes | Coordinator | done in `0.6.22`: three pulses (1.14 s) with alarm usage (`VibrationAttributes` API 33+, `AudioAttributes` API 26-32); device check recipe in `docs/testing.md`; on-device confirmation open |
+| D2 | `/updateDependencies` (2026-10-08) | Coordinator | done in `0.6.29`: analyzer 14.5.0, katex override 0.19.0, download-artifact v8.0.2, setup-node v7.1.0, upload-artifact v7.0.2; Flutter, Dart, pub app packages, Python tools, binaries, Docker digests and Android command-line tools already current; AGP/Kotlin/Gradle held at the Flutter 3.47.6 template and tree-sitter at 0.25.2 on purpose |
 | W1 | Remove all parked agent worktrees and their branches (owner request 2026-10-07), after archiving their unmerged work | Coordinator | done: 19 worktrees and 20 local branches removed; only `main` remains locally and on GitHub |
 
 Owner decision 2026-10-08: no further emulator work (see AGENTS.md

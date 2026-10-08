@@ -33,7 +33,7 @@ jobs:
           toolchain,tools,deps,format,analyze,fnlen,shell,python,tooltests,docs,licenses,yaml,secrets,vulns,kotlin
       - name: Upload pipeline logs
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: static-logs
           path: reports/pipeline
@@ -51,7 +51,7 @@ jobs:
         run: ./localPipeline.sh --only toolchain,deps,test,coverage
       - name: Upload coverage and logs
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: test-reports
           path: |
@@ -70,14 +70,14 @@ jobs:
       - name: Build debug APK and check privacy gate
         run: ./localPipeline.sh --only toolchain,deps,native,apk,privacy
       - name: Upload debug APK
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: raumfreund-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 14
       - name: Upload pipeline logs
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: android-logs
           path: reports/pipeline

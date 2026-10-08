@@ -12,7 +12,7 @@ environment:
 
 # Exact pins (AGENTS.md section 4); pubspec.lock is committed.
 dependencies:
-  analyzer: 14.4.0
+  analyzer: 14.5.0
 
 dev_dependencies:
   lints: 6.1.0
