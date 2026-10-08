@@ -1,3 +1,8 @@
+<!--
+SPDX-License-Identifier: GPL-3.0-only
+Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
+-->
+
 # 🎉 Individualsoftware für alle 🥳
 
 Am Wochenende berichtete meine liebe Frau, dass einige Klassen und Tagesheimgruppen 𝐋ä𝐫𝐦𝐚𝐦𝐩𝐞𝐥𝐧 einsetzen. Klingt gut, dachte ich. Dieses technische Hilfsmittel kann helfen, alle zu ermutigen, zur Hausaufgabenzeit ruhiger zu sein.
@@ -12,7 +17,6 @@ Eine vollkommen lokal nutzbare, kostenlose Android-App auf Flutter-Basis. Eine K
 Ah, ach so: Es ist leicht, die Katze zu vergraulen, aber schwer, wieder ihr Vertrauen zu gewinnen (Hysterese).
 
 Holt euch ein Release-APK auf 𝐆𝐢𝐭𝐇𝐮𝐛: 𝐦𝐚𝐫𝐜𝐞𝐥𝐞𝐩𝐭𝐫𝐢𝐜𝐤 -> 𝐑𝐚𝐮𝐦𝐟𝐫𝐞𝐮𝐧𝐝
-https://github.com/marcelpetrick/Raumfreund/releases/
+<https://github.com/marcelpetrick/Raumfreund/releases/>
 
-
-#agenticSoftwareEngineering
+\#agenticSoftwareEngineering
