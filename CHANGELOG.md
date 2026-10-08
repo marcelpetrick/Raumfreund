@@ -75,3 +75,4 @@ these lines (see docs/releasing.md).
 * v0.6.25 makes the LinkedIn post draft pass the Markdown lint
 * v0.6.26 records the debug-v0.6.25-build70 release
 * v0.6.27 records the owner decision to stop emulator testing
+* v0.6.28 documents the GitHub branch protection and the tag-only release environment

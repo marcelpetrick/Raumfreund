@@ -195,9 +195,11 @@ These cannot be truthfully completed by repository automation alone:
   microphone, thermal and endurance tests; five-day RC soak before `v1.0.0`;
 - creation and backup of the production keystore and GitHub signing secrets
   (debug releases do not need them);
-- GitHub environment/branch protection configuration;
 - Play Console app, developer verification, questionnaires, content rating,
   public privacy-policy URL and the decision to publish through Play.
+
+GitHub branch protection and the `release` environment are configured since
+2026-10-08 (see `docs/releasing.md`).
 
 Until then the repository may publish clearly labelled debug APK releases but
 must not claim a production-signed release or completed device certification.

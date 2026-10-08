@@ -25,6 +25,12 @@ The keystore and `android/key.properties` are ignored and removed after the
 build. Missing secrets deliberately fail the workflow. Never upload a
 debug-signed artifact as a production release.
 
+Repository settings (set 2026-10-08): `main` rejects force-pushes and
+deletion and requires a linear history, also for administrators; pull
+requests are not required because work happens directly on `main`. The
+`release` environment accepts deployments only from `v*` tags, so the signing
+secrets, once stored there, are available to tagged releases only.
+
 The license inventory required for every production release starts from
 [`docs/third-party-licenses.md`](third-party-licenses.md); refresh it when
 dependencies change.
