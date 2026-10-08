@@ -160,7 +160,7 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | F5 | Dart-side safety timeout for an alarm output that never completes | Coordinator | done in `0.6.7`: 2 s timeout, then the output counts as failed |
 | CI1 | GitHub CI red since `16e84b9`: `setup-java` rejects the JDK pin `21.0.12.1+1` (the local pipeline does not run `setup-java`) | Coordinator | done in `0.6.9`: pinned as `21.0.12+101.0.LTS`; CI green on `4755d27` |
 | Q2 | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.6.9-build54`, checksum verified after download |
-| I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | soak and permission/lifecycle/rotation matrix done 2026-10-07 (see `docs/testing.md`); found and fixed: no retry after a permanent denial (`0.6.17`); open: missing vibrator, occupied microphone; watch item: one non-reproducible silent start after a rotated dialog |
+| I1/E1 | Emulator acceptance harness, matrix and 30-minute soak | Coordinator | soak and permission/lifecycle/rotation matrix done 2026-10-07 (see `docs/testing.md`); found and fixed: no retry after a permanent denial (`0.6.17`); remaining emulator items dropped by owner decision 2026-10-08 |
 | D1 | Reconcile plan, testing evidence and release readiness | Coordinator | done in `0.6.10` |
 | L3 | Pipeline check: license inventory vs. `pubspec.lock` and `.flutter-version` | Coordinator | done in `0.6.11`: pipeline step `licenses` |
 | U1 | Error headline names the cause ("Mikrofon belegt", "Keine Messwerte", …) instead of the generic "Messung nicht möglich"; uses the so far unused error titles | Coordinator | done in `0.6.12` |
@@ -171,14 +171,19 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | VB1 | Owner never noticed the alarm vibration: single 300 ms pulse without usage attributes | Coordinator | done in `0.6.22`: three pulses (1.14 s) with alarm usage (`VibrationAttributes` API 33+, `AudioAttributes` API 26-32); device check recipe in `docs/testing.md`; on-device confirmation open |
 | W1 | Remove all parked agent worktrees and their branches (owner request 2026-10-07), after archiving their unmerged work | Coordinator | done: 19 worktrees and 20 local branches removed; only `main` remains locally and on GitHub |
 
-- [ ] Emulator tests for grant/deny/permanent deny, settings redirect, dialog
-  lifecycle, background stop, rapid start/stop, stale events, stream failures,
-  persistence and missing vibrator.
-- [ ] Native instrumented/UiAutomator coverage where Flutter tests cannot
-  prove Android permission/lifecycle behaviour.
-- [ ] Occupied/silenced microphone and interrupted recording on an emulator.
-- [ ] Proof that the alarm tone cannot retrigger itself, and that no audio
-  files, logs, analytics or network access are produced.
+Owner decision 2026-10-08: no further emulator work (see AGENTS.md
+section 6). The prototype runs and works; the remaining emulator items are
+dropped, not open:
+
+- Dropped: further emulator tests (stale events, stream failures,
+  persistence, missing vibrator). The permission, lifecycle and rotation
+  matrix ran on 2026-10-07 and is recorded in `docs/testing.md`.
+- Dropped: native instrumented/UiAutomator suites.
+- Dropped: occupied/silenced microphone and interrupted recording on an
+  emulator; the owner checks these on real devices.
+- Covered without an emulator: the alarm tone cannot retrigger itself
+  (controller and alarm state machine tests), and the privacy gate blocks
+  network permissions, network APIs and audio-saving code in every build.
 - [x] 30-minute emulator soak with crash and resource-cleanup inspection
   (2026-10-07, see `docs/testing.md`).
 

@@ -89,15 +89,22 @@ thing, the stricter rule applies.
 
 - `./localPipeline.sh` is the single local quality gate: formatting, linting,
   static/type checks, function-length check, unit/widget/golden tests,
-  coverage, Android builds, and (once available) integration/e2e and Docker
-  checks. GitHub Actions mirror this pipeline and must stay green.
+  coverage, Android builds, license and privacy checks, and Docker checks. GitHub Actions mirror this pipeline and must stay green.
 - **Line coverage must stay at or above 95 %** for the measurable own Dart code.
-- Use unit, widget, golden, integration and end-to-end tests where appropriate.
+- Use unit, widget, golden and app-level widget tests where appropriate.
 - Run formatting, analysis, tests and builds relevant to every change. Fix
   failures; name skipped checks explicitly.
 - A test script in the repository is not proof of a successful test run. Only
   claim results that were actually executed.
 - Platform/device tests that were not executed are marked as **open**.
+- **No emulator testing** (owner decision 2026-10-08): the prototype runs and
+  works, so no time goes into emulator acceptance runs, emulator matrices,
+  soaks or emulator/instrumented (UiAutomator, `integration_test`) suites.
+  This waives the emulator integration tests of `Raumfreund-VISION.md`
+  section 10. Behaviour that unit, widget and app tests cannot prove is
+  checked by the owner on real devices; agents document such checks as open
+  for the owner instead of automating them. The emulator is used only to
+  record demo media with `tool/demo/`.
 
 ## 7. Privacy and safety
 

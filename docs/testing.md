@@ -109,6 +109,8 @@ used as evidence):
   the same process did too; a repeat of the same steps worked. It is a watch
   item for the device tests, not a confirmed defect.
 
-Still open on the emulator: a missing vibrator during an alarm and an
-occupied microphone; both need input this host cannot provide. Real-device tests remain open
+Emulator testing ends here by owner decision (2026-10-08, AGENTS.md
+section 6): the prototype runs and works. A missing vibrator, an occupied
+microphone and the rotated-dialog watch item are left to the owner's checks
+on real devices. Real-device tests remain open
 as listed above.
