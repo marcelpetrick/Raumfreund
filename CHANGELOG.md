@@ -77,3 +77,4 @@ these lines (see docs/releasing.md).
 * v0.6.27 records the owner decision to stop emulator testing
 * v0.6.28 documents the GitHub branch protection and the tag-only release environment
 * v0.6.29 updates analyzer, the katex override and three GitHub Actions
+* v0.6.30 updates the Kotlin Gradle plugin to 2.4.21 (kotlin-stdlib 2.4.21 in the APK) and lists the new kotlin-stdlib in the license inventory

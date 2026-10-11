@@ -10,7 +10,7 @@ green commits (see the weekly maintenance workflow).
 | Flutter (stable) | 3.47.6 (released 2026-10-01, framework 5fc3468) | `.flutter-version` | [releases_linux.json](https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json), [archive](https://docs.flutter.dev/install/archive) |
 | Dart | 3.13.5 (bundled with Flutter 3.47.6) | `pubspec.yaml` `environment.sdk` | same |
 | Android Gradle Plugin | 9.1.0 | `android/settings.gradle.kts` | Flutter 3.47.6 app template |
-| Kotlin Gradle Plugin | 2.4.0 | `android/settings.gradle.kts` | Flutter 3.47.6 app template |
+| Kotlin Gradle Plugin | 2.4.21 | `android/settings.gradle.kts` | Flutter 3.47.6 app template line 2.4, newest patch release |
 | Gradle | 9.3.1 | wrapper properties, distribution checksum and regenerated wrapper JAR/scripts | Flutter 3.47.6 app template |
 | JDK (build) | Temurin 21.0.12.1+1 (`setup-java` needs its exact Adoptium SemVer `21.0.12+101.0.LTS`) | `.github/actions/setup`, pinned Docker digest | AGP 9 requires JDK 17+; 21 is the current LTS supported by Gradle 9.3 |
 | Node.js (tooling) | 24.x; CI 24.21.0 | `tool/node/package.json`, `.github/actions/setup` | npm lint tools support the active Node 24 LTS line |
@@ -21,9 +21,16 @@ green commits (see the weekly maintenance workflow).
 | NDK | 28.2.13676358 | Flutter default | Flutter 3.47.6 `FlutterExtension.kt` |
 | ABIs | arm64-v8a, armeabi-v7a, x86_64 | Flutter release defaults | Flutter Android release builds |
 
-AGP, Kotlin and Gradle are taken exactly from the template that Flutter 3.47.6
-generates, because that is the combination the Flutter team tests; newer single
-releases of AGP or Kotlin are not adopted ahead of Flutter.
+AGP, Kotlin and Gradle follow the release lines of the template that
+Flutter 3.47.6 generates, because that is the combination the Flutter team
+tests; a newer minor or major release of AGP or Kotlin is not adopted ahead of
+Flutter. Bug-fix releases within the template's line are adopted once the full
+pipeline is green: Kotlin 2.4.21 is a patch release of the template's 2.4.0.
+
+The Kotlin Gradle plugin also adds `kotlin-stdlib` of its own version to the
+app, so a Kotlin update changes a shipped library. The privacy step therefore
+fails until the Android rows of `docs/third-party-licenses.md` name the new
+`kotlin-stdlib` version; update the inventory in the same commit.
 
 The Gradle distribution has a pinned SHA-256 and CI validates the committed
 wrapper before executing it. Android release verification uses exactly

@@ -117,7 +117,7 @@ standard library and everything else is pulled in transitively.
 
 | Group | Artifact | Version | License | Source |
 | --- | --- | --- | --- | --- |
-| `org.jetbrains.kotlin` | `kotlin-stdlib` | 2.4.0 | Apache-2.0 | Maven Central |
+| `org.jetbrains.kotlin` | `kotlin-stdlib` | 2.4.21 | Apache-2.0 | Maven Central |
 | `org.jetbrains` | `annotations` | 23.0.0 | Apache-2.0 | Maven Central |
 | `org.jetbrains.kotlin` | `kotlin-stdlib-jdk8` | 1.8.20 | Apache-2.0 | Maven Central |
 | `org.jetbrains.kotlin` | `kotlin-stdlib-jdk7` | 1.8.20 | Apache-2.0 | Maven Central |
@@ -208,7 +208,7 @@ standard library and everything else is pulled in transitively.
 
 The `android/` build files themselves declare only `junit:junit:4.13.2`
 (`testImplementation`, not shipped). The pinned plugin versions are Android
-Gradle Plugin 9.1.0 and Kotlin Gradle plugin 2.4.0 (`android/settings.gradle.kts`).
+Gradle Plugin 9.1.0 and Kotlin Gradle plugin 2.4.21 (`android/settings.gradle.kts`).
 
 ## Not shipped: dev and build-only tools
 
@@ -249,7 +249,7 @@ strictly ships.
 | Flutter SDK / Dart SDK | 3.47.6 / 3.13.5 | BSD-3-Clause | `.flutter-version`, `.flutter-sha256` |
 | Gradle (wrapper) | 9.3.1 | Apache-2.0 | `android/gradle/wrapper/gradle-wrapper.properties` |
 | Android Gradle Plugin | 9.1.0 | Apache-2.0 | `android/settings.gradle.kts` |
-| Kotlin Gradle plugin and compiler | 2.4.0 | Apache-2.0 | `android/settings.gradle.kts` |
+| Kotlin Gradle plugin and compiler | 2.4.21 | Apache-2.0 | `android/settings.gradle.kts` |
 | JDK (Eclipse Temurin 21 in Docker; Java 17 bytecode target) | 21 | GPL-2.0-with-classpath-exception | `Dockerfile` |
 | Docker base image `eclipse-temurin:21-jdk-noble` (build stage) | digest-pinned | OS packages under their own licenses (Ubuntu 24.04 base, JDK GPL-2.0 with Classpath Exception) | `Dockerfile` |
 | Docker base image `nginxinc/nginx-unprivileged:1-alpine` (runtime stage that serves the APK download page, not part of the APK) | digest-pinned | BSD-2-Clause (nginx) plus Alpine packages | `Dockerfile` |
