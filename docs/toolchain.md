@@ -11,8 +11,8 @@ green commits (see the weekly maintenance workflow).
 | Dart | 3.13.5 (bundled with Flutter 3.47.6) | `pubspec.yaml` `environment.sdk` | same |
 | Android Gradle Plugin | 9.1.0 | `android/settings.gradle.kts` | Flutter 3.47.6 app template |
 | Kotlin Gradle Plugin | 2.4.21 | `android/settings.gradle.kts` | Flutter 3.47.6 app template line 2.4, newest patch release |
-| Gradle | 9.3.1 | wrapper properties, distribution checksum and regenerated wrapper JAR/scripts | Flutter 3.47.6 app template |
-| JDK (build) | Temurin 21.0.12.1+1 (`setup-java` needs its exact Adoptium SemVer `21.0.12+101.0.LTS`) | `.github/actions/setup`, pinned Docker digest | AGP 9 requires JDK 17+; 21 is the current LTS supported by Gradle 9.3 |
+| Gradle | 9.8.1 | wrapper properties, distribution checksum and regenerated wrapper JAR/scripts | newest 9.x release; AGP 9.1.0 needs Gradle 9.1 or newer (template: 9.3.1) |
+| JDK (build) | Temurin 21.0.12.1+1 (`setup-java` needs its exact Adoptium SemVer `21.0.12+101.0.LTS`) | `.github/actions/setup`, pinned Docker digest | AGP 9 requires JDK 17+; 21 is the current LTS supported by Gradle 9.8 |
 | Node.js (tooling) | 24.x; CI 24.21.0 | `tool/node/package.json`, `.github/actions/setup` | npm lint tools support the active Node 24 LTS line |
 | Java/Kotlin bytecode target | 17 | `android/app/build.gradle.kts` | Flutter template default |
 | compileSdk | 36 | Flutter default (`flutter.compileSdkVersion`) | Flutter 3.47.6 `FlutterExtension.kt` |
@@ -26,6 +26,8 @@ Flutter 3.47.6 generates, because that is the combination the Flutter team
 tests; a newer minor or major release of AGP or Kotlin is not adopted ahead of
 Flutter. Bug-fix releases within the template's line are adopted once the full
 pipeline is green: Kotlin 2.4.21 is a patch release of the template's 2.4.0.
+Gradle follows the newest release of the major version the pinned AGP
+supports (9.x for AGP 9.1.0), again only after a green pipeline.
 
 The Kotlin Gradle plugin also adds `kotlin-stdlib` of its own version to the
 app, so a Kotlin update changes a shipped library. The privacy step therefore

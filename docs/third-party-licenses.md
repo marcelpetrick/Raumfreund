@@ -247,7 +247,7 @@ strictly ships.
 | Tool | Version | License | Where pinned |
 | --- | --- | --- | --- |
 | Flutter SDK / Dart SDK | 3.47.6 / 3.13.5 | BSD-3-Clause | `.flutter-version`, `.flutter-sha256` |
-| Gradle (wrapper) | 9.3.1 | Apache-2.0 | `android/gradle/wrapper/gradle-wrapper.properties` |
+| Gradle (wrapper) | 9.8.1 | Apache-2.0 | `android/gradle/wrapper/gradle-wrapper.properties` |
 | Android Gradle Plugin | 9.1.0 | Apache-2.0 | `android/settings.gradle.kts` |
 | Kotlin Gradle plugin and compiler | 2.4.21 | Apache-2.0 | `android/settings.gradle.kts` |
 | JDK (Eclipse Temurin 21 in Docker; Java 17 bytecode target) | 21 | GPL-2.0-with-classpath-exception | `Dockerfile` |
