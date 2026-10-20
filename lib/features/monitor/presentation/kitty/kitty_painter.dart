@@ -14,6 +14,10 @@ import 'kitty_face.dart';
 import 'kitty_mood.dart';
 import 'kitty_pose.dart';
 
+/// Share of the wake-up during which Mia is still drawn asleep, so that
+/// returning to the app first shows her sleeping before she wakes up.
+const double kKittyWakeLead = 0.25;
+
 /// Size of the design box Mia is drawn in (scaled to fit the canvas).
 const Size kKittyDesignSize = Size(240, 224);
 
@@ -30,6 +34,7 @@ class KittyPainter extends CustomPainter {
     required this.walk,
     this.running = false,
     this.accessories = const <KittyAccessory>{},
+    this.wake,
   });
 
   /// Mood to draw.
@@ -49,8 +54,27 @@ class KittyPainter extends CustomPainter {
   /// Everything she wears moves with her; the toy mouse stays on the stage.
   final Set<KittyAccessory> accessories;
 
+  /// Progress (0..1) of waking up from sleep into [mood], including the
+  /// sleeping lead of [kKittyWakeLead]; null otherwise.
+  final double? wake;
+
+  bool get _sleepyLead {
+    final progress = wake;
+    return progress != null && progress < kKittyWakeLead;
+  }
+
+  /// Wake-up progress after the sleeping lead, as [KittyPose] expects it.
+  double? get _poseWake {
+    final progress = wake;
+    if (progress == null || _sleepyLead) return null;
+    return (progress - kKittyWakeLead) / (1 - kKittyWakeLead);
+  }
+
+  /// The mood drawn now: still asleep during the lead of the wake-up.
+  KittyMood get _drawn => _sleepyLead ? KittyMood.sleeping : mood;
+
   /// Fleeing Mia is scared whatever the current zone says.
-  KittyMood get _shown => running ? KittyMood.scared : mood;
+  KittyMood get _shown => running ? KittyMood.scared : _drawn;
 
   /// Horizontal walk offset in design units for a canvas of [size].
   static double walkOffset(Size size, double walk) {
@@ -67,7 +91,13 @@ class KittyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final scale = _scaleFor(size);
     if (scale <= 0) return;
-    final pose = KittyPose.of(mood, phase, walk, running: running);
+    final pose = KittyPose.of(
+      _drawn,
+      phase,
+      walk,
+      running: running,
+      wake: _poseWake,
+    );
     final walkDx = walkOffset(size, walk);
     canvas
       ..save()
@@ -99,6 +129,13 @@ class KittyPainter extends CustomPainter {
     if (pose.walking) canvas.translate(pose.lookDx, 0);
     paintFace(canvas, _shown, pose);
     canvas.restore();
+    final waking = pose.wake;
+    if (waking != null) {
+      // The mood's own effects start once she is awake.
+      paintZzz(canvas, phase, opacity: 1 - waking / 0.3);
+      paintWakeSparkles(canvas, waking);
+      return;
+    }
     switch (_shown) {
       case KittyMood.happy:
         paintPurr(canvas, phase);
@@ -106,6 +143,9 @@ class KittyPainter extends CustomPainter {
         paintSweat(canvas, phase);
       case KittyMood.scared:
         paintWhimper(canvas, phase);
+      case KittyMood.sleeping:
+        paintNoseBubble(canvas, phase);
+        paintZzz(canvas, phase);
       case KittyMood.idle:
         break;
     }
@@ -144,5 +184,6 @@ class KittyPainter extends CustomPainter {
       oldDelegate.phase != phase ||
       oldDelegate.walk != walk ||
       oldDelegate.running != running ||
+      oldDelegate.wake != wake ||
       !setEquals(oldDelegate.accessories, accessories);
 }

@@ -21,6 +21,7 @@ MonitorViewData _data({
   int stars = 3,
   int? wallet,
   bool quickStars = false,
+  bool waking = false,
 }) => MonitorViewData(
   phase: phase,
   thresholds: Thresholds.defaults,
@@ -33,6 +34,7 @@ MonitorViewData _data({
   starProgress: .4,
   starJustEarned: starEarned,
   quickStarMode: quickStars,
+  waking: waking,
 );
 
 Future<double> _panelHeight(

@@ -7,7 +7,9 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 - Status: accepted; implemented; independent review required before release
 - Date: 2026-10-03 (alarm rules amended 2026-10-04 by ADR 0004; alarm delay
-  made configurable 2026-10-04; no-reading watchdog added 2026-10-06)
+  made configurable 2026-10-04; no-reading watchdog added 2026-10-06;
+  backgrounding amended 2026-10-20 by
+  [ADR 0005](0005-sleep-in-background.md))
 
 ## Context
 
@@ -32,7 +34,10 @@ state and id before changing state.
 - Genuine backgrounding, opening Settings/About, stream failure, the
   no-reading watchdog and controller disposal use the same stop path and
   clear alarm continuity.
-- Foregrounding and returning from another page never restart automatically.
+- Returning from another page never restarts automatically. Since ADR 0005,
+  backgrounding a running measurement ends in `sleeping`, and the app
+  coming back starts a new session by itself; nothing records in the
+  background.
 - The Android permission dialog is tracked as an application-owned request.
   Its temporary activity pause is not treated as genuine backgrounding.
 - A granted permission result starts recording only if its request token is

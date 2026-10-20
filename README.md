@@ -98,7 +98,11 @@ The main view provides one large start/stop action, an estimated 0–130 dB
 gauge, German status text, Mia's matching expression, a 10-minute heartbeat
 timeline and quiet-minute stars. Colour is never the only state indicator.
 Opening another page always stops an active measurement safely; returning does
-not restart it automatically.
+not restart it automatically. Leaving the app (home button, app switcher,
+screen lock) pauses a running measurement instead: nothing records in the
+background, Mia falls asleep, and when the app is back she wakes up and the
+measurement continues by itself
+([ADR 0005](docs/adr/0005-sleep-in-background.md)).
 
 The **Settings** button in the top app bar opens a separate view for the
 yellow and red thresholds, the alarm delay (how long it may be too loud before

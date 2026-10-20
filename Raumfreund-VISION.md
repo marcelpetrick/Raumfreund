@@ -29,7 +29,7 @@ Version 1 ist eine Android-App für Handy und Tablet. iOS, Desktop und Web gehö
 - Die Anzeige darf leicht geglättet sein. Verwende für die Alarmentscheidung einen separat definierten und dokumentierten Messwert; UI-Animationen dürfen die Timerlogik nicht beeinflussen.
 - Unterstütze Start/Stopp, verhindere parallele Messinstanzen und schnelle Mehrfachstarts.
 - Halte den Bildschirm nur während einer aktiven Messung eingeschaltet.
-- Stoppe die Messung beim Wechsel in den Hintergrund und beim Öffnen von Einstellungen oder About. Kehre ohne automatischen Neustart zurück.
+- Stoppe die Messung beim Wechsel in den Hintergrund und beim Öffnen von Einstellungen oder About. Kehre aus Einstellungen oder About ohne automatischen Neustart zurück. Nach einem Wechsel in den Hintergrund schläft Mia; kommt die App wieder in den Vordergrund, wacht sie auf und die Messung läuft von selbst weiter (Owner-Entscheidung 2026-10-20, Issue #7, ADR 0005). Im Hintergrund wird nie aufgenommen.
 - Behandle Berechtigungsdialoge getrennt von einem echten Hintergrundwechsel. Eine Anfrage darf sich durch den eigenen Lifecycle-Handler nicht selbst abbrechen. Nach Freigabe nur im Vordergrund starten.
 - Zeige verständliche Fehler für verweigerte Berechtigung, dauerhaft verweigerten Zugriff, belegtes Mikrofon und abgebrochene Aufnahme. Biete einen passenden Weg zu den Android-App-Einstellungen, wenn erforderlich.
 

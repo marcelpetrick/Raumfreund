@@ -128,3 +128,91 @@ void _pawPrint(Canvas canvas, Offset c, double alpha) {
     canvas.drawCircle(c.translate(dx, dx == 0 ? -6.5 : -5), 2.1, paint);
   }
 }
+
+const Color _dreamLilac = Color(0xFFD9CCFF);
+
+/// Three "Z" that drift up and to the right of the sleeping head, growing
+/// and fading; [opacity] fades them out while she wakes up.
+void paintZzz(Canvas canvas, double phase, {double opacity = 1}) {
+  for (var i = 0; i < 3; i++) {
+    final p = (phase + i / 3) % 1;
+    final size = 8 + 10 * p;
+    // Right of the head and above the tail, where nothing covers them.
+    final center = Offset(
+      206 + 20 * p + 3 * math.sin(p * 2 * math.pi),
+      92 - 62 * p,
+    );
+    final alpha = math.sin(p * math.pi).clamp(0.0, 1.0) * opacity;
+    if (alpha <= 0) continue;
+    _z(canvas, center, size, _dreamLilac.withValues(alpha: alpha));
+  }
+}
+
+void _z(Canvas canvas, Offset c, double size, Color color) {
+  final h = size / 2;
+  final path = Path()
+    ..moveTo(c.dx - h, c.dy - h)
+    ..lineTo(c.dx + h, c.dy - h)
+    ..lineTo(c.dx - h, c.dy + h)
+    ..lineTo(c.dx + h, c.dy + h);
+  canvas
+    ..drawPath(path, Glow.haloStroke(color, 5, sigma: 3))
+    ..drawPath(path, Glow.stroke(color, 2.6));
+}
+
+/// Sleepy nose bubble that swells and shrinks with each breath.
+void paintNoseBubble(Canvas canvas, double phase) {
+  final breath = (math.sin(phase * 2 * math.pi) + 1) / 2;
+  final radius = 3 + 6 * breath;
+  final center = Offset(129 + radius * 0.6, 117 + radius * 0.3);
+  canvas
+    ..drawCircle(
+      center,
+      radius,
+      Paint()..color = AppColors.tear.withValues(alpha: 0.28),
+    )
+    ..drawCircle(
+      center,
+      radius,
+      Glow.stroke(AppColors.tear.withValues(alpha: 0.75), 1.4),
+    )
+    ..drawCircle(
+      center.translate(-radius * 0.35, -radius * 0.35),
+      math.max(1, radius * 0.22),
+      Paint()..color = const Color(0xCCFFFFFF),
+    );
+}
+
+/// Little twinkling stars around the head at the end of waking up [wake].
+void paintWakeSparkles(Canvas canvas, double wake) {
+  final t = ((wake - 0.65) / 0.35).clamp(0.0, 1.0);
+  final alpha = math.sin(t * math.pi);
+  if (alpha <= 0) return;
+  const spots = [
+    (Offset(46, 40), 7.0),
+    (Offset(196, 34), 9.0),
+    (Offset(206, 92), 6.0),
+  ];
+  for (final (center, radius) in spots) {
+    _sparkle(
+      canvas,
+      center,
+      radius * (0.6 + 0.4 * t),
+      AppColors.star.withValues(alpha: alpha),
+    );
+  }
+}
+
+void _sparkle(Canvas canvas, Offset c, double r, Color color) {
+  final w = r * 0.28;
+  final path = Path()
+    ..moveTo(c.dx, c.dy - r)
+    ..quadraticBezierTo(c.dx + w, c.dy - w, c.dx + r, c.dy)
+    ..quadraticBezierTo(c.dx + w, c.dy + w, c.dx, c.dy + r)
+    ..quadraticBezierTo(c.dx - w, c.dy + w, c.dx - r, c.dy)
+    ..quadraticBezierTo(c.dx - w, c.dy - w, c.dx, c.dy - r)
+    ..close();
+  canvas
+    ..drawPath(path, Glow.halo(color, sigma: 4, alpha: color.a * 0.6))
+    ..drawPath(path, Paint()..color = color);
+}

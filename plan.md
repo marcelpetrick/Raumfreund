@@ -32,6 +32,9 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
 - App bar actions **Settings** and **About**; opening either stops measurement
   without auto-restart. About lists author, email `mail@marcelpetrick.it`,
   version/build/commit, project link, privacy and licences.
+- Leaving the app pauses a running measurement: nothing records in the
+  background, Mia sleeps, and on return she wakes up while the measurement
+  resumes by itself (owner request, issue #7, ADR 0005).
 
 ## Verified state (2026-10-08, `0.6.26+71`)
 
@@ -173,6 +176,8 @@ session restart; the earlier A1/N1/I1 agents had stopped):
 | D3 | Dependabot Kotlin 2.4.21 PR red in step `privacy`: the Kotlin Gradle plugin ships `kotlin-stdlib` of its own version, the license inventory still listed 2.4.0 | Coordinator | done in `0.6.30`: plugin 2.4.21, inventory and `docs/toolchain.md` updated (patch releases within the template line are adopted) |
 | D4 | Dependabot Gradle wrapper 9.8.1 PR | Coordinator | done in `0.6.31`: wrapper JAR and distribution SHA-256 match services.gradle.org; toolchain and license docs updated |
 | D5 | `/updateDependencies` (2026-10-20) and Dependabot PR #6 (`test` 1.33.0) | Coordinator | done in `0.6.32`: Flutter 3.47.7, test 1.33.0, ruff 0.17.1, osv-scanner 2.7.0, setup-java v6.1.0, Node 24.22.0, dockerfile 1.28.0, Temurin/nginx digests, js-yaml 5.5.0 and smol-toml 1.9.1 overrides; locked pub updates bring `shared_preferences_android` 2.5.1 (Pigeon JNI: `jni` builds `libdartjni.so`, CMake 3.22.1 now pinned in Docker), 16 new transitive packages (MIT `yaml` among them), DataStore 1.2.1 and kotlinx.serialization 1.7.3 in the APK; license inventory and in-app notices updated; AGP/Kotlin/Gradle unchanged (template unchanged) and tree-sitter held at 0.25.2 |
+| B1 | Issue #7: pause in the background, Mia sleeps and wakes up measuring on return | Coordinator (own worktree) | done in `0.7.0`: controller status `sleeping`, automatic wake session, sleeping and wake-up animation, ADR 0005, device checks in `docs/testing.md` (open for the owner) |
+| R2 | Independent review of B1 (lifecycle) | Opus reviewer (read-only) | done: 1 major (explicit stop during the sleep teardown was lost and could restart behind Settings), 4 minor (wake-up on failure, hard cut, invisible sleep phase, device cases, test gaps); all fixed or documented in `0.7.0` |
 | W1 | Remove all parked agent worktrees and their branches (owner request 2026-10-07), after archiving their unmerged work | Coordinator | done: 19 worktrees and 20 local branches removed; only `main` remains locally and on GitHub |
 
 Owner decision 2026-10-08: no further emulator work (see AGENTS.md

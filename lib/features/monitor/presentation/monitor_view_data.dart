@@ -22,6 +22,9 @@ enum MonitorPhase {
 
   /// The last start or measurement failed.
   error,
+
+  /// Paused while the app is in the background; resumes on return.
+  sleeping,
 }
 
 /// User-facing measurement error rendered by the monitor page.
@@ -69,6 +72,7 @@ final class MonitorViewData {
     this.starProgress = 0,
     this.starJustEarned = false,
     this.quickStarMode = false,
+    this.waking = false,
     this.error,
   });
 
@@ -133,6 +137,10 @@ final class MonitorViewData {
   /// classroom wallet twelve times faster.
   final bool quickStarMode;
 
+  /// Whether a paused measurement is restarting after the app came back:
+  /// Mia still sleeps and wakes up once the measurement runs.
+  final bool waking;
+
   /// Error detail when [phase] is [MonitorPhase.error].
   final MonitorErrorKind? error;
 
@@ -142,4 +150,9 @@ final class MonitorViewData {
 
   /// Whether a measurement is active and the primary action stops it.
   bool get isActive => phase == MonitorPhase.measuring;
+
+  /// Whether Mia sleeps: paused, or a paused measurement is restarting.
+  bool get kittySleeps =>
+      phase == MonitorPhase.sleeping ||
+      (waking && phase == MonitorPhase.starting);
 }

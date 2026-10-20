@@ -45,14 +45,21 @@ class MonitorStatusPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _StatusHeadline(data: data),
+          // The sleeping hint, the error body and the warnings (alarm output
+          // failed, readings too sparse) stay height-variable on purpose:
+          // they only occur in rare states, where a layout change is
+          // expected and a permanently reserved slot would waste space.
+          if (data.phase == MonitorPhase.sleeping) ...[
+            const SizedBox(height: 8),
+            Text(
+              l10n.sleepingHint,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
           if (data.phase == MonitorPhase.error) ...[
             const SizedBox(height: 12),
             _ErrorBody(error: data.error),
           ],
-          // The error body and the warnings (alarm output failed, readings
-          // too sparse) stay height-variable on purpose: they only occur in
-          // rare states, where a layout change is expected and a permanently
-          // reserved slot would waste space.
           if (data.phase != MonitorPhase.error) ...[
             const SizedBox(height: 10),
             _alarmSlot(l10n),
@@ -255,6 +262,8 @@ class _StatusHeadline extends StatelessWidget {
               l10n.statusIdle,
               l10n.statusStarting,
               l10n.statusStopping,
+              l10n.statusSleeping,
+              l10n.statusWaking,
               l10n.statusGreen,
               l10n.statusYellow,
               l10n.statusRed,
@@ -272,13 +281,16 @@ class _StatusHeadline extends StatelessWidget {
     MonitorPhase.starting ||
     MonitorPhase.stopping => Icons.hourglass_top_rounded,
     MonitorPhase.error => Icons.error_outline_rounded,
+    MonitorPhase.sleeping => Icons.bedtime_rounded,
     MonitorPhase.idle || MonitorPhase.measuring => Icons.pets_rounded,
   };
 
   String _status(AppLocalizations l10n) => switch (data.phase) {
     MonitorPhase.idle => l10n.statusIdle,
-    MonitorPhase.starting => l10n.statusStarting,
+    MonitorPhase.starting =>
+      data.waking ? l10n.statusWaking : l10n.statusStarting,
     MonitorPhase.stopping => l10n.statusStopping,
+    MonitorPhase.sleeping => l10n.statusSleeping,
     MonitorPhase.error => _errorTitle(l10n, data.error),
     MonitorPhase.measuring => switch (data.zone) {
       null => l10n.statusStarting,

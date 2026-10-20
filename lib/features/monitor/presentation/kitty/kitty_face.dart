@@ -65,10 +65,24 @@ void _ear(
 }
 
 /// Blush, eyes, brows, nose, mouth and whiskers for [mood].
+///
+/// While waking up ([KittyPose.wake] set) the face is a calm one whose
+/// eyes follow [KittyPose.eyeOpen] and whose mouth yawns; the mood's own
+/// face takes over when she is awake.
 void paintFace(Canvas canvas, KittyMood mood, KittyPose pose) {
   _cheeks(canvas, mood);
   _whiskers(canvas);
+  if (pose.wake != null) {
+    _openEye(canvas, kLeftEye, pose);
+    _openEye(canvas, kRightEye, pose);
+    _nose(canvas);
+    paintMouth(canvas, KittyMood.idle, yawn: pose.yawn);
+    return;
+  }
   switch (mood) {
+    case KittyMood.sleeping:
+      _closedEye(canvas, kLeftEye);
+      _closedEye(canvas, kRightEye);
     case KittyMood.happy:
       _happyEye(canvas, kLeftEye);
       _happyEye(canvas, kRightEye);
@@ -89,6 +103,7 @@ void _cheeks(Canvas canvas, KittyMood mood) {
   final alpha = switch (mood) {
     KittyMood.happy => 0.7,
     KittyMood.idle => 0.45,
+    KittyMood.sleeping => 0.55,
     KittyMood.uneasy => 0.25,
     KittyMood.scared => 0.3,
   };
@@ -115,6 +130,8 @@ void _whiskers(Canvas canvas) {
 }
 
 void _openEye(Canvas canvas, Offset center, KittyPose pose) {
+  // Nearly shut reads better as the closed lid line than as a thin slit.
+  if (pose.eyeOpen < 0.12) return _closedEye(canvas, center);
   final open = pose.eyeOpen.clamp(0.08, 1.0);
   final rect = Rect.fromCenter(
     center: center,
@@ -135,6 +152,22 @@ void _openEye(Canvas canvas, Offset center, KittyPose pose) {
   canvas
     ..drawCircle(center + look + Offset(5, -7 * open), 5.5, white)
     ..drawCircle(center + look + Offset(-5, 6 * open), 2.6, white);
+}
+
+/// Peacefully closed eye: a soft downward lid curve with two lashes.
+void _closedEye(Canvas canvas, Offset c) {
+  final lid = Path()
+    ..moveTo(c.dx - 13, c.dy - 1)
+    ..quadraticBezierTo(c.dx, c.dy + 11, c.dx + 13, c.dy - 1);
+  final ink = Glow.stroke(KittyColors.ink, 4.5);
+  final outer = c.dx < 120 ? -1.0 : 1.0;
+  canvas
+    ..drawPath(lid, ink)
+    ..drawLine(
+      c.translate(outer * 13, -1),
+      c.translate(outer * 17, -5),
+      Glow.stroke(KittyColors.ink, 2.5),
+    );
 }
 
 void _happyEye(Canvas canvas, Offset c) {
@@ -178,9 +211,30 @@ void _nose(Canvas canvas) {
     ..drawCircle(const Offset(118, 114), 1.6, Paint()..color = _shine);
 }
 
-/// Mouth shape per mood: "ω" with tongue, wavy line or small gasping mouth.
-void paintMouth(Canvas canvas, KittyMood mood) {
+/// Mouth shape per mood: "ω" with tongue, wavy line or small gasping mouth;
+/// a [yawn] above zero opens a round yawning mouth instead.
+void paintMouth(Canvas canvas, KittyMood mood, {double yawn = 0}) {
   final line = Glow.stroke(KittyColors.ink, 3);
+  if (yawn > 0.05) {
+    final mouth = Rect.fromCenter(
+      center: Offset(120, 127 + 4 * yawn),
+      width: 10 + 8 * yawn,
+      height: 4 + 16 * yawn,
+    );
+    canvas
+      ..drawOval(mouth, Paint()..color = KittyColors.mouth)
+      ..drawOval(
+        Rect.fromLTRB(
+          mouth.left + 3,
+          mouth.center.dy,
+          mouth.right - 3,
+          mouth.bottom - 1,
+        ),
+        Paint()..color = KittyColors.tongue,
+      )
+      ..drawOval(mouth, line);
+    return;
+  }
   if (mood == KittyMood.uneasy) {
     final wave = Path()..moveTo(106, 130);
     for (var x = 106.0; x <= 134; x += 1) {

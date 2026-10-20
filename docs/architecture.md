@@ -101,8 +101,12 @@ Events whose id differs from the active id are ignored.
 A start command is serialized so rapid taps cannot create parallel recorders.
 Stop is safe in every state and awaits native cleanup. Backgrounding, navigating
 to Settings or About, stream failure and disposal all converge on the same
-idempotent stop path. Returning to the foreground or monitor never starts a new
-session without a fresh user action.
+idempotent stop path. Returning to the monitor never starts a new session
+without a fresh user action. Backgrounding is the one exception
+([ADR 0005](adr/0005-sleep-in-background.md)): a starting or running
+measurement ends in the `sleeping` state (Mia sleeps), and when the app is
+visible again a new session starts by itself and Mia wakes up. Nothing
+records while the app is in the background.
 
 Android temporarily pauses the activity while its own permission dialog is
 visible. The controller records that a permission request is active and does

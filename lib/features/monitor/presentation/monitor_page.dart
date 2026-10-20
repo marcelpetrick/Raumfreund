@@ -114,6 +114,7 @@ class MonitorPage extends StatelessWidget {
           walkedAway: data.kittyWalkedAway,
           accessories: data.kittyAccessories,
           reduceMotion: MediaQuery.disableAnimationsOf(context),
+          wakeUp: data.isActive,
         ),
       ),
       const SizedBox(height: 12),
@@ -141,6 +142,7 @@ class MonitorPage extends StatelessWidget {
                 walkedAway: data.kittyWalkedAway,
                 accessories: data.kittyAccessories,
                 reduceMotion: MediaQuery.disableAnimationsOf(context),
+                wakeUp: data.isActive,
               ),
             ),
           ],
@@ -166,10 +168,12 @@ class MonitorPage extends StatelessWidget {
     onOpenAndroidSettings: onOpenAndroidSettings,
   );
 
-  KittyMood get _kittyMood => switch (data.zone) {
-    Zone.green => KittyMood.happy,
-    Zone.yellow => KittyMood.uneasy,
-    Zone.red => KittyMood.scared,
-    null => KittyMood.idle,
-  };
+  KittyMood get _kittyMood => data.kittySleeps
+      ? KittyMood.sleeping
+      : switch (data.zone) {
+          Zone.green => KittyMood.happy,
+          Zone.yellow => KittyMood.uneasy,
+          Zone.red => KittyMood.scared,
+          null => KittyMood.idle,
+        };
 }

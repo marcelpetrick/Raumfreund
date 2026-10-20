@@ -43,6 +43,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get statusRed => 'Oh weh, das ist zu laut!';
 
   @override
+  String get statusSleeping => 'Mia schläft – Messung pausiert';
+
+  @override
+  String get statusWaking => 'Mia wacht auf …';
+
+  @override
+  String get sleepingHint =>
+      'Im Hintergrund hört Raumfreund nicht zu. Sobald du die App wieder öffnest, wacht Mia auf und misst weiter.';
+
+  @override
   String get statusError => 'Messung nicht möglich';
 
   @override
@@ -143,6 +153,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get kittyScared => 'Mia hat Angst – es ist viel zu laut';
+
+  @override
+  String get kittySleeping => 'Mia schläft, bis du zurückkommst';
 
   @override
   String get kittyAwaySign => 'Zu laut – Mia hat sich versteckt';

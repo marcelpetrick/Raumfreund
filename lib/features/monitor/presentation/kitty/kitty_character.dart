@@ -18,8 +18,12 @@ export 'kitty_mood.dart';
 /// Pure presentation: the caller decides [mood] and [walkedAway] (see the
 /// mood mapping of the monitor). When [walkedAway] turns true she first
 /// whimpers (scared mood) and then runs off; when it turns false she walks
-/// back calmly. With [reduceMotion] there is no walking
-/// and no looping animation – changes only crossfade.
+/// back calmly. When [mood] leaves [KittyMood.sleeping] while [wakeUp] is
+/// set she wakes up (still asleep for a moment, then yawn, blink, stretch)
+/// before showing the new mood; otherwise she only crossfades. With
+/// [reduceMotion]
+/// there is no walking, no waking up and no looping animation – changes
+/// only crossfade.
 class KittyCharacter extends StatefulWidget {
   /// Creates Mia.
   const KittyCharacter({
@@ -27,6 +31,7 @@ class KittyCharacter extends StatefulWidget {
     this.walkedAway = false,
     this.reduceMotion = false,
     this.accessories = const <KittyAccessory>{},
+    this.wakeUp = false,
     super.key,
   });
 
@@ -42,6 +47,10 @@ class KittyCharacter extends StatefulWidget {
   /// Equipped shop items, drawn on or next to Mia.
   final Set<KittyAccessory> accessories;
 
+  /// Whether leaving [KittyMood.sleeping] plays the wake-up: true when the
+  /// paused measurement runs again, false when it failed or was stopped.
+  final bool wakeUp;
+
   /// Duration of the idle loop (blink, tail, purr, trembling).
   static const Duration loopDuration = Duration(seconds: 4);
 
@@ -50,6 +59,9 @@ class KittyCharacter extends StatefulWidget {
 
   /// Duration of the calm walk back onto the stage.
   static const Duration walkDuration = Duration(milliseconds: 2400);
+
+  /// Duration of waking up from sleep, including [kKittyWakeLead].
+  static const Duration wakeDuration = Duration(milliseconds: 2200);
 
   /// Duration of crossfades.
   static const Duration fadeDuration = Duration(milliseconds: 350);
@@ -69,6 +81,10 @@ class _KittyCharacterState extends State<KittyCharacter>
     duration: KittyCharacter.walkDuration,
     value: widget.walkedAway ? 1 : 0,
   );
+  late final AnimationController _wake = AnimationController(
+    vsync: this,
+    duration: KittyCharacter.wakeDuration,
+  );
 
   @override
   void initState() {
@@ -80,6 +96,7 @@ class _KittyCharacterState extends State<KittyCharacter>
   void didUpdateWidget(KittyCharacter oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.reduceMotion != widget.reduceMotion) _syncLoop();
+    _syncWake(oldWidget.mood);
     if (oldWidget.walkedAway != widget.walkedAway ||
         oldWidget.reduceMotion != widget.reduceMotion) {
       final target = widget.walkedAway ? 1.0 : 0.0;
@@ -99,6 +116,23 @@ class _KittyCharacterState extends State<KittyCharacter>
     }
   }
 
+  /// Starts waking up when the mood leaves sleep; stops it when she falls
+  /// asleep again, runs away or motion is reduced.
+  void _syncWake(KittyMood oldMood) {
+    final asleep = widget.mood == KittyMood.sleeping;
+    if (asleep || widget.reduceMotion || widget.walkedAway) {
+      _wake
+        ..stop()
+        ..value = 0;
+    } else if (oldMood == KittyMood.sleeping && widget.wakeUp) {
+      // The returned future completes when she is awake; nothing waits.
+      _wake.forward(from: 0).ignore();
+    }
+  }
+
+  /// Wake-up progress while waking, otherwise null.
+  double? get _wakeProgress => _wake.isAnimating ? _wake.value : null;
+
   void _syncLoop() {
     if (widget.reduceMotion) {
       _loop
@@ -113,6 +147,7 @@ class _KittyCharacterState extends State<KittyCharacter>
   void dispose() {
     _loop.dispose();
     _walk.dispose();
+    _wake.dispose();
     super.dispose();
   }
 
@@ -159,21 +194,26 @@ class _KittyCharacterState extends State<KittyCharacter>
     ),
   );
 
-  Widget _buildAnimated(AppLocalizations l10n) => AnimatedSwitcher(
-    duration: KittyCharacter.fadeDuration,
-    child: AnimatedBuilder(
-      key: ValueKey(widget.mood),
-      animation: Listenable.merge([_loop, _walk]),
-      builder: (context, _) => _KittyScene(
-        mood: widget.mood,
-        phase: _loop.value,
-        walk: Curves.easeInOut.transform(_walk.value),
-        running: widget.walkedAway,
-        accessories: widget.accessories,
-        signText: l10n.kittyAwaySign,
+  Widget _buildAnimated(AppLocalizations l10n) {
+    // Captured, so the outgoing scene keeps its own mood while it fades out.
+    final mood = widget.mood;
+    return AnimatedSwitcher(
+      duration: KittyCharacter.fadeDuration,
+      child: AnimatedBuilder(
+        key: ValueKey(mood),
+        animation: Listenable.merge([_loop, _walk, _wake]),
+        builder: (context, _) => _KittyScene(
+          mood: mood,
+          phase: _loop.value,
+          walk: Curves.easeInOut.transform(_walk.value),
+          running: widget.walkedAway,
+          accessories: widget.accessories,
+          signText: l10n.kittyAwaySign,
+          wake: _wakeProgress,
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 /// Mia's stage at one animation frame plus the "gone" sign.
@@ -185,6 +225,7 @@ class _KittyScene extends StatelessWidget {
     required this.running,
     required this.accessories,
     required this.signText,
+    this.wake,
     super.key,
   });
 
@@ -194,6 +235,7 @@ class _KittyScene extends StatelessWidget {
   final bool running;
   final Set<KittyAccessory> accessories;
   final String signText;
+  final double? wake;
 
   @override
   Widget build(BuildContext context) {
@@ -209,6 +251,7 @@ class _KittyScene extends StatelessWidget {
             walk: walk,
             running: running,
             accessories: accessories,
+            wake: wake,
           ),
         ),
         if (signOpacity > 0)

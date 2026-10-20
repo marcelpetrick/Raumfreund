@@ -160,6 +160,24 @@ abstract class AppLocalizations {
   /// **'Oh weh, das ist zu laut!'**
   String get statusRed;
 
+  /// Headline while the measurement is paused because the app is in the background.
+  ///
+  /// In de, this message translates to:
+  /// **'Mia schläft – Messung pausiert'**
+  String get statusSleeping;
+
+  /// Headline while a paused measurement restarts after the app came back.
+  ///
+  /// In de, this message translates to:
+  /// **'Mia wacht auf …'**
+  String get statusWaking;
+
+  /// Explanation below the headline while the measurement is paused in the background.
+  ///
+  /// In de, this message translates to:
+  /// **'Im Hintergrund hört Raumfreund nicht zu. Sobald du die App wieder öffnest, wacht Mia auf und misst weiter.'**
+  String get sleepingHint;
+
   /// Headline when the measurement failed.
   ///
   /// In de, this message translates to:
@@ -339,6 +357,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Mia hat Angst – es ist viel zu laut'**
   String get kittyScared;
+
+  /// Kitty mood sleeping while the app is in the background (screen reader).
+  ///
+  /// In de, this message translates to:
+  /// **'Mia schläft, bis du zurückkommst'**
+  String get kittySleeping;
 
   /// Sign shown when the kitty walked away.
   ///

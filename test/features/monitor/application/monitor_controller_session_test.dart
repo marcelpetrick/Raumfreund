@@ -210,17 +210,18 @@ void permissionLifecycleTests() {
       expect(h.state.status, MonitorStatus.measuring);
     });
 
-    test('grant while in the background does not auto start', () async {
+    test('grant in the background sleeps and records only on return', () async {
       await openDialog();
       h.controller.onLifecycleChanged(AppLifecycleState.hidden);
       h.controller.onLifecycleChanged(AppLifecycleState.paused);
       h.permission.completeRequest(MicrophonePermissionStatus.granted);
       await starting;
-      expect(h.state.status, MonitorStatus.stopped);
+      expect(h.state.status, MonitorStatus.sleeping);
       expect(h.source.startCalls, isEmpty);
       h.controller.onLifecycleChanged(AppLifecycleState.resumed);
       await settle();
-      expect(h.state.status, MonitorStatus.stopped);
+      expect(h.state.status, MonitorStatus.measuring);
+      expect(h.source.startCalls, [h.controller.lastSessionId]);
     });
 
     test('denial while in the background is still reported', () async {
@@ -241,20 +242,33 @@ void lifecycleTests() {
     for (final background in [
       AppLifecycleState.hidden,
       AppLifecycleState.paused,
-      AppLifecycleState.detached,
     ]) {
-      test('$background stops without restart on resume', () async {
+      test('$background sleeps and resumes on return', () async {
         await h.controller.start();
         h.controller.onLifecycleChanged(background);
         await settle();
-        expect(h.state.status, MonitorStatus.stopped);
+        expect(h.state.status, MonitorStatus.sleeping);
         expect(h.screen.isOn, isFalse);
+        expect(h.source.recordingSession, isNull);
         h.controller.onLifecycleChanged(AppLifecycleState.resumed);
         await settle();
-        expect(h.state.status, MonitorStatus.stopped);
-        expect(h.source.startCalls, [1]);
+        expect(h.state.status, MonitorStatus.measuring);
+        expect(h.screen.isOn, isTrue);
+        expect(h.source.startCalls, [1, 2]);
       });
     }
+
+    test('detached stops without restart on resume', () async {
+      await h.controller.start();
+      h.controller.onLifecycleChanged(AppLifecycleState.detached);
+      await settle();
+      expect(h.state.status, MonitorStatus.stopped);
+      expect(h.screen.isOn, isFalse);
+      h.controller.onLifecycleChanged(AppLifecycleState.resumed);
+      await settle();
+      expect(h.state.status, MonitorStatus.stopped);
+      expect(h.source.startCalls, [1]);
+    });
 
     test('inactive (notification shade) keeps measuring', () async {
       await h.controller.start();
@@ -291,7 +305,7 @@ void staleSessionTests() {
       expect(h.screen.isOn, isFalse);
     });
 
-    test('background while starting stops', () async {
+    test('background while starting sleeps and stops the late start', () async {
       h.source.holdStart = true;
       final starting = h.controller.start();
       await settle();
@@ -299,7 +313,9 @@ void staleSessionTests() {
       await settle();
       h.source.completeStart();
       await starting;
-      expect(h.state.status, MonitorStatus.stopped);
+      expect(h.state.status, MonitorStatus.sleeping);
+      expect(h.source.stopCalls, 2);
+      expect(h.source.recordingSession, isNull);
     });
 
     test('late start of an old session does not stop a newer one', () async {

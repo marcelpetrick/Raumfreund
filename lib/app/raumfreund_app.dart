@@ -254,6 +254,7 @@ MonitorViewData _viewData(
   starProgress: state.starProgress,
   starJustEarned: state.starJustEarned,
   quickStarMode: quickStarMode,
+  waking: state.waking,
   error: _error(state.failure),
 );
 
@@ -264,6 +265,7 @@ MonitorPhase _phase(MonitorStatus status) => switch (status) {
   MonitorStatus.measuring => MonitorPhase.measuring,
   MonitorStatus.stopping => MonitorPhase.stopping,
   MonitorStatus.error => MonitorPhase.error,
+  MonitorStatus.sleeping => MonitorPhase.sleeping,
 };
 
 MonitorErrorKind? _error(MonitorFailure? failure) => switch (failure) {

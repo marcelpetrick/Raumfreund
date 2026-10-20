@@ -115,6 +115,106 @@ void main() {
     expect(find.text(l10nDe.starsHintQuickTest), findsOneWidget);
   });
   _shopTests();
+  _sleepTest();
+  _sleepNavigationTest();
+}
+
+void _sleepNavigationTest() {
+  testWidgets('opening Settings while Mia wakes up does not restart', (
+    tester,
+  ) async {
+    final binding = tester.binding;
+    addTearDown(
+      () => binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed),
+    );
+    final monitor = MonitorHarness();
+    await tester.pumpWidget(
+      RaumfreundApp(
+        settingsController: SettingsController(InMemorySettingsRepository()),
+        monitorController: monitor.controller,
+        appInfoPort: const _FakeAppInfoPort(),
+      ),
+    );
+    await _finishAsyncWork(tester);
+    await tester.tap(find.text(l10nDe.measureStart));
+    await _finishAsyncWork(tester);
+    for (final state in [
+      AppLifecycleState.inactive,
+      AppLifecycleState.hidden,
+      AppLifecycleState.paused,
+    ]) {
+      binding.handleAppLifecycleStateChanged(state);
+    }
+    await _finishWithRealAsync(tester);
+    monitor.source.holdStart = true;
+    binding
+      ..handleAppLifecycleStateChanged(AppLifecycleState.hidden)
+      ..handleAppLifecycleStateChanged(AppLifecycleState.inactive)
+      ..handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await _finishAsyncWork(tester);
+    expect(find.text(l10nDe.statusWaking), findsOneWidget);
+
+    await tester.tap(find.byTooltip(l10nDe.actionSettings));
+    await _finishWithRealAsync(tester);
+    expect(find.byType(SettingsPage), findsOneWidget);
+    monitor.source.completeStart();
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await _finishWithRealAsync(tester);
+    expect(find.text(l10nDe.measureStart), findsOneWidget);
+    expect(monitor.source.recordingSession, isNull);
+    expect(monitor.source.startCalls, [1, 2]);
+  });
+}
+
+void _sleepTest() {
+  testWidgets('Mia sleeps in the background and wakes up measuring', (
+    tester,
+  ) async {
+    final binding = tester.binding;
+    addTearDown(
+      () => binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed),
+    );
+    final monitor = MonitorHarness();
+    await tester.pumpWidget(
+      RaumfreundApp(
+        settingsController: SettingsController(InMemorySettingsRepository()),
+        monitorController: monitor.controller,
+        appInfoPort: const _FakeAppInfoPort(),
+      ),
+    );
+    await _finishAsyncWork(tester);
+    await tester.tap(find.text(l10nDe.measureStart));
+    await _finishAsyncWork(tester);
+    KittyMood mood() =>
+        tester.widget<KittyCharacter>(find.byType(KittyCharacter)).mood;
+
+    for (final state in [
+      AppLifecycleState.inactive,
+      AppLifecycleState.hidden,
+      AppLifecycleState.paused,
+    ]) {
+      binding.handleAppLifecycleStateChanged(state);
+    }
+    await _finishWithRealAsync(tester);
+    expect(find.text(l10nDe.statusSleeping), findsOneWidget);
+    expect(mood(), KittyMood.sleeping);
+    expect(monitor.screen.isOn, isFalse);
+
+    monitor.source.holdStart = true;
+    binding
+      ..handleAppLifecycleStateChanged(AppLifecycleState.hidden)
+      ..handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    await _finishAsyncWork(tester);
+    expect(find.text(l10nDe.statusWaking), findsOneWidget);
+    expect(mood(), KittyMood.sleeping);
+
+    monitor.source.completeStart();
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await _finishAsyncWork(tester);
+    expect(find.text(l10nDe.measureStop), findsOneWidget);
+    expect(mood(), KittyMood.idle);
+    expect(monitor.source.startCalls, [1, 2]);
+  });
 }
 
 void _shopTests() {

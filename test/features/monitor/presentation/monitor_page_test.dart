@@ -39,6 +39,7 @@ MonitorViewData _data({
   bool alarmOutputFailed = false,
   int? countdown,
   Set<KittyAccessory> accessories = const {},
+  bool waking = false,
 }) => MonitorViewData(
   phase: phase,
   thresholds: Thresholds.defaults,
@@ -58,6 +59,7 @@ MonitorViewData _data({
   stars: 2,
   starProgress: .5,
   starJustEarned: alarmPlaying,
+  waking: waking,
   error: error,
 );
 
@@ -80,9 +82,61 @@ void _noReadingsTest() {
   });
 }
 
+void _sleepTest() {
+  testWidgets('Mia sleeps in the background and while waking up', (
+    tester,
+  ) async {
+    KittyMood mood() =>
+        tester.widget<KittyCharacter>(find.byType(KittyCharacter)).mood;
+    var toggles = 0;
+    await pumpTestApp(
+      tester,
+      MonitorPage(
+        data: _data(phase: MonitorPhase.sleeping, zone: null),
+        onToggleMeasurement: () => toggles++,
+        onOpenSettings: () async {},
+        onOpenAbout: () async {},
+        onOpenShop: () async {},
+      ),
+      scaffold: false,
+      disableAnimations: true,
+    );
+    expect(mood(), KittyMood.sleeping);
+    expect(find.text(l10nDe.statusSleeping), findsOneWidget);
+    expect(find.text(l10nDe.sleepingHint), findsOneWidget);
+    expect(find.byIcon(Icons.bedtime_rounded), findsOneWidget);
+    await tester.tap(find.text(l10nDe.measureStart));
+    expect(toggles, 1);
+
+    await _pumpPage(
+      tester,
+      _data(phase: MonitorPhase.starting, zone: null, waking: true),
+    );
+    expect(mood(), KittyMood.sleeping);
+    expect(find.text(l10nDe.statusWaking), findsOneWidget);
+    expect(find.text(l10nDe.sleepingHint), findsNothing);
+
+    await _pumpPage(tester, _data(phase: MonitorPhase.starting, zone: null));
+    expect(mood(), KittyMood.idle);
+    expect(find.text(l10nDe.statusStarting), findsOneWidget);
+
+    await _pumpPage(tester, _data(zone: null, waking: true));
+    expect(mood(), KittyMood.idle);
+    final kitty = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
+    expect(kitty.wakeUp, isTrue);
+    await _pumpPage(tester, _data(phase: MonitorPhase.error, zone: null));
+    expect(
+      tester.widget<KittyCharacter>(find.byType(KittyCharacter)).wakeUp,
+      isFalse,
+    );
+  });
+}
+
 void main() {
   _accessoryTest();
   _noReadingsTest();
+  _sleepTest();
+  _zoneMoodTest();
   testWidgets('idle page exposes Settings, About and shop actions', (
     tester,
   ) async {
@@ -159,26 +213,6 @@ void main() {
     expect(find.byType(Row), findsWidgets);
     expect(find.text(l10nDe.statusYellow), findsOneWidget);
   });
-
-  testWidgets('maps zones to Mia and sends her away only when told to', (
-    tester,
-  ) async {
-    const moods = {
-      Zone.green: KittyMood.happy,
-      Zone.yellow: KittyMood.uneasy,
-      Zone.red: KittyMood.scared,
-    };
-    for (final MapEntry(key: zone, value: mood) in moods.entries) {
-      await _pumpPage(tester, _data(zone: zone));
-      final kitty = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
-      expect(kitty.mood, mood);
-      expect(kitty.walkedAway, isFalse);
-    }
-    await _pumpPage(tester, _data(zone: Zone.red, alarmFired: true));
-    final away = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
-    expect(away.mood, KittyMood.scared);
-    expect(away.walkedAway, isTrue);
-  });
 }
 
 void _accessoryTest() {
@@ -197,5 +231,27 @@ void _accessoryTest() {
       tester.widget<KittyCharacter>(find.byType(KittyCharacter)).accessories,
       worn,
     );
+  });
+}
+
+void _zoneMoodTest() {
+  testWidgets('maps zones to Mia and sends her away only when told to', (
+    tester,
+  ) async {
+    const moods = {
+      Zone.green: KittyMood.happy,
+      Zone.yellow: KittyMood.uneasy,
+      Zone.red: KittyMood.scared,
+    };
+    for (final MapEntry(key: zone, value: mood) in moods.entries) {
+      await _pumpPage(tester, _data(zone: zone));
+      final kitty = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
+      expect(kitty.mood, mood);
+      expect(kitty.walkedAway, isFalse);
+    }
+    await _pumpPage(tester, _data(zone: Zone.red, alarmFired: true));
+    final away = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
+    expect(away.mood, KittyMood.scared);
+    expect(away.walkedAway, isTrue);
   });
 }

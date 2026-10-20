@@ -24,6 +24,11 @@ enum MonitorStatus {
 
   /// The last attempt failed; see [MonitorState.failure]. Start is possible.
   error,
+
+  /// Paused because the app left the foreground while measuring (ADR 0005):
+  /// nothing records, and a new session starts when the app is visible
+  /// again. Start and stop are possible.
+  sleeping,
 }
 
 /// Why the measurement is in [MonitorStatus.error].
@@ -69,6 +74,7 @@ final class MonitorState {
     this.stars = 0,
     this.starProgress = 0,
     this.starJustEarned = false,
+    this.waking = false,
   });
 
   /// Stopped state without any measurement.
@@ -132,9 +138,21 @@ final class MonitorState {
   /// True only in the state emitted for the sample that earned a star.
   final bool starJustEarned;
 
+  /// Whether this session started automatically after a pause
+  /// ([MonitorStatus.sleeping]) and does not measure yet: Mia still sleeps
+  /// and wakes up once it measures.
+  final bool waking;
+
   /// Whether a measurement is running or being set up/torn down.
-  bool get isBusy =>
-      status != MonitorStatus.stopped && status != MonitorStatus.error;
+  bool get isBusy => switch (status) {
+    MonitorStatus.stopped ||
+    MonitorStatus.error ||
+    MonitorStatus.sleeping => false,
+    MonitorStatus.permissionPending ||
+    MonitorStatus.starting ||
+    MonitorStatus.measuring ||
+    MonitorStatus.stopping => true,
+  };
 
   /// Returns a copy with the given fields replaced. Nullable fields are
   /// replaced via the `clear…` flags.
@@ -159,6 +177,7 @@ final class MonitorState {
     int? stars,
     double? starProgress,
     bool? starJustEarned,
+    bool? waking,
   }) => MonitorState(
     status: status ?? this.status,
     failure: clearFailure ? null : failure ?? this.failure,
@@ -179,5 +198,6 @@ final class MonitorState {
     stars: stars ?? this.stars,
     starProgress: starProgress ?? this.starProgress,
     starJustEarned: starJustEarned ?? this.starJustEarned,
+    waking: waking ?? this.waking,
   );
 }

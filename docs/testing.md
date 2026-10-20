@@ -23,7 +23,8 @@ Open device acceptance work:
 - microphone permission and settings redirection on two manufacturers;
 - occupied/interrupted microphone behavior;
 - vibration availability and alarm audibility;
-- background/foreground behavior and a 30-minute thermal soak;
+- background/foreground behavior and a 30-minute thermal soak, including
+  the sleep and wake-up of ADR 0005 (see below);
 - TalkBack, large text and reduced-motion checks on real hardware.
 
 These checks are never claimed from an emulator-only run.
@@ -42,6 +43,31 @@ follows the phone's alarm-vibration setting, also in silent mode.
    setting for alarm vibration (Settings, Sound and vibration, Vibration and
    haptics) and whether the device has a vibrator at all.
 4. Restore the thresholds with **Standardwerte**.
+
+## Checking sleep and wake-up on a device
+
+ADR 0005 pauses a running measurement in the background and resumes it on
+return. Unit, widget and app tests cover the rules with fake ports; these
+device checks are open for the owner:
+
+1. Start the measurement, press Home. Android shows no microphone
+   indicator while the app is away.
+2. Open the app again: Mia is asleep for a moment, then yawns, blinks and
+   stretches while the measurement already runs again (stop button, live
+   gauge).
+3. Repeat with the app switcher, the screen lock (power button) and split
+   screen (the app stays measuring while visible next to another app).
+4. Return during a phone call or while another app records: "Mikrofon
+   belegt" with **Erneut versuchen** after the call.
+5. Stop the measurement, press Home and return: it stays stopped.
+6. With reduced motion (Android "Remove animations") Mia only crossfades
+   between sleeping and awake.
+7. Grant the microphone "Nur dieses Mal", measure, leave the app for a few
+   minutes and return: Android usually ends the process, so the app starts
+   fresh ("Bereit"); if it survives, the permission dialog appears again.
+8. Turn the screen off and on without unlocking: some devices resume the
+   app behind the lock screen for a moment. The measurement must not keep
+   running there (no lasting microphone indicator).
 
 ## Emulator smoke tests and a known emulator defect
 
@@ -98,7 +124,8 @@ used as evidence):
   starts by itself. This pass found that the panel then offered no way to
   start; it now also offers **Erneut versuchen**, which starts measuring.
 - Background (Home) while measuring: stopped, no restart on return, stars
-  kept.
+  kept. (Behaviour of that build; since ADR 0005 the measurement sleeps and
+  resumes on return.)
 - Twelve rapid taps on the start/stop button end stopped; eleven end
   measuring with live readings. No crash or ANR in logcat.
 

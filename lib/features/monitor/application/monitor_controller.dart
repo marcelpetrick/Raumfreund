@@ -25,12 +25,15 @@ import 'ports.dart';
 ///
 /// * Only one session at a time. Every [start] gets a new session id; events
 ///   and async completions of other sessions are dropped.
-/// * [start] works only from [MonitorStatus.stopped]/[MonitorStatus.error];
-///   calls while busy are ignored (no double start by rapid taps).
+/// * [start] works only from [MonitorStatus.stopped], [MonitorStatus.error]
+///   and [MonitorStatus.sleeping]; calls while busy are ignored (no double
+///   start by rapid taps).
 /// * Lifecycle changes while the permission dialog is open do not cancel
 ///   the request; after a grant recording starts only in the foreground.
-/// * Going to the background stops the measurement; there is no automatic
-///   restart on resume.
+/// * Going to the background ends a starting or running measurement in
+///   [MonitorStatus.sleeping] (nothing records in the background); when the
+///   app is visible again, a new session starts by itself (ADR 0005).
+///   Explicit stops, navigation and errors never restart automatically.
 /// * Cleanup ([stop], [dispose]) is idempotent.
 /// * A recorder that delivers no valid reading for [firstReadingTimeout]
 ///   after measuring begins, or for [readingStallTimeout] afterwards, ends
@@ -81,6 +84,11 @@ final class MonitorController extends ChangeNotifier {
   int? _activeSession;
   bool _alarmOutputActive = false;
   bool _disposed = false;
+
+  /// Whether a measurement ended by backgrounding should resume on return.
+  /// Set when it falls asleep; every explicit stop clears it, also while the
+  /// recorder of the sleeping session is still being released.
+  bool _resumeOnReturn = false;
   ScheduledCallback? _watchdog;
   bool _sessionHadReading = false;
 
@@ -119,11 +127,14 @@ final class MonitorController extends ChangeNotifier {
   int get lastSessionId => _lastSessionId;
 
   /// Starts a measurement (permission → recording). Ignored while busy.
-  Future<void> start() async {
+  Future<void> start() => _start(waking: false);
+
+  Future<void> _start({required bool waking}) async {
     if (_disposed || _state.isBusy) return;
+    _resumeOnReturn = false;
     final session = ++_lastSessionId;
     _activeSession = session;
-    _prepareSession();
+    _prepareSession(waking: waking);
     final permission = await _obtainPermission();
     if (!_isCurrent(session)) return;
     switch (permission) {
@@ -137,22 +148,31 @@ final class MonitorController extends ChangeNotifier {
         break;
     }
     // The app may have gone to the background while the dialog was open.
-    if (!_isForeground) return _endSession();
+    // The teacher asked for a measurement, so it waits for the return.
+    if (!_isForeground) return _fallAsleep();
     await _startRecording(session);
   }
 
-  /// Stops the measurement. Idempotent; keeps the level history.
+  /// Stops the measurement, also a paused one, so it does not resume.
+  /// Idempotent; keeps the level history.
   Future<void> stop() async {
-    if (_activeSession == null) return;
+    _resumeOnReturn = false;
+    if (_activeSession == null) {
+      if (_state.status == MonitorStatus.sleeping) {
+        _emit(_state.copyWith(status: MonitorStatus.stopped));
+      }
+      return;
+    }
     await _endSession();
   }
 
-  /// Start/stop button: starts when stopped or failed, stops while
+  /// Start/stop button: starts when stopped, failed or paused, stops while
   /// measuring, and ignores taps during transitions.
   Future<void> toggle() async {
     switch (_state.status) {
       case MonitorStatus.stopped:
       case MonitorStatus.error:
+      case MonitorStatus.sleeping:
         await start();
       case MonitorStatus.measuring:
         await stop();
@@ -163,21 +183,50 @@ final class MonitorController extends ChangeNotifier {
     }
   }
 
-  /// Forwards app lifecycle changes. Hidden/paused/detached stop the
-  /// measurement, except while the permission dialog is pending (the
-  /// dialog itself pauses the activity). Inactive is ignored.
+  /// Forwards app lifecycle changes (ADR 0005).
+  ///
+  /// Hidden/paused put a starting or running measurement to sleep, except
+  /// while the permission dialog is pending (the dialog itself pauses the
+  /// activity). Detached stops for good. Inactive and resumed wake a
+  /// sleeping measurement: the app is visible again (inactive is also the
+  /// first step back from the background).
   void onLifecycleChanged(AppLifecycleState lifecycle) {
     _lifecycle = lifecycle;
     switch (lifecycle) {
       case AppLifecycleState.hidden:
       case AppLifecycleState.paused:
+        _sleep();
       case AppLifecycleState.detached:
         if (_state.status == MonitorStatus.permissionPending) return;
         unawaited(stop());
       case AppLifecycleState.resumed:
       case AppLifecycleState.inactive:
+        _wakeIfSleeping();
+    }
+  }
+
+  void _sleep() {
+    switch (_state.status) {
+      case MonitorStatus.starting:
+      case MonitorStatus.measuring:
+        if (_activeSession != null) unawaited(_fallAsleep());
+      case MonitorStatus.permissionPending:
+      case MonitorStatus.stopped:
+      case MonitorStatus.stopping:
+      case MonitorStatus.error:
+      case MonitorStatus.sleeping:
         return;
     }
+  }
+
+  Future<void> _fallAsleep() {
+    _resumeOnReturn = true;
+    return _endSession(sleep: true);
+  }
+
+  void _wakeIfSleeping() {
+    if (_state.status != MonitorStatus.sleeping || !_isForeground) return;
+    unawaited(_start(waking: true));
   }
 
   /// Stops the measurement and uses [settings] (thresholds, calibration,
@@ -209,6 +258,7 @@ final class MonitorController extends ChangeNotifier {
   void dispose() {
     if (_disposed) return;
     _disposed = true;
+    _resumeOnReturn = false;
     _activeSession = null;
     _cancelWatchdog();
     _alarm.reset();
@@ -222,7 +272,7 @@ final class MonitorController extends ChangeNotifier {
       _lifecycle == AppLifecycleState.resumed ||
       _lifecycle == AppLifecycleState.inactive;
 
-  void _prepareSession() {
+  void _prepareSession({required bool waking}) {
     _sessionSettings = _settings;
     _alarm = _alarmFor(_settings);
     _calibration = Calibration(correctionDb: _settings.calibrationCorrectionDb);
@@ -243,6 +293,7 @@ final class MonitorController extends ChangeNotifier {
         thresholds: _settings.thresholds,
         starJustEarned: false,
         starProgress: 0,
+        waking: waking,
       ),
     );
   }
@@ -289,7 +340,7 @@ final class MonitorController extends ChangeNotifier {
       if (_activeSession == null) await _guard(_levelSource.stop);
       return;
     }
-    _emit(_state.copyWith(status: MonitorStatus.measuring));
+    _emit(_state.copyWith(status: MonitorStatus.measuring, waking: false));
     _armWatchdog(session);
     await _guard(() => _screenAwake.setKeepScreenOn(enabled: true));
   }
@@ -468,7 +519,14 @@ final class MonitorController extends ChangeNotifier {
     unawaited(_endSession(failure: MonitorFailure.noReadings));
   }
 
-  Future<void> _endSession({MonitorFailure? failure}) async {
+  /// Ends the session through the one stop path. With [sleep] it ends in
+  /// [MonitorStatus.sleeping] and wakes again at once if the app came back
+  /// while the recorder was being released – unless an explicit stop
+  /// (navigation, settings, detached) arrived meanwhile.
+  Future<void> _endSession({
+    MonitorFailure? failure,
+    bool sleep = false,
+  }) async {
     _activeSession = null;
     _cancelWatchdog();
     _alarm.reset();
@@ -485,16 +543,23 @@ final class MonitorController extends ChangeNotifier {
         signalThin: false,
         starProgress: 0,
         starJustEarned: false,
+        waking: false,
       ),
     );
     await _teardown();
     if (_activeSession != null) return;
+    final asleep = sleep && _resumeOnReturn && failure == null;
     _emit(
       _state.copyWith(
-        status: failure == null ? MonitorStatus.stopped : MonitorStatus.error,
+        status: failure != null
+            ? MonitorStatus.error
+            : asleep
+            ? MonitorStatus.sleeping
+            : MonitorStatus.stopped,
         failure: failure,
       ),
     );
+    if (asleep) _wakeIfSleeping();
   }
 
   Future<void> _teardown() async {
