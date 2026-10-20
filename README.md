@@ -9,7 +9,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 [![Docker](https://github.com/marcelpetrick/Raumfreund/actions/workflows/docker.yml/badge.svg?branch=main)](https://github.com/marcelpetrick/Raumfreund/actions/workflows/docker.yml)
 [![Latest debug APK](https://img.shields.io/badge/debug%20APK-latest-brightgreen.svg)](https://github.com/marcelpetrick/Raumfreund/releases/latest)
 [![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg)](LICENSE)
-[![Flutter 3.47.6](https://img.shields.io/badge/Flutter-3.47.6-02569B.svg)](https://docs.flutter.dev/release/archive)
+[![Flutter 3.47.7](https://img.shields.io/badge/Flutter-3.47.7-02569B.svg)](https://docs.flutter.dev/release/archive)
 [![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2.svg)](https://dart.dev/)
 [![Android 7+](https://img.shields.io/badge/Android-7.0%2B-3DDC84.svg)](docs/toolchain.md)
 [![Coverage gate: 95%](https://img.shields.io/badge/coverage%20gate-95%25-brightgreen.svg)](docs/testing.md)
@@ -128,7 +128,7 @@ immediately and is not part of Speichern/Abbrechen.
 
 ## Build and test
 
-The repository pins Flutter `3.47.6` and its bundled Dart `3.13.5`. On supported
+The repository pins Flutter `3.47.7` and its bundled Dart `3.13.5`. On supported
 Linux x86-64 development hosts, the single quality gate is:
 
 ```sh

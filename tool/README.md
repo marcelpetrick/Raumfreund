@@ -54,7 +54,7 @@ here and cross-checked against the downloaded files.
 | shfmt | 3.14.1 | GitHub release `mvdan/sh` `shfmt_v3.14.1_linux_amd64` | GitHub release asset digest (the project publishes no sums file) |
 | actionlint | 1.7.12 | GitHub release `rhysd/actionlint` `actionlint_1.7.12_linux_amd64.tar.gz` | `actionlint_1.7.12_checksums.txt` (matches asset digest) |
 | gitleaks | 8.30.1 | GitHub release `gitleaks/gitleaks` `gitleaks_8.30.1_linux_x64.tar.gz` | `gitleaks_8.30.1_checksums.txt` (matches asset digest) |
-| osv-scanner | 2.6.0 | GitHub release `google/osv-scanner` `osv-scanner_linux_amd64` | `osv-scanner_SHA256SUMS` (matches asset digest) |
+| osv-scanner | 2.7.0 | GitHub release `google/osv-scanner` `osv-scanner_linux_amd64` | `osv-scanner_SHA256SUMS` (matches asset digest) |
 | ktlint | 1.8.0 | GitHub release `ktlint/ktlint` `ktlint` (self-executing jar) | GitHub release asset digest |
 | detekt-cli | 1.23.8 | Maven Central `io.gitlab.arturbosch.detekt:detekt-cli:1.23.8:all` | Maven Central `.sha256` file |
 

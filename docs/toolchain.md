@@ -7,22 +7,23 @@ green commits (see the weekly maintenance workflow).
 
 | Component | Version | Pinned in | Source |
 | --- | --- | --- | --- |
-| Flutter (stable) | 3.47.6 (released 2026-10-01, framework 5fc3468) | `.flutter-version` | [releases_linux.json](https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json), [archive](https://docs.flutter.dev/install/archive) |
-| Dart | 3.13.5 (bundled with Flutter 3.47.6) | `pubspec.yaml` `environment.sdk` | same |
-| Android Gradle Plugin | 9.1.0 | `android/settings.gradle.kts` | Flutter 3.47.6 app template |
-| Kotlin Gradle Plugin | 2.4.21 | `android/settings.gradle.kts` | Flutter 3.47.6 app template line 2.4, newest patch release |
+| Flutter (stable) | 3.47.7 (released 2026-10-08, framework abaf9c5) | `.flutter-version` | [releases_linux.json](https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json), [archive](https://docs.flutter.dev/install/archive) |
+| Dart | 3.13.5 (bundled with Flutter 3.47.7) | `pubspec.yaml` `environment.sdk` | same |
+| Android Gradle Plugin | 9.1.0 | `android/settings.gradle.kts` | Flutter 3.47.7 app template |
+| Kotlin Gradle Plugin | 2.4.21 | `android/settings.gradle.kts` | Flutter 3.47.7 app template line 2.4, newest patch release |
 | Gradle | 9.8.1 | wrapper properties, distribution checksum and regenerated wrapper JAR/scripts | newest 9.x release; AGP 9.1.0 needs Gradle 9.1 or newer (template: 9.3.1) |
 | JDK (build) | Temurin 21.0.12.1+1 (`setup-java` needs its exact Adoptium SemVer `21.0.12+101.0.LTS`) | `.github/actions/setup`, pinned Docker digest | AGP 9 requires JDK 17+; 21 is the current LTS supported by Gradle 9.8 |
-| Node.js (tooling) | 24.x; CI 24.21.0 | `tool/node/package.json`, `.github/actions/setup` | npm lint tools support the active Node 24 LTS line |
+| Node.js (tooling) | 24.x; CI 24.22.0 | `tool/node/package.json`, `.github/actions/setup` | npm lint tools support the active Node 24 LTS line |
 | Java/Kotlin bytecode target | 17 | `android/app/build.gradle.kts` | Flutter template default |
-| compileSdk | 36 | Flutter default (`flutter.compileSdkVersion`) | Flutter 3.47.6 `FlutterExtension.kt` |
+| compileSdk | 36 | Flutter default (`flutter.compileSdkVersion`) | Flutter 3.47.7 `FlutterExtension.kt` |
 | targetSdk | 36 (Android 16) | Flutter default | meets Play requirement "new apps and updates must target API 36 from 2026-08-31" ([target-sdk](https://developer.android.com/google/play/requirements/target-sdk)) |
-| minSdk | 24 (Android 7.0) | Flutter default | Flutter 3.47.6 minimum supported Android version |
-| NDK | 28.2.13676358 | Flutter default | Flutter 3.47.6 `FlutterExtension.kt` |
+| minSdk | 24 (Android 7.0) | Flutter default | Flutter 3.47.7 minimum supported Android version |
+| NDK | 28.2.13676358 | Flutter default | Flutter 3.47.7 `FlutterExtension.kt` |
+| CMake (Android SDK) | 3.22.1 | `Dockerfile` | default CMake of AGP 9.1, used for the native `libdartjni.so` of the `jni` package (via `shared_preferences_android` 2.5); Gradle installs it on demand where it is missing |
 | ABIs | arm64-v8a, armeabi-v7a, x86_64 | Flutter release defaults | Flutter Android release builds |
 
 AGP, Kotlin and Gradle follow the release lines of the template that
-Flutter 3.47.6 generates, because that is the combination the Flutter team
+Flutter 3.47.7 generates, because that is the combination the Flutter team
 tests; a newer minor or major release of AGP or Kotlin is not adopted ahead of
 Flutter. Bug-fix releases within the template's line are adopted once the full
 pipeline is green: Kotlin 2.4.21 is a patch release of the template's 2.4.0.

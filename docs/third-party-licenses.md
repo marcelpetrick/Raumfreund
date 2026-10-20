@@ -5,10 +5,10 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 # Third-party licenses
 
-This is the inventory of third-party software in Raumfreund `0.6.0+45` (dependencies unchanged since `0.5.4+43`)
-(Flutter `3.47.6`, Dart `3.13.5`). Raumfreund itself is GPL-3.0-only. All
-listed licenses are permissive (BSD-3-Clause, Apache-2.0, CC-BY-4.0 for the
-Material Icons font) and compatible with
+This is the inventory of third-party software in Raumfreund `0.6.32+77`
+(Flutter `3.47.7`, Dart `3.13.5`). Raumfreund itself is GPL-3.0-only. All
+listed licenses are permissive (BSD-3-Clause, Apache-2.0, MIT for the
+`yaml` package, CC-BY-4.0 for the Material Icons font) and compatible with
 distribution under GPLv3 (see [GPL compatibility](#gpl-compatibility)).
 
 How it was determined (so it can be reproduced and re-checked):
@@ -24,8 +24,8 @@ How it was determined (so it can be reproduced and re-checked):
   Gradle Plugin generates for the release variant
   (`build/app/outputs/sdk-dependencies/release/`) and from the APK's
   `META-INF/*.version` files. Their licenses (Apache-2.0 for AndroidX, Kotlin,
-  kotlinx.coroutines, Okio, JetBrains annotations, Guava `listenablefuture`,
-  ReLinker, JSpecify; BSD-3-Clause for the Flutter embedding) are the
+  kotlinx.coroutines, kotlinx.serialization, Okio, JetBrains annotations,
+  Guava `listenablefuture`, ReLinker, JSpecify; BSD-3-Clause for the Flutter embedding) are the
   publicly documented licenses of those artifacts and were **not** re-verified
   from the POM/jar files in this pass.
 - The inventory must be regenerated whenever `pubspec.lock`, the Flutter pin
@@ -43,11 +43,11 @@ Only `dependencies` (and their transitive closure) are part of the app; the
 
 | Component | Version | License | Source |
 | --- | --- | --- | --- |
-| Flutter framework (`flutter`, `flutter_localizations`, `sky_engine`) | 3.47.6 | BSD-3-Clause | [flutter/flutter](https://github.com/flutter/flutter), `LICENSE` of the SDK |
-| Flutter engine (`libflutter.so`, per ABI) | `692136cb6582dbfc5af3fb33c2515a069f2f66d0` | BSD-3-Clause plus bundled third-party code | [flutter/flutter `engine/`](https://github.com/flutter/flutter/tree/3.47.6/engine) |
+| Flutter framework (`flutter`, `flutter_localizations`, `sky_engine`) | 3.47.7 | BSD-3-Clause | [flutter/flutter](https://github.com/flutter/flutter), `LICENSE` of the SDK |
+| Flutter engine (`libflutter.so`, per ABI) | `deb287481e3ce9468f3434937ced4240a70539ca` | BSD-3-Clause plus bundled third-party code | [flutter/flutter `engine/`](https://github.com/flutter/flutter/tree/3.47.7/engine) |
 | Dart runtime (inside `libflutter.so` / `libapp.so`) | 3.13.5 | BSD-3-Clause | [dart-lang/sdk](https://github.com/dart-lang/sdk) |
-| Material Icons font (`MaterialIcons-Regular.otf`) | bundled with Flutter 3.47.6 | CC-BY-4.0 (the licence file the SDK ships with the font) | `bin/cache/artifacts/material_fonts/MaterialIcons_LICENSE.txt` in the SDK |
-| Fragment shaders `ink_sparkle.frag`, `stretch_effect.frag` | bundled with Flutter 3.47.6 | BSD-3-Clause | Flutter SDK |
+| Material Icons font (`MaterialIcons-Regular.otf`) | bundled with Flutter 3.47.7 | CC-BY-4.0 (the licence file the SDK ships with the font) | `bin/cache/artifacts/material_fonts/MaterialIcons_LICENSE.txt` in the SDK |
+| Fragment shaders `ink_sparkle.frag`, `stretch_effect.frag` | bundled with Flutter 3.47.7 | BSD-3-Clause | Flutter SDK |
 
 The engine statically bundles further third-party code (Skia, ICU, FreeType,
 HarfBuzz, libpng, libjpeg-turbo, libwebp, zlib, BoringSSL, Impeller
@@ -78,88 +78,90 @@ means pub resolves it because `shared_preferences` or `flutter` lists
 platform implementations for other platforms (iOS, Linux, Windows, Web), but
 it is not used by an Android build. They are listed anyway because Flutter
 still includes their notices in `NOTICES.Z` and the conservative reading is
-to treat them as part of the distribution.
+to treat them as part of the distribution. "graph only (build hook)" marks
+packages that only the build hook of `objective_c` (the iOS/macOS
+implementation of `shared_preferences`) uses while Flutter assembles the
+build; they are not compiled into the app.
+
+Since `shared_preferences_android` 2.5.0 the plugin talks to Android through
+`jni` (Pigeon JNI). `jni` builds the native library `libdartjni.so` for every
+ABI from its own C sources (BSD-3-Clause) and the JNI header of the Android
+Open Source Project it bundles (`third_party/jni.h`, Apache-2.0).
 
 | Package | Version | License | Source | In Android build |
 | --- | --- | --- | --- | --- |
+| `args` | 2.7.0 | BSD-3-Clause | [pub.dev/packages/args](https://pub.dev/packages/args/versions/2.7.0) | graph only |
 | `characters` | 1.4.1 | BSD-3-Clause | [pub.dev/packages/characters](https://pub.dev/packages/characters/versions/1.4.1) | compiled |
 | `clock` | 1.1.3 | Apache-2.0 | [pub.dev/packages/clock](https://pub.dev/packages/clock/versions/1.1.3) | compiled |
+| `code_assets` | 2.1.0 | BSD-3-Clause | [pub.dev/packages/code_assets](https://pub.dev/packages/code_assets/versions/2.1.0) | graph only (build hook) |
 | `collection` | 1.19.1 | BSD-3-Clause | [pub.dev/packages/collection](https://pub.dev/packages/collection/versions/1.19.1) | compiled |
-| `ffi` | 2.2.0 | BSD-3-Clause | [pub.dev/packages/ffi](https://pub.dev/packages/ffi/versions/2.2.0) | graph only |
+| `crypto` | 3.0.7 | BSD-3-Clause | [pub.dev/packages/crypto](https://pub.dev/packages/crypto/versions/3.0.7) | graph only (build hook) |
+| `ffi` | 2.2.0 | BSD-3-Clause | [pub.dev/packages/ffi](https://pub.dev/packages/ffi/versions/2.2.0) | compiled |
 | `file` | 7.0.1 | BSD-3-Clause | [pub.dev/packages/file](https://pub.dev/packages/file/versions/7.0.1) | graph only |
 | `flutter_web_plugins` | 0.0.0 | BSD-3-Clause | Flutter SDK (`sdk: flutter`) | graph only |
+| `hooks` | 2.2.0 | BSD-3-Clause | [pub.dev/packages/hooks](https://pub.dev/packages/hooks/versions/2.2.0) | graph only (build hook) |
+| `jni` | 1.1.0 | BSD-3-Clause | [pub.dev/packages/jni](https://pub.dev/packages/jni/versions/1.1.0) | compiled |
+| `jni_util` | 1.0.0 | BSD-3-Clause | [pub.dev/packages/jni_util](https://pub.dev/packages/jni_util/versions/1.0.0) | compiled |
+| `logging` | 1.3.0 | BSD-3-Clause | [pub.dev/packages/logging](https://pub.dev/packages/logging/versions/1.3.0) | graph only (build hook) |
 | `material_color_utilities` | 0.13.0 | Apache-2.0 | [pub.dev/packages/material_color_utilities](https://pub.dev/packages/material_color_utilities/versions/0.13.0) | compiled |
 | `meta` | 1.19.0 | BSD-3-Clause | [pub.dev/packages/meta](https://pub.dev/packages/meta/versions/1.19.0) | compiled |
+| `objective_c` | 9.6.2 | BSD-3-Clause | [pub.dev/packages/objective_c](https://pub.dev/packages/objective_c/versions/9.6.2) | graph only |
+| `package_config` | 3.0.0 | BSD-3-Clause | [pub.dev/packages/package_config](https://pub.dev/packages/package_config/versions/3.0.0) | graph only |
 | `path` | 1.9.1 | BSD-3-Clause | [pub.dev/packages/path](https://pub.dev/packages/path/versions/1.9.1) | compiled |
 | `path_provider_linux` | 2.2.2 | BSD-3-Clause | [pub.dev/packages/path_provider_linux](https://pub.dev/packages/path_provider_linux/versions/2.2.2) | graph only |
 | `path_provider_platform_interface` | 2.1.3 | BSD-3-Clause | [pub.dev/packages/path_provider_platform_interface](https://pub.dev/packages/path_provider_platform_interface/versions/2.1.3) | graph only |
 | `path_provider_windows` | 2.3.0 | BSD-3-Clause | [pub.dev/packages/path_provider_windows](https://pub.dev/packages/path_provider_windows/versions/2.3.0) | graph only |
 | `platform` | 3.2.0 | BSD-3-Clause | [pub.dev/packages/platform](https://pub.dev/packages/platform/versions/3.2.0) | graph only |
 | `plugin_platform_interface` | 2.1.8 | BSD-3-Clause | [pub.dev/packages/plugin_platform_interface](https://pub.dev/packages/plugin_platform_interface/versions/2.1.8) | compiled |
-| `shared_preferences_android` | 2.4.28 | BSD-3-Clause | [pub.dev/packages/shared_preferences_android](https://pub.dev/packages/shared_preferences_android/versions/2.4.28) | compiled |
-| `shared_preferences_foundation` | 2.5.7 | BSD-3-Clause | [pub.dev/packages/shared_preferences_foundation](https://pub.dev/packages/shared_preferences_foundation/versions/2.5.7) | graph only |
+| `pub_semver` | 2.2.1 | BSD-3-Clause | [pub.dev/packages/pub_semver](https://pub.dev/packages/pub_semver/versions/2.2.1) | graph only (build hook) |
+| `record_use` | 1.1.1 | BSD-3-Clause | [pub.dev/packages/record_use](https://pub.dev/packages/record_use/versions/1.1.1) | graph only (build hook) |
+| `shared_preferences_android` | 2.5.1 | BSD-3-Clause | [pub.dev/packages/shared_preferences_android](https://pub.dev/packages/shared_preferences_android/versions/2.5.1) | compiled |
+| `shared_preferences_foundation` | 2.6.0 | BSD-3-Clause | [pub.dev/packages/shared_preferences_foundation](https://pub.dev/packages/shared_preferences_foundation/versions/2.6.0) | graph only |
 | `shared_preferences_linux` | 2.4.1 | BSD-3-Clause | [pub.dev/packages/shared_preferences_linux](https://pub.dev/packages/shared_preferences_linux/versions/2.4.1) | graph only |
 | `shared_preferences_platform_interface` | 2.4.2 | BSD-3-Clause | [pub.dev/packages/shared_preferences_platform_interface](https://pub.dev/packages/shared_preferences_platform_interface/versions/2.4.2) | compiled |
 | `shared_preferences_web` | 2.4.3 | BSD-3-Clause | [pub.dev/packages/shared_preferences_web](https://pub.dev/packages/shared_preferences_web/versions/2.4.3) | graph only |
 | `shared_preferences_windows` | 2.4.1 | BSD-3-Clause | [pub.dev/packages/shared_preferences_windows](https://pub.dev/packages/shared_preferences_windows/versions/2.4.1) | graph only |
 | `sky_engine` | 0.0.0 | BSD-3-Clause | Flutter SDK (`sdk: flutter`) | compiled |
+| `source_span` | 1.10.2 | BSD-3-Clause | [pub.dev/packages/source_span](https://pub.dev/packages/source_span/versions/1.10.2) | graph only (build hook) |
+| `string_scanner` | 1.4.1 | BSD-3-Clause | [pub.dev/packages/string_scanner](https://pub.dev/packages/string_scanner/versions/1.4.1) | graph only (build hook) |
+| `term_glyph` | 1.2.2 | BSD-3-Clause | [pub.dev/packages/term_glyph](https://pub.dev/packages/term_glyph/versions/1.2.2) | graph only (build hook) |
+| `typed_data` | 1.4.0 | BSD-3-Clause | [pub.dev/packages/typed_data](https://pub.dev/packages/typed_data/versions/1.4.0) | graph only (build hook) |
 | `vector_math` | 2.4.3 | BSD-3-Clause | [pub.dev/packages/vector_math](https://pub.dev/packages/vector_math/versions/2.4.3) | compiled |
 | `web` | 1.1.1 | BSD-3-Clause | [pub.dev/packages/web](https://pub.dev/packages/web/versions/1.1.1) | graph only |
 | `xdg_directories` | 1.1.0 | BSD-3-Clause | [pub.dev/packages/xdg_directories](https://pub.dev/packages/xdg_directories/versions/1.1.0) | graph only |
+| `yaml` | 3.1.4 | MIT | [pub.dev/packages/yaml](https://pub.dev/packages/yaml/versions/3.1.4) | graph only (build hook) |
 
 ### Android and Gradle libraries (main, ships)
 
-Resolved release runtime dependencies of the Android app (88 artifacts), from
+Resolved release runtime dependencies of the Android app (89 artifacts), from
 the AGP SDK dependency report. The main sources are the Flutter
 embedding and engine (`io.flutter`) and the `shared_preferences_android`
-plugin (AndroidX DataStore 1.1.7, AndroidX Preference 1.2.1); the Kotlin
+plugin (AndroidX DataStore 1.2.1, AndroidX Preference 1.2.1); the Kotlin
 standard library and everything else is pulled in transitively.
 
 | Group | Artifact | Version | License | Source |
 | --- | --- | --- | --- | --- |
 | `org.jetbrains.kotlin` | `kotlin-stdlib` | 2.4.21 | Apache-2.0 | Maven Central |
 | `org.jetbrains` | `annotations` | 23.0.0 | Apache-2.0 | Maven Central |
-| `org.jetbrains.kotlin` | `kotlin-stdlib-jdk8` | 1.8.20 | Apache-2.0 | Maven Central |
-| `org.jetbrains.kotlin` | `kotlin-stdlib-jdk7` | 1.8.20 | Apache-2.0 | Maven Central |
-| `io.flutter` | `armeabi_v7a_release` | 1.0.0-692136cb6582dbfc5af3fb33c2515a069f2f66d0 | BSD-3-Clause | Flutter engine Maven repository |
-| `io.flutter` | `arm64_v8a_release` | 1.0.0-692136cb6582dbfc5af3fb33c2515a069f2f66d0 | BSD-3-Clause | Flutter engine Maven repository |
-| `io.flutter` | `x86_64_release` | 1.0.0-692136cb6582dbfc5af3fb33c2515a069f2f66d0 | BSD-3-Clause | Flutter engine Maven repository |
-| `androidx.datastore` | `datastore` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.datastore` | `datastore-android` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.annotation` | `annotation` | 1.8.1 | Apache-2.0 | Google Maven |
-| `androidx.annotation` | `annotation-jvm` | 1.8.1 | Apache-2.0 | Google Maven |
-| `androidx.datastore` | `datastore-core` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.datastore` | `datastore-core-android` | 1.1.7 | Apache-2.0 | Google Maven |
-| `org.jetbrains.kotlin` | `kotlin-parcelize-runtime` | 1.9.22 | Apache-2.0 | Maven Central |
-| `org.jetbrains.kotlin` | `kotlin-android-extensions-runtime` | 1.9.22 | Apache-2.0 | Maven Central |
-| `org.jetbrains.kotlinx` | `kotlinx-coroutines-core` | 1.7.3 | Apache-2.0 | Maven Central |
-| `org.jetbrains.kotlinx` | `kotlinx-coroutines-core-jvm` | 1.7.3 | Apache-2.0 | Maven Central |
-| `org.jetbrains.kotlinx` | `kotlinx-coroutines-bom` | 1.7.3 | Apache-2.0 | Maven Central |
-| `org.jetbrains.kotlinx` | `kotlinx-coroutines-android` | 1.7.3 | Apache-2.0 | Maven Central |
-| `androidx.datastore` | `datastore-core-okio` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.datastore` | `datastore-core-okio-jvm` | 1.1.7 | Apache-2.0 | Google Maven |
-| `com.squareup.okio` | `okio` | 3.4.0 | Apache-2.0 | Maven Central |
-| `com.squareup.okio` | `okio-jvm` | 3.4.0 | Apache-2.0 | Maven Central |
-| `androidx.datastore` | `datastore-preferences` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.datastore` | `datastore-preferences-android` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.datastore` | `datastore-preferences-core` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.datastore` | `datastore-preferences-core-android` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.datastore` | `datastore-preferences-proto` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.datastore` | `datastore-preferences-external-protobuf` | 1.1.7 | Apache-2.0 | Google Maven |
-| `androidx.preference` | `preference` | 1.2.1 | Apache-2.0 | Google Maven |
-| `androidx.appcompat` | `appcompat` | 1.1.0 | Apache-2.0 | Google Maven |
-| `androidx.core` | `core` | 1.13.1 | Apache-2.0 | Google Maven |
-| `androidx.annotation` | `annotation-experimental` | 1.4.0 | Apache-2.0 | Google Maven |
-| `androidx.collection` | `collection` | 1.1.0 | Apache-2.0 | Google Maven |
-| `androidx.concurrent` | `concurrent-futures` | 1.1.0 | Apache-2.0 | Google Maven |
-| `com.google.guava` | `listenablefuture` | 1.0 | Apache-2.0 | Maven Central |
-| `androidx.interpolator` | `interpolator` | 1.0.0 | Apache-2.0 | Google Maven |
+| `io.flutter` | `armeabi_v7a_release` | 1.0.0-deb287481e3ce9468f3434937ced4240a70539ca | BSD-3-Clause | Flutter engine Maven repository |
+| `io.flutter` | `arm64_v8a_release` | 1.0.0-deb287481e3ce9468f3434937ced4240a70539ca | BSD-3-Clause | Flutter engine Maven repository |
+| `io.flutter` | `x86_64_release` | 1.0.0-deb287481e3ce9468f3434937ced4240a70539ca | BSD-3-Clause | Flutter engine Maven repository |
+| `io.flutter` | `flutter_embedding_release` | 1.0.0-deb287481e3ce9468f3434937ced4240a70539ca | BSD-3-Clause | Flutter engine Maven repository |
+| `androidx.lifecycle` | `lifecycle-common` | 2.7.0 | Apache-2.0 | Google Maven |
+| `androidx.annotation` | `annotation` | 1.9.1 | Apache-2.0 | Google Maven |
+| `androidx.annotation` | `annotation-jvm` | 1.9.1 | Apache-2.0 | Google Maven |
+| `org.jetbrains.kotlinx` | `kotlinx-coroutines-android` | 1.9.0 | Apache-2.0 | Maven Central |
+| `org.jetbrains.kotlinx` | `kotlinx-coroutines-core` | 1.9.0 | Apache-2.0 | Maven Central |
+| `org.jetbrains.kotlinx` | `kotlinx-coroutines-core-jvm` | 1.9.0 | Apache-2.0 | Maven Central |
+| `org.jetbrains.kotlinx` | `kotlinx-coroutines-bom` | 1.9.0 | Apache-2.0 | Maven Central |
+| `androidx.lifecycle` | `lifecycle-common-java8` | 2.7.0 | Apache-2.0 | Google Maven |
+| `androidx.lifecycle` | `lifecycle-process` | 2.7.0 | Apache-2.0 | Google Maven |
 | `androidx.lifecycle` | `lifecycle-runtime` | 2.7.0 | Apache-2.0 | Google Maven |
 | `androidx.arch.core` | `core-common` | 2.2.0 | Apache-2.0 | Google Maven |
 | `androidx.arch.core` | `core-runtime` | 2.2.0 | Apache-2.0 | Google Maven |
-| `androidx.lifecycle` | `lifecycle-common` | 2.7.0 | Apache-2.0 | Google Maven |
-| `androidx.lifecycle` | `lifecycle-common-java8` | 2.7.0 | Apache-2.0 | Google Maven |
-| `androidx.lifecycle` | `lifecycle-process` | 2.7.0 | Apache-2.0 | Google Maven |
+| `androidx.profileinstaller` | `profileinstaller` | 1.3.1 | Apache-2.0 | Google Maven |
+| `androidx.concurrent` | `concurrent-futures` | 1.1.0 | Apache-2.0 | Google Maven |
+| `com.google.guava` | `listenablefuture` | 1.0 | Apache-2.0 | Maven Central |
 | `androidx.startup` | `startup-runtime` | 1.1.1 | Apache-2.0 | Google Maven |
 | `androidx.tracing` | `tracing` | 1.2.0 | Apache-2.0 | Google Maven |
 | `androidx.lifecycle` | `lifecycle-livedata-core` | 2.7.0 | Apache-2.0 | Google Maven |
@@ -170,11 +172,13 @@ standard library and everything else is pulled in transitively.
 | `androidx.lifecycle` | `lifecycle-viewmodel-ktx` | 2.7.0 | Apache-2.0 | Google Maven |
 | `androidx.lifecycle` | `lifecycle-viewmodel-savedstate` | 2.7.0 | Apache-2.0 | Google Maven |
 | `androidx.core` | `core-ktx` | 1.13.1 | Apache-2.0 | Google Maven |
+| `androidx.core` | `core` | 1.13.1 | Apache-2.0 | Google Maven |
+| `androidx.annotation` | `annotation-experimental` | 1.4.0 | Apache-2.0 | Google Maven |
+| `androidx.collection` | `collection` | 1.1.0 | Apache-2.0 | Google Maven |
+| `androidx.interpolator` | `interpolator` | 1.0.0 | Apache-2.0 | Google Maven |
+| `androidx.versionedparcelable` | `versionedparcelable` | 1.1.1 | Apache-2.0 | Google Maven |
 | `androidx.savedstate` | `savedstate` | 1.2.1 | Apache-2.0 | Google Maven |
 | `androidx.savedstate` | `savedstate-ktx` | 1.2.1 | Apache-2.0 | Google Maven |
-| `androidx.profileinstaller` | `profileinstaller` | 1.3.1 | Apache-2.0 | Google Maven |
-| `androidx.versionedparcelable` | `versionedparcelable` | 1.1.1 | Apache-2.0 | Google Maven |
-| `androidx.cursoradapter` | `cursoradapter` | 1.0.0 | Apache-2.0 | Google Maven |
 | `androidx.fragment` | `fragment` | 1.7.1 | Apache-2.0 | Google Maven |
 | `androidx.activity` | `activity` | 1.8.1 | Apache-2.0 | Google Maven |
 | `androidx.activity` | `activity-ktx` | 1.8.1 | Apache-2.0 | Google Maven |
@@ -183,6 +187,34 @@ standard library and everything else is pulled in transitively.
 | `androidx.customview` | `customview` | 1.1.0 | Apache-2.0 | Google Maven |
 | `androidx.fragment` | `fragment-ktx` | 1.7.1 | Apache-2.0 | Google Maven |
 | `androidx.collection` | `collection-ktx` | 1.1.0 | Apache-2.0 | Google Maven |
+| `androidx.window` | `window-java` | 1.2.0 | Apache-2.0 | Google Maven |
+| `androidx.window` | `window` | 1.2.0 | Apache-2.0 | Google Maven |
+| `androidx.window.extensions.core` | `core` | 1.0.0 | Apache-2.0 | Google Maven |
+| `com.getkeepsafe.relinker` | `relinker` | 1.4.5 | Apache-2.0 | Maven Central |
+| `androidx.exifinterface` | `exifinterface` | 1.4.1 | Apache-2.0 | Google Maven |
+| `org.jspecify` | `jspecify` | 1.0.0 | Apache-2.0 | Maven Central |
+| `androidx.datastore` | `datastore` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-android` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-core` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-core-android` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-core-okio` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-core-okio-jvm` | 1.2.1 | Apache-2.0 | Google Maven |
+| `com.squareup.okio` | `okio` | 3.9.1 | Apache-2.0 | Maven Central |
+| `com.squareup.okio` | `okio-jvm` | 3.9.1 | Apache-2.0 | Maven Central |
+| `org.jetbrains.kotlinx` | `kotlinx-serialization-json` | 1.7.3 | Apache-2.0 | Maven Central |
+| `org.jetbrains.kotlinx` | `kotlinx-serialization-json-jvm` | 1.7.3 | Apache-2.0 | Maven Central |
+| `org.jetbrains.kotlinx` | `kotlinx-serialization-bom` | 1.7.3 | Apache-2.0 | Maven Central |
+| `org.jetbrains.kotlinx` | `kotlinx-serialization-core` | 1.7.3 | Apache-2.0 | Maven Central |
+| `org.jetbrains.kotlinx` | `kotlinx-serialization-core-jvm` | 1.7.3 | Apache-2.0 | Maven Central |
+| `androidx.datastore` | `datastore-preferences` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-preferences-android` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-preferences-core` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-preferences-core-android` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-preferences-proto` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.datastore` | `datastore-preferences-external-protobuf` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.preference` | `preference` | 1.2.1 | Apache-2.0 | Google Maven |
+| `androidx.appcompat` | `appcompat` | 1.1.0 | Apache-2.0 | Google Maven |
+| `androidx.cursoradapter` | `cursoradapter` | 1.0.0 | Apache-2.0 | Google Maven |
 | `androidx.appcompat` | `appcompat-resources` | 1.1.0 | Apache-2.0 | Google Maven |
 | `androidx.vectordrawable` | `vectordrawable` | 1.1.0 | Apache-2.0 | Google Maven |
 | `androidx.vectordrawable` | `vectordrawable-animated` | 1.1.0 | Apache-2.0 | Google Maven |
@@ -195,16 +227,9 @@ standard library and everything else is pulled in transitively.
 | `androidx.print` | `print` | 1.0.0 | Apache-2.0 | Google Maven |
 | `androidx.coordinatorlayout` | `coordinatorlayout` | 1.0.0 | Apache-2.0 | Google Maven |
 | `androidx.slidingpanelayout` | `slidingpanelayout` | 1.2.0 | Apache-2.0 | Google Maven |
-| `androidx.window` | `window` | 1.2.0 | Apache-2.0 | Google Maven |
-| `androidx.window.extensions.core` | `core` | 1.0.0 | Apache-2.0 | Google Maven |
-| `androidx.window` | `window-java` | 1.2.0 | Apache-2.0 | Google Maven |
 | `androidx.transition` | `transition` | 1.4.1 | Apache-2.0 | Google Maven |
 | `androidx.swiperefreshlayout` | `swiperefreshlayout` | 1.0.0 | Apache-2.0 | Google Maven |
 | `androidx.asynclayoutinflater` | `asynclayoutinflater` | 1.0.0 | Apache-2.0 | Google Maven |
-| `io.flutter` | `flutter_embedding_release` | 1.0.0-692136cb6582dbfc5af3fb33c2515a069f2f66d0 | BSD-3-Clause | Flutter engine Maven repository |
-| `com.getkeepsafe.relinker` | `relinker` | 1.4.5 | Apache-2.0 | Maven Central |
-| `androidx.exifinterface` | `exifinterface` | 1.4.1 | Apache-2.0 | Google Maven |
-| `org.jspecify` | `jspecify` | 1.0.0 | Apache-2.0 | Maven Central |
 
 The `android/` build files themselves declare only `junit:junit:4.13.2`
 (`testImplementation`, not shipped). The pinned plugin versions are Android
@@ -228,13 +253,10 @@ These are in `pubspec.lock` but are not compiled into the app.
 | `leak_tracker_testing` | 3.0.2 | BSD-3-Clause | [pub.dev/packages/leak_tracker_testing](https://pub.dev/packages/leak_tracker_testing/versions/3.0.2) |
 | `lints` | 6.1.0 | BSD-3-Clause | [pub.dev/packages/lints](https://pub.dev/packages/lints/versions/6.1.0) |
 | `matcher` | 0.12.20 | BSD-3-Clause | [pub.dev/packages/matcher](https://pub.dev/packages/matcher/versions/0.12.20) |
-| `source_span` | 1.10.2 | BSD-3-Clause | [pub.dev/packages/source_span](https://pub.dev/packages/source_span/versions/1.10.2) |
 | `stack_trace` | 1.12.2 | BSD-3-Clause | [pub.dev/packages/stack_trace](https://pub.dev/packages/stack_trace/versions/1.12.2) |
 | `stream_channel` | 2.1.4 | BSD-3-Clause | [pub.dev/packages/stream_channel](https://pub.dev/packages/stream_channel/versions/2.1.4) |
-| `string_scanner` | 1.4.1 | BSD-3-Clause | [pub.dev/packages/string_scanner](https://pub.dev/packages/string_scanner/versions/1.4.1) |
-| `term_glyph` | 1.2.2 | BSD-3-Clause | [pub.dev/packages/term_glyph](https://pub.dev/packages/term_glyph/versions/1.2.2) |
 | `test_api` | 0.7.12 | BSD-3-Clause | [pub.dev/packages/test_api](https://pub.dev/packages/test_api/versions/0.7.12) |
-| `vm_service` | 15.3.0 | BSD-3-Clause | [pub.dev/packages/vm_service](https://pub.dev/packages/vm_service/versions/15.3.0) |
+| `vm_service` | 15.4.0 | BSD-3-Clause | [pub.dev/packages/vm_service](https://pub.dev/packages/vm_service/versions/15.4.0) |
 
 Note that Flutter's `NOTICES.Z` in the inspected build also contains notices
 for several of these packages (for example `flutter_lints`, `leak_tracker`,
@@ -246,7 +268,7 @@ strictly ships.
 
 | Tool | Version | License | Where pinned |
 | --- | --- | --- | --- |
-| Flutter SDK / Dart SDK | 3.47.6 / 3.13.5 | BSD-3-Clause | `.flutter-version`, `.flutter-sha256` |
+| Flutter SDK / Dart SDK | 3.47.7 / 3.13.5 | BSD-3-Clause | `.flutter-version`, `.flutter-sha256` |
 | Gradle (wrapper) | 9.8.1 | Apache-2.0 | `android/gradle/wrapper/gradle-wrapper.properties` |
 | Android Gradle Plugin | 9.1.0 | Apache-2.0 | `android/settings.gradle.kts` |
 | Kotlin Gradle plugin and compiler | 2.4.21 | Apache-2.0 | `android/settings.gradle.kts` |
@@ -273,8 +295,9 @@ GPL legalese. Flutter's `LicenseRegistry` is fed from the bundled
 - the app itself (`raumfreund`).
 
 `NOTICES.Z` does not contain the native Android libraries (AndroidX, Kotlin
-stdlib, kotlinx.coroutines, Okio, JetBrains annotations, Guava
-`listenablefuture`, ReLinker, JSpecify) or the Material Icons font licence.
+stdlib, kotlinx.coroutines, kotlinx.serialization, Okio, JetBrains
+annotations, Guava `listenablefuture`, ReLinker, JSpecify), the AOSP JNI
+header compiled into `libdartjni.so`, or the Material Icons font licence.
 `lib/app/native_licenses.dart` therefore registers two extra
 `LicenseRegistry` entries at start-up: the Apache License 2.0
 (`assets/licenses/apache-2.0.txt`, satisfying section 4(a)) for those
@@ -286,11 +309,11 @@ together with the Android table above.
 
 - CC-BY-4.0 (Material Icons font) is compatible with GPLv3 according to the
   FSF; its attribution is shown on the licence page.
-- BSD-3-Clause and the other permissive licenses of the Dart packages and the
-  Flutter engine are compatible with GPL-3.0-only.
+- BSD-3-Clause, MIT (`yaml`) and the other permissive licenses of the Dart
+  packages and the Flutter engine are compatible with GPL-3.0-only.
 - Apache-2.0 is compatible with GPLv3 (but not GPLv2-only; the app is GPLv3).
-  This covers AndroidX, Kotlin, kotlinx.coroutines, Okio and the other
-  Apache-2.0 components.
+  This covers AndroidX, Kotlin, kotlinx.coroutines, kotlinx.serialization,
+  Okio, the AOSP JNI header and the other Apache-2.0 components.
 - The Android build toolchain (JDK under GPL-2.0 with Classpath Exception,
   Gradle, AGP) is not distributed in the APK, so it imposes no
   redistribution obligations on the app.

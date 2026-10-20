@@ -48,7 +48,7 @@ tools=(
 	"shfmt|3.14.1|bin|${gh}/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_linux_amd64|76e77641faa025814b77f153b29796b8e6fa2fca03e0c76a691608b86c7ea7bf"
 	"actionlint|1.7.12|tgz|${gh}/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz|8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
 	"gitleaks|8.30.1|tgz|${gh}/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz|551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
-	"osv-scanner|2.6.0|bin|${gh}/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64|ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108"
+	"osv-scanner|2.7.0|bin|${gh}/google/osv-scanner/releases/download/v2.7.0/osv-scanner_linux_amd64|160c6253e2922e9e0a6a9771c5c4c40a4b3c6090b34a3cdd5e80c96cc2e4218b"
 	"ktlint|1.8.0|bin|${gh}/ktlint/ktlint/releases/download/1.8.0/ktlint|a3fd620207d5c40da6ca789b95e7f823c54e854b7fade7f613e91096a3706d75"
 	"detekt|1.23.8|jar|${maven}/io/gitlab/arturbosch/detekt/detekt-cli/1.23.8/detekt-cli-1.23.8-all.jar|3afe89a11120303c73c9bdda3d8fe558dd9070a6937d27819ddc04b275381245"
 )

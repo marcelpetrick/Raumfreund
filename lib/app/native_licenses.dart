@@ -21,11 +21,14 @@ const List<String> androidLibraryPackages = [
   'AndroidX',
   'Kotlin Standard Library',
   'kotlinx.coroutines',
+  'kotlinx.serialization',
   'Okio',
   'JetBrains Java Annotations',
   'Guava ListenableFuture',
   'ReLinker',
   'JSpecify',
+  // JNI header that the `jni` package compiles into libdartjni.so.
+  'Android Open Source Project JNI header',
 ];
 
 /// Licence entries for bundled native code and fonts that Flutter's

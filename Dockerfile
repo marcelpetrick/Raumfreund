@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.27.1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+# syntax=docker/dockerfile:1.28.0@sha256:bb22d9815c728170f72750f4e5b0d672e06176142e1d602c7e66c050100b7e5b
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 #
@@ -6,7 +6,8 @@
 #
 # Stages:
 #   toolchain  pinned JDK 21, Android SDK (cmdline-tools 23.0, platform 36,
-#              build-tools 36.0.0, NDK 28.2) and Flutter (.flutter-version)
+#              build-tools 36.0.0, NDK 28.2, CMake 3.22.1) and Flutter
+#              (.flutter-version)
 #   build      runs the Dart quality gates (format, analyze, tests, coverage)
 #              and builds the release APK via tool/build_apk.sh
 #   runtime    unprivileged nginx serving a download page + APK on port 8080
@@ -17,7 +18,7 @@
 # "keystore" (see docs/releasing.md); without it the APK is debug-signed and
 # named *-debugsigned.apk.
 
-FROM eclipse-temurin:21-jdk-noble@sha256:b468c3fc688b14450571494f588bd939378e7fd542ed5a73f8efc13f17872a87 AS toolchain
+FROM eclipse-temurin:21-jdk-noble@sha256:107215954359f1ab0be058a247d7c64ed6e69c71c1682d471d38ef751ec8e964 AS toolchain
 
 ARG ANDROID_CMDLINE_TOOLS_BUILD=16111833
 ARG ANDROID_CMDLINE_TOOLS_SHA256=0877a1d048fe4a24efe2eff536ca4223f7adeb58648bb81909d33c446918cfa8
@@ -42,6 +43,11 @@ RUN curl -sSfL -o /tmp/tools.zip \
     && yes | sdkmanager --licenses >/dev/null \
     && sdkmanager --install "platforms;android-36" "build-tools;36.0.0" \
         "ndk;28.2.13676358" >/dev/null
+
+# The jni package (used by shared_preferences_android) builds libdartjni.so
+# with the default CMake of AGP 9.1 (3.22.1); installed here so the Gradle
+# build does not fetch it on every image build.
+RUN sdkmanager --install "cmake;3.22.1" >/dev/null
 
 WORKDIR /src
 COPY .flutter-version .flutter-sha256 ./
@@ -69,7 +75,7 @@ RUN --mount=type=cache,target=/root/.gradle \
     && rm -f android/key.properties android/upload-keystore.jks \
     && docker/render_index.sh dist docker/index.html.template dist/index.html
 
-FROM nginxinc/nginx-unprivileged:1-alpine@sha256:b9241c6e7b8e9a862f129d8d4199ab64b10390949a78bdd5603379b32c844083 AS runtime
+FROM nginxinc/nginx-unprivileged:1-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e AS runtime
 ARG GIT_COMMIT=unknown
 LABEL org.opencontainers.image.title="Raumfreund" \
       org.opencontainers.image.description="Raumfreund Android APK download server (friendly noise traffic light)" \
