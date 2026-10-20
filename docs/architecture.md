@@ -94,8 +94,9 @@ raw levels through the zone hysteresis only. Exact measurement semantics live in
 ## Measurement session lifecycle
 
 The application controller exposes explicit states equivalent to stopped,
-permission pending, starting, measuring, stopping and error. One increasing
-session id is allocated for each start attempt that reaches native recording.
+permission pending, starting, measuring, stopping, error and sleeping (paused
+in the background, ADR 0005). One increasing session id is allocated for each
+start attempt that reaches native recording.
 Events whose id differs from the active id are ignored.
 
 A start command is serialized so rapid taps cannot create parallel recorders.

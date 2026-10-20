@@ -39,8 +39,9 @@ release workflow. A public production release additionally requires the
 owner's Android signing secrets and physical-device acceptance evidence. The
 living status and external blockers are in [`plan.md`](plan.md).
 
-The coverage badge reports the latest measured first-party Dart result; 95% is
-the enforced minimum. It is not a claim that every platform path or product
+The coverage badge shows the enforced minimum of 95% line coverage for the
+first-party Dart code; `./localPipeline.sh` prints the measured value (99.97%
+at `0.7.3`). Neither is a claim that every platform path or product
 requirement is already covered. Real microphone and lifecycle tests on two
 Android devices remain mandatory before a production release.
 

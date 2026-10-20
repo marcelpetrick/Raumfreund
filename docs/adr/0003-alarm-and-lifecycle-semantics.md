@@ -22,7 +22,8 @@ create duplicate recorders, early alarms or a self-triggering loop.
 
 The application controller is the single owner of a measurement session. It
 serializes transitions and exposes explicit stopped, permission-pending,
-starting, measuring, stopping and error states. Each native recording receives
+starting, measuring, stopping and error states (plus `sleeping` since
+ADR 0005). Each native recording receives
 a monotonically increasing session id; every callback checks both controller
 state and id before changing state.
 

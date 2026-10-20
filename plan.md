@@ -45,6 +45,11 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   from `2384ae8` to `0ee855f` because of the venv Python, fixed in CI2, and
   on `0d6f6b2` because a markdown-it advisory appeared between the local
   run and CI, fixed in `1739d07`).
+- [x] A fresh `git clone` of `9a40b8b` passes `./localPipeline.sh` as the
+  README describes (2026-10-20, all 21 steps, 577 tests, 99.97 % line
+  coverage, Docker check included). The clone downloaded its own Flutter
+  SDK and project tools; the host's Android SDK, Gradle, pub and Docker
+  caches already existed.
 - [x] Dependabot PRs #1–#3 and #6 are closed; the pinned tooling was updated
   by hand.
 - [x] Debug release `debug-v0.1.2-build14` is GitHub's latest release. Its APK

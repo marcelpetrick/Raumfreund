@@ -85,3 +85,4 @@ these lines (see docs/releasing.md).
 * v0.7.1 renders README screenshots of every monitor state, including Mia sleeping and waking up, with tool/render_screenshots.sh
 * v0.7.2 records the debug-v0.7.1-build80 release
 * v0.7.3 tests the phone layout, the app wiring of About, settings save, star reset and Android settings, and settings edge cases
+* v0.7.4 records a green fresh-checkout build and lists the sleeping state in the architecture docs
