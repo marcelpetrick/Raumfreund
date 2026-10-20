@@ -44,7 +44,12 @@ the enforced minimum. It is not a claim that every platform path or product
 requirement is already covered. Real microphone and lifecycle tests on two
 Android devices remain mandatory before a production release.
 
-![Raumfreund in green, yellow and red, and Mia hiding after the alarm](docs/screenshots/overview.png)
+![Raumfreund ready, in green, yellow and red, Mia hiding after the alarm, asleep in the background, waking up, and an error](docs/screenshots/overview.png)
+
+Top row: ready, green, yellow, red. Bottom row: Mia hides after the alarm,
+sleeps while the app is in the background, yawns while she wakes up and the
+measurement resumes, and an error with its explanation. The screenshots are
+rendered from the real widgets with `tool/render_screenshots.sh`.
 
 Demo videos (4:5, 1080x1350, under 30 s, for social media): a chronological
 [walkthrough](docs/video/raumfreund_A_story_4x5.mp4) and a

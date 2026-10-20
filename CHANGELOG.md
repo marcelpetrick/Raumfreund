@@ -82,3 +82,4 @@ these lines (see docs/releasing.md).
 * v0.6.32 updates Flutter to 3.47.7, the pub lockfile (shared_preferences_android 2.5.1 now uses jni with a native libdartjni.so), test 1.33.0, ruff 0.17.1, osv-scanner 2.7.0, setup-java v6.1.0, Node 24.22.0, Docker images and npm overrides, and pins CMake 3.22.1 in Docker; license inventory updated
 * v0.6.33 pins markdown-it 14.3.3 in the markdownlint tooling (GHSA-vfgh-jcmw-g37q, dev only)
 * v0.7.0 lets Mia sleep while the app is in the background and wake up on return, when the measurement resumes by itself (issue #7, ADR 0005); nothing records in the background
+* v0.7.1 renders README screenshots of every monitor state, including Mia sleeping and waking up, with tool/render_screenshots.sh
