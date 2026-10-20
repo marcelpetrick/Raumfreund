@@ -83,3 +83,4 @@ these lines (see docs/releasing.md).
 * v0.6.33 pins markdown-it 14.3.3 in the markdownlint tooling (GHSA-vfgh-jcmw-g37q, dev only)
 * v0.7.0 lets Mia sleep while the app is in the background and wake up on return, when the measurement resumes by itself (issue #7, ADR 0005); nothing records in the background
 * v0.7.1 renders README screenshots of every monitor state, including Mia sleeping and waking up, with tool/render_screenshots.sh
+* v0.7.2 records the debug-v0.7.1-build80 release

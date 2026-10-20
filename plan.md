@@ -36,14 +36,17 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   background, Mia sleeps, and on return she wakes up while the measurement
   resumes by itself (owner request, issue #7, ADR 0005).
 
-## Verified state (2026-10-08, `0.6.26+71`)
+## Verified state (2026-10-20, `0.7.2+81`)
 
 - [x] Domain, controller, native `AudioRecord` recorder, platform channels,
-  localized UI, Settings, About, persistence, docs and ADRs 0001–0003 exist.
-- [x] GitHub Actions CI and Docker workflows are green on `85ae64a` (CI was
-  red from `16e84b9` to `0f7529b` because of the JDK pin, fixed in CI1, and
-  from `2384ae8` to `0ee855f` because of the venv Python, fixed in CI2).
-- [x] Dependabot PRs #1–#3 are closed; the pinned tooling was updated by hand.
+  localized UI, Settings, About, persistence, docs and ADRs 0001–0005 exist.
+- [x] GitHub Actions CI and Docker workflows are green on `3f64821` (CI was
+  red from `16e84b9` to `0f7529b` because of the JDK pin, fixed in CI1,
+  from `2384ae8` to `0ee855f` because of the venv Python, fixed in CI2, and
+  on `0d6f6b2` because a markdown-it advisory appeared between the local
+  run and CI, fixed in `1739d07`).
+- [x] Dependabot PRs #1–#3 and #6 are closed; the pinned tooling was updated
+  by hand.
 - [x] Debug release `debug-v0.1.2-build14` is GitHub's latest release. Its APK
   checksum matches, the signature is Android Debug
   (`C5:55:29:…:4F:49`, this machine's debug keystore), it requests only
@@ -110,16 +113,15 @@ Four review rounds with probe tests shaped the rule; details are in
 - Pauses of up to about 2.5 s inside a loud phase count towards the delay.
 - The countdown may wait just above zero until the next loud sample.
 
-### Latest release check (2026-10-07)
+### Latest release check (2026-10-20)
 
-`debug-v0.6.25-build70` (commit `85ae64a`) is GitHub's latest release,
+`debug-v0.7.1-build80` (commit `3f64821`) is GitHub's latest release,
 published with `tool/release_debug.sh` after green local pipeline, CI and
 Docker runs for that exact commit; the downloaded APK matches `SHA256SUMS`.
-It adds the cause-specific error headlines, the retry after a permanent
-denial, the license checks, the noticeable alarm vibration, the demo
-videos and the LinkedIn notes to `debug-v0.6.12-build57`. A production
-`v*` release stays blocked: no production keystore and no signing secrets
-exist (checked 2026-10-08).
+It adds Mia sleeping in the background and waking up measuring (issue #7),
+Flutter 3.47.7 with the dependency update, and screenshots of every state
+to `debug-v0.6.25-build70`. A production `v*` release stays blocked: no
+production keystore and no signing secrets exist (checked 2026-10-20).
 
 ## Star shop (implemented 2026-10-05)
 

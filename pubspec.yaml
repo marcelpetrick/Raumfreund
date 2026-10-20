@@ -6,7 +6,7 @@ publish_to: 'none'
 
 # Semantic version + monotonic Android versionCode. Never edit by hand:
 # use tool/bump_version.sh (see AGENTS.md).
-version: 0.7.1+80
+version: 0.7.2+81
 
 environment:
   sdk: 3.13.5
