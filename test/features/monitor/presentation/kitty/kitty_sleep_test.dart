@@ -183,6 +183,19 @@ void _characterTests() {
       expect(_wakes(tester), everyElement(isNull));
     });
 
+    testWidgets('reduced motion during the wake-up ends it', (tester) async {
+      await _pump(tester, KittyMood.sleeping);
+      await _pump(tester, KittyMood.happy);
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(_wakes(tester), contains(isNotNull));
+      await _pump(tester, KittyMood.happy, reduceMotion: true);
+      await tester.pump(
+        KittyCharacter.fadeDuration + const Duration(milliseconds: 50),
+      );
+      expect(_wakes(tester), everyElement(isNull));
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+
     testWidgets('falling asleep again stops waking up', (tester) async {
       await _pump(tester, KittyMood.sleeping);
       await _pump(tester, KittyMood.idle);

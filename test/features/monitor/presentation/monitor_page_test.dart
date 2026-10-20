@@ -7,7 +7,10 @@ import 'package:raumfreund/features/monitor/domain/level_history_point.dart';
 import 'package:raumfreund/features/monitor/domain/thresholds.dart';
 import 'package:raumfreund/features/monitor/domain/zone.dart';
 import 'package:raumfreund/features/monitor/presentation/kitty/kitty_character.dart';
+import 'package:raumfreund/features/monitor/presentation/level_gauge.dart';
+import 'package:raumfreund/features/monitor/presentation/level_timeline.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_page.dart';
+import 'package:raumfreund/features/monitor/presentation/monitor_status_panel.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_view_data.dart';
 import 'package:raumfreund/features/shop/domain/kitty_accessory.dart';
 
@@ -137,6 +140,7 @@ void main() {
   _noReadingsTest();
   _sleepTest();
   _zoneMoodTest();
+  _layoutTests();
   testWidgets('idle page exposes Settings, About and shop actions', (
     tester,
   ) async {
@@ -253,5 +257,45 @@ void _zoneMoodTest() {
     final away = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
     expect(away.mood, KittyMood.scared);
     expect(away.walkedAway, isTrue);
+  });
+}
+
+void _layoutTests() {
+  Rect rectOf(WidgetTester tester, Type type) =>
+      tester.getRect(find.byType(type));
+
+  testWidgets('phones stack gauge, Mia, panel and timeline in one column', (
+    tester,
+  ) async {
+    setScreenSize(tester, const Size(390, 1600));
+    await _pumpPage(tester, _data(phase: MonitorPhase.sleeping, zone: null));
+    final gauge = rectOf(tester, LevelGauge);
+    final kitty = rectOf(tester, KittyCharacter);
+    final panel = rectOf(tester, MonitorStatusPanel);
+    final timeline = rectOf(tester, LevelTimeline);
+    expect(kitty.height, 230);
+    expect(gauge.bottom, lessThanOrEqualTo(kitty.top));
+    expect(kitty.bottom, lessThanOrEqualTo(panel.top));
+    expect(panel.bottom, lessThanOrEqualTo(timeline.top));
+    expect(timeline.left, panel.left);
+    final mia = tester.widget<KittyCharacter>(find.byType(KittyCharacter));
+    expect(mia.mood, KittyMood.sleeping);
+    expect(mia.wakeUp, isFalse);
+    expect(mia.reduceMotion, isTrue);
+  });
+
+  testWidgets('tablets put panel and timeline beside Mia', (tester) async {
+    setScreenSize(tester, const Size(1000, 900));
+    await _pumpPage(tester, _data());
+    final kitty = rectOf(tester, KittyCharacter);
+    final panel = rectOf(tester, MonitorStatusPanel);
+    final timeline = rectOf(tester, LevelTimeline);
+    expect(kitty.height, 250);
+    expect(panel.left, greaterThan(kitty.right));
+    expect(panel.bottom, lessThanOrEqualTo(timeline.top));
+    expect(
+      tester.widget<KittyCharacter>(find.byType(KittyCharacter)).wakeUp,
+      isTrue,
+    );
   });
 }

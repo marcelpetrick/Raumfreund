@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/app/theme/app_theme.dart';
+import 'package:raumfreund/features/monitor/domain/thresholds.dart';
 import 'package:raumfreund/features/settings/domain/app_settings.dart';
 import 'package:raumfreund/features/settings/presentation/settings_page.dart';
 import 'package:raumfreund/l10n/generated/app_localizations.dart';
@@ -145,6 +146,7 @@ void _resetTests() {
 }
 
 void main() {
+  _registerThresholdEdgeTests();
   _resetTests();
   testWidgets('renders all controls and cancel discards the draft', (
     tester,
@@ -364,5 +366,59 @@ void _registerSaveRetryTest() {
     await tester.pumpAndSettle();
     expect(attempts, 2);
     expect(result?.thresholds.yellowDb, 61);
+  });
+}
+
+void _registerThresholdEdgeTests() {
+  testWidgets('a throwing save counts as failed and keeps the draft', (
+    tester,
+  ) async {
+    AppSettings? result;
+    await _open(
+      tester,
+      (value) => result = value,
+      onSave: (_) async => throw Exception('storage unavailable'),
+    );
+    await tester.ensureVisible(find.text(l10nDe.settingsSave));
+    await tester.tap(find.text(l10nDe.settingsSave));
+    await tester.pumpAndSettle();
+    expect(find.byType(SettingsPage), findsOneWidget);
+    expect(find.text(l10nDe.settingsSaveError), findsOneWidget);
+    expect(result, isNull);
+  });
+
+  testWidgets('lowering red onto yellow pushes yellow down', (tester) async {
+    AppSettings? result;
+    await _open(
+      tester,
+      (value) => result = value,
+      initial: AppSettings.defaults.copyWith(
+        thresholds: Thresholds(yellowDb: 60, redDb: 61),
+      ),
+    );
+    await tester.tap(find.byTooltip(l10nDe.settingsDecrease('Rot ab')));
+    await tester.ensureVisible(find.text(l10nDe.settingsSave));
+    await tester.tap(find.text(l10nDe.settingsSave));
+    await tester.pumpAndSettle();
+    expect(result?.thresholds, Thresholds(yellowDb: 59, redDb: 60));
+  });
+
+  testWidgets('yellow cannot go below the lowest level', (tester) async {
+    await _open(
+      tester,
+      (_) {},
+      initial: AppSettings.defaults.copyWith(
+        thresholds: Thresholds(yellowDb: Thresholds.minDb, redDb: 70),
+      ),
+    );
+    final decrease = tester.widget<IconButton>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.remove_rounded),
+            matching: find.byType(IconButton),
+          )
+          .first,
+    );
+    expect(decrease.onPressed, isNull);
   });
 }
