@@ -47,6 +47,9 @@ jobs:
     needs: verify
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    # The signing secrets live in the "release" environment (v* tags only);
+    # a job only receives environment secrets when it names the environment.
+    environment: release
     permissions:
       contents: read
       id-token: write

@@ -25,6 +25,47 @@ The keystore and `android/key.properties` are ignored and removed after the
 build. Missing secrets deliberately fail the workflow. Never upload a
 debug-signed artifact as a production release.
 
+### Creating the upload key (owner, once)
+
+The production release is blocked until the owner has created the key and
+stored it as `release` environment secrets. With Google Play App Signing
+this key is the *upload* key: Google signs what users install, and a lost
+upload key can be reset through the Play Console. Without Play it is the
+only signing key: losing it means no update can ever be installed over the
+released app again.
+
+1. Create the keystore outside the repository with the pinned JDK 21
+   (`keytool` prompts for both passwords; use a password manager):
+
+   ```sh
+   keytool -genkeypair -v -storetype PKCS12 \
+     -keystore ~/raumfreund-upload.jks -alias upload \
+     -keyalg RSA -keysize 4096 -validity 10000 \
+     -dname "CN=Marcel Petrick, O=Raumfreund, C=DE"
+   ```
+
+   Google Play requires a key valid until at least 2033-10-22; 10000 days
+   cover that.
+2. Back up the `.jks` file and both passwords in two separate safe places
+   (e.g. the password manager and an offline medium). Never commit them;
+   `*.jks` and `android/key.properties` are ignored.
+3. Store the secrets in the `release` environment, so that only `v*` tags
+   can use them:
+
+   ```sh
+   base64 -w0 ~/raumfreund-upload.jks |
+     gh secret set ANDROID_KEYSTORE_BASE64 --env release
+   gh secret set ANDROID_KEYSTORE_PASSWORD --env release
+   gh secret set ANDROID_KEY_ALIAS --env release --body upload
+   gh secret set ANDROID_KEY_PASSWORD --env release
+   gh secret list --env release
+   ```
+
+   For a PKCS12 keystore both passwords are the same.
+4. Record the certificate fingerprint for the release notes and the Play
+   Console: `keytool -list -v -keystore ~/raumfreund-upload.jks -alias
+   upload` (SHA-256 line).
+
 Repository settings (set 2026-10-08): `main` rejects force-pushes and
 deletion and requires a linear history, also for administrators; pull
 requests are not required because work happens directly on `main`. The
