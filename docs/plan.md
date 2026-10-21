@@ -36,11 +36,12 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
   background, Mia sleeps, and on return she wakes up while the measurement
   resumes by itself (owner request, issue #7, ADR 0005).
 
-## Verified state (2026-10-20, `0.7.2+81`)
+## Verified state (2026-10-21, `0.8.0+87`)
 
 - [x] Domain, controller, native `AudioRecord` recorder, platform channels,
-  localized UI, Settings, About, persistence, docs and ADRs 0001–0005 exist.
-- [x] GitHub Actions CI and Docker workflows are green on `3f64821` (CI was
+  UI in four languages, Settings, About, persistence, docs and ADRs
+  0001–0006 exist.
+- [x] GitHub Actions CI and Docker workflows are green on `604aee0` (CI was
   red from `16e84b9` to `0f7529b` because of the JDK pin, fixed in CI1,
   from `2384ae8` to `0ee855f` because of the venv Python, fixed in CI2, and
   on `0d6f6b2` because a markdown-it advisory appeared between the local
@@ -118,15 +119,15 @@ Four review rounds with probe tests shaped the rule; details are in
 - Pauses of up to about 2.5 s inside a loud phase count towards the delay.
 - The countdown may wait just above zero until the next loud sample.
 
-### Latest release check (2026-10-20)
+### Latest release check (2026-10-21)
 
-`debug-v0.7.1-build80` (commit `3f64821`) is GitHub's latest release,
+`debug-v0.8.0-build87` (commit `604aee0`) is GitHub's latest release,
 published with `tool/release_debug.sh` after green local pipeline, CI and
 Docker runs for that exact commit; the downloaded APK matches `SHA256SUMS`.
-It adds Mia sleeping in the background and waking up measuring (issue #7),
-Flutter 3.47.7 with the dependency update, and screenshots of every state
-to `debug-v0.6.25-build70`. A production `v*` release stays blocked: no
-production keystore and no signing secrets exist (checked 2026-10-20).
+It adds English, Croatian and Mandarin with the live language switch, the
+red-teamed text corrections and the release-environment fix of the signing
+job to `debug-v0.7.1-build80`. A production `v*` release stays blocked: no
+production keystore and no signing secrets exist (checked 2026-10-21).
 
 ## Star shop (implemented 2026-10-05)
 
