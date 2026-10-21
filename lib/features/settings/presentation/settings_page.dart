@@ -8,6 +8,8 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/glow_panel.dart';
 import '../../../shared/widgets/night_sky_background.dart';
 import '../../monitor/domain/thresholds.dart';
+import '../application/language_controller.dart';
+import '../domain/app_language.dart';
 import '../domain/app_settings.dart';
 
 /// Editable settings page.
@@ -32,6 +34,7 @@ class SettingsPage extends StatefulWidget {
     required this.initialSettings,
     required this.onSave,
     this.onResetStars,
+    this.languageController,
     super.key,
   });
 
@@ -47,6 +50,12 @@ class SettingsPage extends StatefulWidget {
   /// Deliberately outside the Save/Cancel draft: it acts immediately on
   /// another store, so Cancel could not undo it.
   final Future<StarResetResult> Function()? onResetStars;
+
+  /// Live UI language. The section is hidden when null.
+  ///
+  /// Also outside the draft: the app switches language the moment one is
+  /// picked, so the teacher sees the result before deciding anything else.
+  final LanguageController? languageController;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -78,6 +87,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        if (widget.languageController case final language?) ...[
+                          _LanguageSection(controller: language),
+                          const SizedBox(height: 16),
+                        ],
                         _thresholdsSection(l10n),
                         const SizedBox(height: 16),
                         _calibrationSection(l10n),
@@ -344,6 +357,64 @@ class _SettingsSection extends StatelessWidget {
       ],
     ),
   );
+}
+
+/// Language choice, applied and stored at once (outside the draft).
+class _LanguageSection extends StatelessWidget {
+  const _LanguageSection({required this.controller});
+
+  final LanguageController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return _SettingsSection(
+      title: l10n.settingsLanguageHeading,
+      icon: Icons.translate_rounded,
+      color: AppColors.tear,
+      children: [
+        ListenableBuilder(
+          listenable: controller,
+          builder: (context, _) => RadioGroup<AppLanguage>(
+            groupValue: controller.language,
+            onChanged: (language) => _select(context, language!),
+            child: Column(
+              children: [
+                for (final language in AppLanguage.values)
+                  RadioListTile<AppLanguage>(
+                    contentPadding: EdgeInsets.zero,
+                    value: language,
+                    title: Text(_name(l10n, language)),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        Text(l10n.settingsLanguageHint),
+      ],
+    );
+  }
+
+  Future<void> _select(BuildContext context, AppLanguage language) async {
+    final messenger = ScaffoldMessenger.of(context);
+    if (await controller.select(language)) return;
+    // The write can fail before the next frame has rebuilt this context in
+    // the new language, so the notice takes the chosen language's texts.
+    final l10n = lookupAppLocalizations(Locale(language.code));
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.settingsLanguageSaveFailed)),
+    );
+  }
+
+  /// Every language is listed under its own name, so someone who cannot
+  /// read the current language still finds theirs.
+  static String _name(AppLocalizations l10n, AppLanguage language) =>
+      switch (language) {
+        AppLanguage.german => l10n.languageGerman,
+        AppLanguage.english => l10n.languageEnglish,
+        AppLanguage.croatian => l10n.languageCroatian,
+        AppLanguage.chinese => l10n.languageChinese,
+      };
 }
 
 /// Teacher reset of the star shop, separated from the editable draft.

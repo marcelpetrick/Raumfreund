@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.7.2+81` — code-complete release candidate**
+Current version: **`0.8.0+87` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -49,8 +49,13 @@ Android devices remain mandatory before a production release.
 
 Top row: ready, green, yellow, red. Bottom row: Mia hides after the alarm,
 sleeps while the app is in the background, yawns while she wakes up and the
-measurement resumes, and an error with its explanation. The screenshots are
-rendered from the real widgets with `tool/render_screenshots.sh`.
+measurement resumes, and an error with its explanation.
+
+![The language choice in Settings, and Raumfreund in English, Croatian and Chinese](docs/screenshots/languages.png)
+
+Languages: Settings with the language choice, then the app in English
+(green), Croatian (yellow) and Chinese (red). The screenshots are rendered
+from the real widgets with `tool/render_screenshots.sh`.
 
 Demo videos (4:5, 1080x1350, under 30 s, for social media): a chronological
 [walkthrough](docs/video/raumfreund_A_story_4x5.mp4) and a
@@ -93,7 +98,10 @@ build.
 - Configurable thresholds, alarm delay, calibration correction, alarm tone and
   vibration, persisted locally with validated schema migration.
 - Dedicated Settings and About views; navigating away safely stops measurement.
-- German localization, reduced-motion support and responsive phone/tablet UI.
+- German, English, Croatian and Mandarin (Simplified Chinese) texts, switched
+  live in Settings and remembered; German is the default
+  ([ADR 0006](docs/adr/0006-ui-languages.md)).
+- Reduced-motion support and responsive phone/tablet UI.
 - Reproducible pinned toolchain, hundreds of automated tests, a 95% Dart
   coverage gate,
   Android lint, secret/vulnerability scans, Docker packaging and tag releases.
@@ -101,7 +109,7 @@ build.
 ## Interaction
 
 The main view provides one large start/stop action, an estimated 0–130 dB
-gauge, German status text, Mia's matching expression, a 10-minute heartbeat
+gauge, status text, Mia's matching expression, a 10-minute heartbeat
 timeline and quiet-minute stars. Colour is never the only state indicator.
 Opening another page always stops an active measurement safely; returning does
 not restart it automatically. Leaving the app (home button, app switcher,
@@ -118,6 +126,9 @@ after 5 seconds in green instead of 60, without resetting stars already
 earned; while it is on, the star line on the monitor says so. The view edits a working copy: **Speichern** validates and persists it,
 **Abbrechen** discards it, and **Standardwerte** restores the proposed defaults.
 Measurement stays stopped while settings are open and after returning.
+The **language** at the top of Settings (Deutsch, English, Hrvatski,
+中文（简体）) is the exception to the working copy: it switches the whole app
+at once and is stored immediately.
 
 The **About** button opens a read-only view with app/version/build details,
 author and project links, the privacy summary, GPL notice and Flutter's

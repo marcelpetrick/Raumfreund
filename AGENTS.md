@@ -81,7 +81,9 @@ thing, the stricter rule applies.
   exclusions to make numbers look better. Any exception must be specific,
   narrow, justified in a comment and reviewable.
 - Document public APIs and non-obvious domain decisions; comments explain *why*.
-- UI is German; all user-visible strings live in the localization files.
+- UI languages are German (default), English, Croatian and Simplified
+  Chinese (ADR 0006); all user-visible strings live in the localization
+  files, and every new string gets an entry in all four ARB files.
 - Every hand-written source file carries an SPDX header:
   `SPDX-License-Identifier: GPL-3.0-only` plus a copyright line.
 

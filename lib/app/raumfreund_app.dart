@@ -16,8 +16,10 @@ import '../features/monitor/application/ports.dart';
 import '../features/monitor/infrastructure/platform_monitor_ports.dart';
 import '../features/monitor/presentation/monitor_page.dart';
 import '../features/monitor/presentation/monitor_view_data.dart';
+import '../features/settings/application/language_controller.dart';
 import '../features/settings/application/settings_controller.dart';
 import '../features/settings/domain/app_settings.dart';
+import '../features/settings/infrastructure/shared_preferences_language_repository.dart';
 import '../features/settings/infrastructure/shared_preferences_settings_repository.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/shop/application/shop_controller.dart';
@@ -35,6 +37,7 @@ class RaumfreundApp extends StatefulWidget {
   /// every injected dependency just like its production dependencies.
   const RaumfreundApp({
     this.settingsController,
+    this.languageController,
     this.monitorController,
     this.appInfoPort,
     this.shopRepository,
@@ -44,6 +47,10 @@ class RaumfreundApp extends StatefulWidget {
 
   /// Settings controller override used by integration and widget tests.
   final SettingsController? settingsController;
+
+  /// UI language; `main` passes one that is already loaded, so the first
+  /// frame appears in the stored language. Also a test seam.
+  final LanguageController? languageController;
 
   /// Monitor controller override used by integration and widget tests.
   final MonitorController? monitorController;
@@ -67,6 +74,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     with WidgetsBindingObserver {
   final _navigatorKey = GlobalKey<NavigatorState>();
   late final SettingsController _settings;
+  late final LanguageController _language;
   late final MonitorController _monitor;
   late final ShopController _shop;
   late final AppInfoPort _appInfoPort;
@@ -86,6 +94,9 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     _settings =
         widget.settingsController ??
         SettingsController(SharedPreferencesSettingsRepository());
+    _language =
+        widget.languageController ??
+        LanguageController(SharedPreferencesLanguageRepository());
     _shop = ShopController(
       widget.shopRepository ?? SharedPreferencesShopRepository(),
     );
@@ -127,36 +138,43 @@ class _RaumfreundAppState extends State<RaumfreundApp>
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    navigatorKey: _navigatorKey,
-    title: 'Raumfreund',
-    debugShowCheckedModeBanner: false,
-    theme: buildAppTheme(),
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    home: AnimatedBuilder(
-      animation: Listenable.merge([_monitor, _settings, _shop]),
-      builder: (context, _) => MonitorPage(
-        data: _viewData(
-          _monitor.state,
-          _shop,
-          quickStarMode: _monitor.settings.quickStarModeEnabled,
-        ),
-        onToggleMeasurement: _initialSettingsReady
-            ? () => unawaited(_monitor.toggle())
-            : null,
-        onRetry: _initialSettingsReady
-            ? () => unawaited(_monitor.start())
-            : null,
-        onOpenAndroidSettings: () => unawaited(_monitor.openAppSettings()),
-        onOpenSettings: _openSettings,
-        onOpenAbout: _openAbout,
-        onOpenShop: _openShop,
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: _language,
+    builder: (context, _) => MaterialApp(
+      navigatorKey: _navigatorKey,
+      title: 'Raumfreund',
+      debugShowCheckedModeBanner: false,
+      theme: buildAppTheme(),
+      // Rebuilding with a new locale keeps the navigator and its routes, so
+      // an open Settings page with its unsaved draft stays where it was.
+      locale: Locale(_language.language.code),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: _home(),
+    ),
+  );
+
+  Widget _home() => AnimatedBuilder(
+    animation: Listenable.merge([_monitor, _settings, _shop]),
+    builder: (context, _) => MonitorPage(
+      data: _viewData(
+        _monitor.state,
+        _shop,
+        quickStarMode: _monitor.settings.quickStarModeEnabled,
       ),
+      onToggleMeasurement: _initialSettingsReady
+          ? () => unawaited(_monitor.toggle())
+          : null,
+      onRetry: _initialSettingsReady ? () => unawaited(_monitor.start()) : null,
+      onOpenAndroidSettings: () => unawaited(_monitor.openAppSettings()),
+      onOpenSettings: _openSettings,
+      onOpenAbout: _openAbout,
+      onOpenShop: _openShop,
     ),
   );
 
   Future<void> _loadInitialState() async {
+    unawaited(_language.load());
     unawaited(_shop.load());
     await _settings.load();
     await _monitor.applySettings(_settings.settings);
@@ -179,6 +197,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
           initialSettings: _settings.settings,
           onSave: _saveSettings,
           onResetStars: _resetStars,
+          languageController: _language,
         ),
       ),
     );
@@ -225,6 +244,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     WidgetsBinding.instance.removeObserver(this);
     _monitor.dispose();
     _settings.dispose();
+    _language.dispose();
     _shop.dispose();
     super.dispose();
   }

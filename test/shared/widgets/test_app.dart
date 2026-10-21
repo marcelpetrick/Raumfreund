@@ -9,7 +9,7 @@ import 'package:raumfreund/l10n/generated/app_localizations.dart';
 /// German localizations for direct use in tests.
 final AppLocalizations l10nDe = lookupAppLocalizations(const Locale('de'));
 
-/// Wraps [child] in a themed, German-localized MaterialApp.
+/// Wraps [child] in a themed MaterialApp, German unless [locale] is given.
 ///
 /// When [scaffold] is true, [child] is placed in a Scaffold body.
 Widget testApp(
@@ -17,9 +17,10 @@ Widget testApp(
   bool scaffold = true,
   bool disableAnimations = false,
   double textScale = 1,
+  Locale locale = const Locale('de'),
 }) => MaterialApp(
   theme: buildAppTheme(),
-  locale: const Locale('de'),
+  locale: locale,
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   builder: (context, app) => MediaQuery(

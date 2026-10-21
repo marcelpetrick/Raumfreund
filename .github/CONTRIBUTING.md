@@ -10,8 +10,9 @@ before changing code. Work on `main`, keep commits atomic and use Conventional
 Commit messages. Every commit needs a version/build bump through
 `tool/bump_version.sh` and a green `./localPipeline.sh` run.
 
-Public APIs and non-obvious decisions need documentation. All visible text is
-German and belongs in the localization files. Hand-written source files need
+Public APIs and non-obvious decisions need documentation. All visible text belongs in
+the localization files, in all four languages (German is the template; see
+ADR 0006). Hand-written source files need
 the project SPDX/copyright header; functions must stay within 100 physical
 lines. Never add audio retention, telemetry, secrets or a release Internet
 permission.

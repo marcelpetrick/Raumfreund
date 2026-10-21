@@ -93,14 +93,23 @@ class _TimelineAxis extends StatelessWidget {
 
   final AppLocalizations l10n;
 
+  /// At large text sizes, or with a longer translation of "now", the three
+  /// labels shrink instead of overflowing the chart width.
   @override
   Widget build(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Text(l10n.timelineMinus10),
-      Text(l10n.timelineMinus5),
-      Text(l10n.timelineNow),
+      _label(l10n.timelineMinus10, Alignment.centerLeft),
+      _label(l10n.timelineMinus5, Alignment.center),
+      _label(l10n.timelineNow, Alignment.centerRight),
     ],
+  );
+
+  static Widget _label(String text, Alignment alignment) => Expanded(
+    child: FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: alignment,
+      child: Text(text),
+    ),
   );
 }
 

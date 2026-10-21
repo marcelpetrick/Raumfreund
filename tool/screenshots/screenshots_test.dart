@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
-// Renders the README screenshots of every monitor state from the real
-// widgets (MonitorPage with Roboto and Material Icons of the pinned SDK).
-// Not part of the test suite: run it through tool/render_screenshots.sh,
-// which writes docs/screenshots/*.png.
+// Renders the README screenshots of every monitor state and of the four UI
+// languages from the real widgets (Roboto and Material Icons of the pinned
+// SDK, Noto Sans CJK for Chinese). Not part of the test suite: run it
+// through tool/render_screenshots.sh, which writes docs/screenshots/*.png.
 
 import 'dart:io';
 import 'dart:math' as math;
@@ -12,6 +12,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/app/theme/app_theme.dart';
 import 'package:raumfreund/features/monitor/domain/level_history_point.dart';
@@ -19,9 +20,14 @@ import 'package:raumfreund/features/monitor/domain/thresholds.dart';
 import 'package:raumfreund/features/monitor/domain/zone.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_page.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_view_data.dart';
+import 'package:raumfreund/features/settings/application/language_controller.dart';
+import 'package:raumfreund/features/settings/domain/app_language.dart';
+import 'package:raumfreund/features/settings/domain/app_settings.dart';
+import 'package:raumfreund/features/settings/presentation/settings_page.dart';
 import 'package:raumfreund/features/shop/domain/kitty_accessory.dart';
 import 'package:raumfreund/l10n/generated/app_localizations.dart';
 
+import '../../test/fakes/in_memory_language_repository.dart';
 import '../../test/goldens/golden_fonts.dart';
 
 /// Size of one screenshot in physical pixels.
@@ -34,19 +40,30 @@ const double _ratio = 1.5;
 final String _outDir =
     Platform.environment['RAUMFREUND_SCREENSHOT_DIR'] ?? 'docs/screenshots';
 
+/// A font with Simplified Chinese glyphs; the test environment has none.
+/// Overridable with RAUMFREUND_CJK_FONT (a .ttf, .otf or .ttc file).
+final String _cjkFont =
+    Platform.environment['RAUMFREUND_CJK_FONT'] ??
+    '/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc';
+
+const String _cjkFamily = 'NotoSansCJK';
+
 final _boundary = GlobalKey();
 
-/// One screenshot: the monitor data shown and how long to animate first.
+/// One screenshot: the page shown (optionally after [before]), its
+/// language and how long to animate first.
 typedef _Shot = ({
   String name,
-  MonitorViewData data,
-  MonitorViewData? before,
+  Widget page,
+  Widget? before,
   Duration settle,
+  Locale locale,
 });
 
 void main() {
   testWidgets('renders all monitor states', (tester) async {
     await loadGoldenFonts();
+    await _loadCjkFont();
     tester.view
       ..physicalSize = _shotSize
       ..devicePixelRatio = _ratio;
@@ -55,22 +72,41 @@ void main() {
     for (final shot in _shots()) {
       images[shot.name] = await _render(tester, shot);
     }
-    await _writeOverview(tester, [for (final name in _overview) images[name]!]);
+    await _writeOverview(tester, [
+      for (final name in _overview) images[name]!,
+    ], 'overview');
+    await _writeOverview(tester, [
+      for (final name in _languages) images[name]!,
+    ], 'languages');
   });
+}
+
+Future<void> _loadCjkFont() async {
+  final file = File(_cjkFont);
+  if (!file.existsSync()) {
+    fail('No CJK font at $_cjkFont; set RAUMFREUND_CJK_FONT');
+  }
+  final bytes = file.readAsBytesSync();
+  await (FontLoader(
+    _cjkFamily,
+  )..addFont(Future.value(ByteData.sublistView(bytes)))).load();
 }
 
 /// Button labels set a text style without a family; Android falls back to
 /// Roboto there, the test environment to its box font. Naming Roboto for
-/// the buttons makes the screenshots match a device.
+/// the buttons makes the screenshots match a device. Chinese glyphs fall
+/// back to Noto Sans CJK, as on Android.
 ThemeData _theme() {
   final base = buildAppTheme();
   ButtonStyle? roboto(ButtonStyle? style) => style?.copyWith(
     textStyle: WidgetStateProperty.resolveWith(
-      (states) =>
-          style.textStyle?.resolve(states)?.copyWith(fontFamily: 'Roboto'),
+      (states) => style.textStyle
+          ?.resolve(states)
+          ?.copyWith(fontFamily: 'Roboto', fontFamilyFallback: [_cjkFamily]),
     ),
   );
   return base.copyWith(
+    textTheme: base.textTheme.apply(fontFamilyFallback: [_cjkFamily]),
     filledButtonTheme: FilledButtonThemeData(
       style: roboto(base.filledButtonTheme.style),
     ),
@@ -83,7 +119,7 @@ ThemeData _theme() {
   );
 }
 
-/// Order of the two overview rows.
+/// Order of the two rows of the state overview.
 const _overview = [
   'idle',
   'green',
@@ -94,6 +130,10 @@ const _overview = [
   'wakeup',
   'error',
 ];
+
+/// The language row: Settings with the language list, then the monitor in
+/// English, Croatian and Chinese.
+const _languages = ['settings', 'english', 'croatian', 'chinese'];
 
 List<_Shot> _shots() {
   const loop = Duration(milliseconds: 1500);
@@ -108,16 +148,37 @@ List<_Shot> _shots() {
     // Mid wake-up: after the sleepy lead she yawns and starts to stretch.
     (
       name: 'wakeup',
-      data: _data(MonitorPhase.measuring, Zone.green),
-      before: sleeping,
+      page: _monitor(_data(MonitorPhase.measuring, Zone.green)),
+      before: _monitor(sleeping),
       settle: const Duration(milliseconds: 1000),
+      locale: const Locale('de'),
     ),
     _shot('error', _data(MonitorPhase.error, null, levelDb: null), loop),
+    (
+      name: 'settings',
+      page: _settings(),
+      before: null,
+      settle: const Duration(milliseconds: 400),
+      locale: const Locale('de'),
+    ),
+    _shot('english', _data(MonitorPhase.measuring, Zone.green), loop, 'en'),
+    _shot('croatian', _data(MonitorPhase.measuring, Zone.yellow), loop, 'hr'),
+    _shot('chinese', _data(MonitorPhase.measuring, Zone.red), loop, 'zh'),
   ];
 }
 
-_Shot _shot(String name, MonitorViewData data, Duration settle) =>
-    (name: name, data: data, before: null, settle: settle);
+_Shot _shot(
+  String name,
+  MonitorViewData data,
+  Duration settle, [
+  String language = 'de',
+]) => (
+  name: name,
+  page: _monitor(data),
+  before: null,
+  settle: settle,
+  locale: Locale(language),
+);
 
 MonitorViewData _data(
   MonitorPhase phase,
@@ -170,23 +231,33 @@ List<LevelHistoryPoint> _history(Zone? zone) {
   ];
 }
 
-Widget _app(MonitorViewData data) => RepaintBoundary(
+Widget _app(Widget page, Locale locale) => RepaintBoundary(
   key: _boundary,
   child: MaterialApp(
     theme: _theme(),
     debugShowCheckedModeBanner: false,
-    locale: const Locale('de'),
+    locale: locale,
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
-    home: MonitorPage(
-      data: data,
-      onToggleMeasurement: () {},
-      onRetry: () {},
-      onOpenAndroidSettings: () {},
-      onOpenSettings: () async {},
-      onOpenAbout: () async {},
-      onOpenShop: () async {},
-    ),
+    home: page,
+  ),
+);
+
+Widget _monitor(MonitorViewData data) => MonitorPage(
+  data: data,
+  onToggleMeasurement: () {},
+  onRetry: () {},
+  onOpenAndroidSettings: () {},
+  onOpenSettings: () async {},
+  onOpenAbout: () async {},
+  onOpenShop: () async {},
+);
+
+Widget _settings() => SettingsPage(
+  initialSettings: AppSettings.defaults,
+  onSave: (_) async => true,
+  languageController: LanguageController(
+    InMemoryLanguageRepository(AppLanguage.german),
   ),
 );
 
@@ -195,10 +266,10 @@ Future<ui.Image> _render(WidgetTester tester, _Shot shot) async {
   await tester.pumpWidget(const SizedBox.shrink());
   final before = shot.before;
   if (before != null) {
-    await tester.pumpWidget(_app(before));
+    await tester.pumpWidget(_app(before, shot.locale));
     await tester.pump(const Duration(milliseconds: 600));
   }
-  await tester.pumpWidget(_app(shot.data));
+  await tester.pumpWidget(_app(shot.page, shot.locale));
   await tester.pump(shot.settle);
   final boundary = tester.renderObject<RenderRepaintBoundary>(
     find.byKey(_boundary),
@@ -210,8 +281,13 @@ Future<ui.Image> _render(WidgetTester tester, _Shot shot) async {
   return image;
 }
 
-/// Two rows of four screenshots at 3/4 size.
-Future<void> _writeOverview(WidgetTester tester, List<ui.Image> images) async {
+/// Rows of four screenshots at 3/4 size, written as [name].png.
+Future<void> _writeOverview(
+  WidgetTester tester,
+  List<ui.Image> images,
+  String name,
+) async {
+  final rows = (images.length / 4).ceil();
   const scale = 0.75;
   const gap = 12.0;
   final w = _shotSize.width * scale;
@@ -219,7 +295,7 @@ Future<void> _writeOverview(WidgetTester tester, List<ui.Image> images) async {
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder)
     ..drawRect(
-      Rect.fromLTWH(0, 0, 4 * w + 3 * gap, 2 * h + gap),
+      Rect.fromLTWH(0, 0, 4 * w + 3 * gap, rows * h + (rows - 1) * gap),
       Paint()..color = const Color(0xFF0B0620),
     );
   for (var i = 0; i < images.length; i++) {
@@ -235,10 +311,10 @@ Future<void> _writeOverview(WidgetTester tester, List<ui.Image> images) async {
   final overview = (await tester.runAsync(
     () => recorder.endRecording().toImage(
       (4 * w + 3 * gap).round(),
-      (2 * h + gap).round(),
+      (rows * h + (rows - 1) * gap).round(),
     ),
   ))!;
-  await _writePng(tester, overview, '$_outDir/overview.png');
+  await _writePng(tester, overview, '$_outDir/$name.png');
 }
 
 Future<void> _writePng(WidgetTester tester, ui.Image image, String path) =>

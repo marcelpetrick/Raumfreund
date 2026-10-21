@@ -361,7 +361,7 @@ void _accessoryTests() {
       expect(
         tester.getSemantics(find.byType(KittyCharacter)),
         matchesSemantics(
-          label: 'Mia ist fröhlich und schnurrt. Mia trägt: Schleife, Schal',
+          label: 'Mia ist fröhlich und schnurrt. Bei Mia: Schleife, Schal',
           isImage: true,
         ),
       );
@@ -377,7 +377,7 @@ void _accessoryTests() {
         walkedAway: true,
         accessories: KittyAccessory.values.toSet(),
       );
-      expect(find.bySemanticsLabel(RegExp('Mia trägt')), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp('Bei Mia')), findsOneWidget);
     });
   });
 }

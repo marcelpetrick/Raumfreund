@@ -6,6 +6,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_de.dart';
+import 'app_localizations_en.dart';
+import 'app_localizations_hr.dart';
+import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
 
@@ -92,7 +95,12 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('de')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('de'),
+    Locale('en'),
+    Locale('hr'),
+    Locale('zh'),
+  ];
 
   /// Name of the app.
   ///
@@ -211,7 +219,7 @@ abstract class AppLocalizations {
   /// Screen-reader text of the countdown.
   ///
   /// In de, this message translates to:
-  /// **'Alarm in {seconds} Sekunden'**
+  /// **'{seconds, plural, =1{Alarm in 1 Sekunde} other{Alarm in {seconds} Sekunden}}'**
   String alarmCountdownSemantics(int seconds);
 
   /// Countdown reached zero; the alarm fires with the next loud reading.
@@ -229,7 +237,7 @@ abstract class AppLocalizations {
   /// Shown while the own alarm sound plays (measurement suppressed).
   ///
   /// In de, this message translates to:
-  /// **'Alarmton läuft – kurze Messpause'**
+  /// **'Alarm läuft – kurze Messpause'**
   String get alarmPlaying;
 
   /// Start button.
@@ -331,7 +339,7 @@ abstract class AppLocalizations {
   /// Warning while microphone readings arrive too sparsely to judge the room; no alarm can fire then.
   ///
   /// In de, this message translates to:
-  /// **'Messung gestört – zu wenige Messwerte. Das Handy drosselt vielleicht das Mikrofon.'**
+  /// **'Messung unsicher – zu wenige Messwerte. Das Handy drosselt vielleicht das Mikrofon.'**
   String get signalThin;
 
   /// Kitty mood idle (screen reader).
@@ -373,7 +381,7 @@ abstract class AppLocalizations {
   /// Appended to the kitty label (screen reader) when she wears shop items.
   ///
   /// In de, this message translates to:
-  /// **'Mia trägt: {items}'**
+  /// **'Bei Mia: {items}'**
   String kittyWearing(String items);
 
   /// Shop item name: bow.
@@ -415,25 +423,25 @@ abstract class AppLocalizations {
   /// Session stars plus the persistent Sternenladen balance.
   ///
   /// In de, this message translates to:
-  /// **'{count, plural, =0{Noch keine Sterne heute} =1{1 Stern heute} other{{count} Sterne heute}} · {total} im Sternenladen'**
+  /// **'{count, plural, =0{Noch keine neuen Sterne} =1{1 neuer Stern} other{{count} neue Sterne}} · {total} im Sternenladen'**
   String starsWithTotal(int count, int total);
 
   /// Explains the star counter.
   ///
   /// In de, this message translates to:
-  /// **'Für jede ruhige Minute gibt es einen Stern'**
+  /// **'Für jede Minute am Stück im grünen Bereich gibt es einen Stern'**
   String get starsHint;
 
   /// Star counter hint while the five-second star test mode is on.
   ///
   /// In de, this message translates to:
-  /// **'Stern-Testmodus: alle 5 ruhigen Sekunden ein Stern'**
+  /// **'Stern-Testmodus: alle 5 Sekunden am Stück im grünen Bereich ein Stern'**
   String get starsHintQuickTest;
 
   /// Progress towards the next star.
   ///
   /// In de, this message translates to:
-  /// **'{percent} % bis zum nächsten Stern'**
+  /// **'Nächster Stern: {percent} % geschafft'**
   String starsProgress(int percent);
 
   /// Shown right after a star was earned.
@@ -451,7 +459,7 @@ abstract class AppLocalizations {
   /// Error body.
   ///
   /// In de, this message translates to:
-  /// **'Raumfreund braucht das Mikrofon, um die Lautstärke zu schätzen. Es wird nichts aufgenommen oder gespeichert.'**
+  /// **'Raumfreund braucht das Mikrofon, um die Lautstärke zu schätzen. Der Ton wird nur kurz ausgewertet – nie gespeichert oder verschickt.'**
   String get errorPermissionDeniedBody;
 
   /// Error title.
@@ -559,13 +567,13 @@ abstract class AppLocalizations {
   /// Tooltip of the minus button.
   ///
   /// In de, this message translates to:
-  /// **'{name} um 1 dB verringern'**
+  /// **'{name}: 1 dB weniger'**
   String settingsDecrease(String name);
 
   /// Tooltip of the plus button.
   ///
   /// In de, this message translates to:
-  /// **'{name} um 1 dB erhöhen'**
+  /// **'{name}: 1 dB mehr'**
   String settingsIncrease(String name);
 
   /// Explains the threshold coupling.
@@ -595,7 +603,7 @@ abstract class AppLocalizations {
   /// How to calibrate.
   ///
   /// In de, this message translates to:
-  /// **'Handy-Mikrofone hören unterschiedlich gut. Lege ein Referenz-Schallpegelmessgerät direkt neben das Handy, sorge für ein gleichmäßiges Geräusch (z. B. Rauschen oder einen Lüfter) und verschiebe die Korrektur, bis Raumfreund denselben Wert zeigt wie das Messgerät. Die Anzeige bleibt trotzdem eine Schätzung.'**
+  /// **'Handy-Mikrofone sind unterschiedlich empfindlich. Lege ein Schallpegelmessgerät direkt neben das Handy und sorge für ein gleichmäßiges Geräusch (z. B. Rauschen oder einen Lüfter). Vergleiche die Anzeige von Raumfreund mit dem Messgerät, stelle hier die Differenz als Korrektur ein, speichere und prüfe erneut. Die Anzeige bleibt trotzdem eine Schätzung.'**
   String get settingsCalibrationExplanation;
 
   /// Section heading.
@@ -631,7 +639,7 @@ abstract class AppLocalizations {
   /// Explains the alarm rule with the configured delay and its range.
   ///
   /// In de, this message translates to:
-  /// **'So funktioniert der Alarm: Er ertönt erst, wenn es insgesamt {seconds} Sekunden gelb oder rot bleibt – kurze Pausen zählen mit – und nur einmal pro Phase. Wechselt die Ampel die Farbe, beginnt die Zeit neu; wird sie wieder grün, wird alles zurückgesetzt. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.'**
+  /// **'So funktioniert der Alarm: Ist die Ampel {seconds} Sekunden lang gelb (oder {seconds} Sekunden lang rot), kommt der Alarm. Kurze leisere Momente unterbrechen die Zeit nicht. Springt die Ampel zwischen Gelb und Rot oder wird sie grün, beginnt die Zeit von vorn – und auch nach jedem Alarm: Bleibt es laut, kommt er erneut. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.'**
   String settingsAlarmDelayRule(int seconds, int min, int max, int standard);
 
   /// Alarm sound switch.
@@ -673,7 +681,7 @@ abstract class AppLocalizations {
   /// Explains the quick star test mode and persistence.
   ///
   /// In de, this message translates to:
-  /// **'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Standardmäßig aus; gesammelte Sterne bleiben erhalten.'**
+  /// **'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen. Standardmäßig aus; gesammelte Sterne bleiben erhalten.'**
   String get settingsStarTestModeHint;
 
   /// Save button.
@@ -781,7 +789,7 @@ abstract class AppLocalizations {
   /// Privacy statement.
   ///
   /// In de, this message translates to:
-  /// **'Raumfreund arbeitet komplett offline. Es wird kein Ton aufgenommen, gespeichert oder versendet – das Mikrofonsignal wird nur kurz im Arbeitsspeicher zu einer Zahl verrechnet und sofort verworfen. Keine Konten, keine Werbung, kein Tracking.'**
+  /// **'Raumfreund arbeitet komplett offline. Das Mikrofonsignal wird nur kurz im Arbeitsspeicher zu einer Lautstärkezahl verrechnet und sofort verworfen – kein Ton wird gespeichert oder versendet. Auf dem Gerät bleiben nur Einstellungen und Sterne. Keine Konten, keine Werbung, kein Tracking.'**
   String get aboutPrivacyBody;
 
   /// Heading.
@@ -823,7 +831,7 @@ abstract class AppLocalizations {
   /// Non-blocking hint when loading the wallet failed.
   ///
   /// In de, this message translates to:
-  /// **'Sterne werden gerade nur zwischengespeichert. Kaufen und Anlegen gehen erst, wenn der Speicher wieder antwortet.'**
+  /// **'Die Sterne können gerade nicht geladen werden. Kaufen und Geben klappen erst wieder, wenn das funktioniert.'**
   String get shopLoadFailed;
 
   /// Non-blocking hint when saving the wallet failed.
@@ -847,13 +855,13 @@ abstract class AppLocalizations {
   /// Puts an owned item on Mia.
   ///
   /// In de, this message translates to:
-  /// **'Anlegen'**
+  /// **'Geben'**
   String get shopEquip;
 
   /// Takes an item off Mia.
   ///
   /// In de, this message translates to:
-  /// **'Ablegen'**
+  /// **'Wegnehmen'**
   String get shopUnequip;
 
   /// Disabled buy button: stars still missing.
@@ -865,7 +873,7 @@ abstract class AppLocalizations {
   /// State of an equipped item.
   ///
   /// In de, this message translates to:
-  /// **'Wird getragen'**
+  /// **'Bei Mia'**
   String get shopWorn;
 
   /// State of an owned but not worn item.
@@ -949,8 +957,50 @@ abstract class AppLocalizations {
   /// Snackbar when the reset could not be stored.
   ///
   /// In de, this message translates to:
-  /// **'Die Sterne wurden zurückgesetzt, aber das Speichern hat nicht geklappt. Es wird später erneut versucht.'**
+  /// **'Die Sterne wurden zurückgesetzt, aber das Speichern hat nicht geklappt. Es wird später erneut versucht – bis dahin können die alten Sterne nach einem Neustart der App wieder auftauchen.'**
   String get settingsResetSaveFailed;
+
+  /// Heading of the language section in Settings.
+  ///
+  /// In de, this message translates to:
+  /// **'Sprache'**
+  String get settingsLanguageHeading;
+
+  /// Explains that the language choice applies and is stored immediately, outside the Save/Cancel draft.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Sprache wechselt sofort und wird gleich gespeichert – unabhängig von Speichern und Abbrechen.'**
+  String get settingsLanguageHint;
+
+  /// Shown when the chosen language could not be stored.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Sprache wurde gewechselt, aber nicht gespeichert. Beim nächsten Start der App gilt wieder die vorherige Sprache.'**
+  String get settingsLanguageSaveFailed;
+
+  /// Name of German in German; identical in every language so speakers find it.
+  ///
+  /// In de, this message translates to:
+  /// **'Deutsch'**
+  String get languageGerman;
+
+  /// Name of English in English; identical in every language.
+  ///
+  /// In de, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// Name of Croatian in Croatian; identical in every language.
+  ///
+  /// In de, this message translates to:
+  /// **'Hrvatski'**
+  String get languageCroatian;
+
+  /// Name of Simplified Chinese in Chinese; identical in every language.
+  ///
+  /// In de, this message translates to:
+  /// **'中文（简体）'**
+  String get languageChinese;
 }
 
 class _AppLocalizationsDelegate
@@ -964,7 +1014,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['de'].contains(locale.languageCode);
+      <String>['de', 'en', 'hr', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -975,6 +1025,12 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'de':
       return AppLocalizationsDe();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'hr':
+      return AppLocalizationsHr();
+    case 'zh':
+      return AppLocalizationsZh();
   }
 
   throw FlutterError(

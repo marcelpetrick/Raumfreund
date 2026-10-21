@@ -15,7 +15,11 @@ plus a scan for audio-persisting and network APIs, see
 
 Automated tests cover the alarm state machine, measurement/session races,
 permission outcomes, stale events, settings migrations, channel payloads,
-phone/tablet widgets, Settings and About. Golden assets are deterministic and
+phone/tablet widgets, Settings and About. For the four UI languages
+(ADR 0006) `test/l10n/arb_consistency_test.dart` compares every translation
+with the German template (keys, placeholders, plural forms, nothing left in
+German) and `test/l10n/localized_layout_test.dart` renders every page in
+every language on a 360 px phone at normal and doubled text size. Golden assets are deterministic and
 use bundled test fonts.
 
 Open device acceptance work:
@@ -25,7 +29,9 @@ Open device acceptance work:
 - vibration availability and alarm audibility;
 - background/foreground behavior and a 30-minute thermal soak, including
   the sleep and wake-up of ADR 0005 (see below);
-- TalkBack, large text and reduced-motion checks on real hardware.
+- TalkBack, large text and reduced-motion checks on real hardware;
+- the four languages on a device (see below), and a read-through of the
+  English, Croatian and Chinese texts by native speakers.
 
 These checks are never claimed from an emulator-only run.
 
@@ -68,6 +74,23 @@ device checks are open for the owner:
 8. Turn the screen off and on without unlocking: some devices resume the
    app behind the lock screen for a moment. The measurement must not keep
    running there (no lasting microphone indicator).
+
+## Checking the languages on a device
+
+Open for the owner:
+
+1. Fresh install: the app starts in German, whatever the phone's language.
+2. In **Einstellungen**, pick **English**: the Settings page and, after going
+   back, the whole app are English at once; an edited but unsaved limit is
+   still there after the switch.
+3. Close the app from the app switcher and start it again: it opens in
+   English directly, without German first.
+4. Pick **Hrvatski** and **中文（简体）**: the Chinese characters render (no
+   boxes), the status headline, buttons and shop cards are not cut off, also
+   with Android's largest font size.
+5. With TalkBack, the language list reads each language in a way a speaker
+   recognizes, and the countdown says "1 second"/"1 sekundu"/"1 秒" at the
+   end.
 
 ## Emulator smoke tests and a known emulator defect
 

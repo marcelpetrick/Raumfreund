@@ -151,6 +151,43 @@ The implemented first-release behaviour is:
 | K1 | Accessory painter layers for Mia | Sonnet | done, `7da90e8` |
 | K2 | Shop page, Settings reset, app composition (after W and K1) | Sonnet | done in `0.5.0` |
 
+## Languages (implemented 2026-10-21)
+
+Owner request: German, English, Croatian and Mandarin (Simplified Chinese)
+texts, switched live in Settings, persisted, German by default (ADR 0006).
+
+| ID | Package | Owner | Status |
+| --- | --- | --- | --- |
+| L10N1 | `AppLanguage`, persisted language repository and controller (own key, independent of the settings snapshot), live `MaterialApp.locale` | Coordinator | done in `0.8.0` |
+| L10N2 | Language section in Settings (immediate, independent of Save/Cancel like the star reset), save-failure notice | Coordinator | done in `0.8.0` |
+| L10N3 | `app_en.arb`, `app_hr.arb`, `app_zh.arb`; ARB consistency test (keys, placeholders, plural forms); layout tests in every language | Coordinator | done in `0.8.0` |
+| L10N4 | Red-team review of all four languages (meaning, tone for children, factual claims vs. behaviour, plurals, truncation) by an independent agent; findings fixed | Opus reviewer + coordinator | done in `0.8.0` |
+| L10N5 | Docs: ADR 0006, README, architecture, AGENTS rule "UI is German", screenshots | Coordinator | done in `0.8.0` |
+
+Red-team result (L10N4): the review found errors in the German source that
+the translations had copied. All of them are fixed in every language:
+
+- **Alarm rule:** it is not "once per phase"; yellow and red time do not add
+  up, and the alarm repeats while the room stays loud.
+- **Privacy:** "nothing is recorded" contradicted Android's permission
+  dialog, which asks to record audio. The text now says the sound is
+  analysed briefly and never saved or sent.
+- **Calibration:** the text described a live value, but the measurement is
+  stopped while Settings is open.
+- **Stars:** "today" was false, and "every quiet minute" is really one
+  minute of green in a row.
+- **Equip:** a cushion and a toy mouse are given to Mia, not worn.
+
+Chinese now says 提醒 instead of 报警 ("call the police"); Croatian uses
+"ovjereni" instead of "umjereni".
+
+Open for the owner:
+
+- a native-speaker read-through on a device;
+- whether the teacher's star reset should also clear the session's
+  new-star counter (after a reset the line can show "5 neue Sterne · 0 im
+  Sternenladen").
+
 ## Open: automated quality evidence
 
 Work packages for the current acceptance pass (re-planned 2026-10-06 after a

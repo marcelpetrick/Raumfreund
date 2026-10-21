@@ -89,3 +89,4 @@ these lines (see docs/releasing.md).
 * v0.7.5 gives the release build job the release environment so it receives the signing secrets, and documents creating the upload key
 * v0.7.6 tests that every workflow job using the signing secrets names the release environment
 * v0.7.7 moves the vision, plan, prototype archive, CONTRIBUTING/SECURITY, linter configs and the Dockerfile out of the repository root
+* v0.8.0 adds English, Croatian and Mandarin texts with a live, persisted language switch in Settings (German stays the default) and corrects the red-teamed alarm, privacy, calibration and star texts

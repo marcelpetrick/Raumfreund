@@ -65,16 +65,16 @@ void _totalTests() {
     tester,
   ) async {
     await _panelHeight(tester, _data(stars: 2, wallet: 7), 1);
-    expect(find.text('2 Sterne heute · 7 im Sternenladen'), findsOneWidget);
+    expect(find.text('2 neue Sterne · 7 im Sternenladen'), findsOneWidget);
 
     await _panelHeight(tester, _data(stars: 0, wallet: 7), 1);
     expect(
-      find.text('Noch keine Sterne heute · 7 im Sternenladen'),
+      find.text('Noch keine neuen Sterne · 7 im Sternenladen'),
       findsOneWidget,
     );
 
     await _panelHeight(tester, _data(stars: 1, wallet: 7), 1);
-    expect(find.text('1 Stern heute · 7 im Sternenladen'), findsOneWidget);
+    expect(find.text('1 neuer Stern · 7 im Sternenladen'), findsOneWidget);
   });
 
   testWidgets('says when the five-second star test mode is on', (tester) async {
@@ -98,7 +98,7 @@ void _totalTests() {
     await _panelHeight(tester, _data(stars: 2, wallet: 7), 1);
 
     expect(
-      find.bySemanticsLabel(RegExp('2 Sterne heute · 7 im Sternenladen')),
+      find.bySemanticsLabel(RegExp('2 neue Sterne · 7 im Sternenladen')),
       findsOneWidget,
     );
     handle.dispose();

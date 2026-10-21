@@ -71,7 +71,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String alarmCountdownSemantics(int seconds) {
-    return 'Alarm in $seconds Sekunden';
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: 'Alarm in $seconds Sekunden',
+      one: 'Alarm in 1 Sekunde',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -81,7 +87,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get alarmFired => 'Alarm ausgelöst';
 
   @override
-  String get alarmPlaying => 'Alarmton läuft – kurze Messpause';
+  String get alarmPlaying => 'Alarm läuft – kurze Messpause';
 
   @override
   String get measureStart => 'Messung starten';
@@ -140,7 +146,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get signalThin =>
-      'Messung gestört – zu wenige Messwerte. Das Handy drosselt vielleicht das Mikrofon.';
+      'Messung unsicher – zu wenige Messwerte. Das Handy drosselt vielleicht das Mikrofon.';
 
   @override
   String get kittyIdle => 'Mia sitzt gemütlich da und wartet';
@@ -162,7 +168,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String kittyWearing(String items) {
-    return 'Mia trägt: $items';
+    return 'Bei Mia: $items';
   }
 
   @override
@@ -197,23 +203,24 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Sterne heute',
-      one: '1 Stern heute',
-      zero: 'Noch keine Sterne heute',
+      other: '$count neue Sterne',
+      one: '1 neuer Stern',
+      zero: 'Noch keine neuen Sterne',
     );
     return '$_temp0 · $total im Sternenladen';
   }
 
   @override
-  String get starsHint => 'Für jede ruhige Minute gibt es einen Stern';
+  String get starsHint =>
+      'Für jede Minute am Stück im grünen Bereich gibt es einen Stern';
 
   @override
   String get starsHintQuickTest =>
-      'Stern-Testmodus: alle 5 ruhigen Sekunden ein Stern';
+      'Stern-Testmodus: alle 5 Sekunden am Stück im grünen Bereich ein Stern';
 
   @override
   String starsProgress(int percent) {
-    return '$percent % bis zum nächsten Stern';
+    return 'Nächster Stern: $percent % geschafft';
   }
 
   @override
@@ -224,7 +231,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errorPermissionDeniedBody =>
-      'Raumfreund braucht das Mikrofon, um die Lautstärke zu schätzen. Es wird nichts aufgenommen oder gespeichert.';
+      'Raumfreund braucht das Mikrofon, um die Lautstärke zu schätzen. Der Ton wird nur kurz ausgewertet – nie gespeichert oder verschickt.';
 
   @override
   String get errorPermanentlyDeniedTitle => 'Mikrofon dauerhaft gesperrt';
@@ -286,12 +293,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String settingsDecrease(String name) {
-    return '$name um 1 dB verringern';
+    return '$name: 1 dB weniger';
   }
 
   @override
   String settingsIncrease(String name) {
-    return '$name um 1 dB erhöhen';
+    return '$name: 1 dB mehr';
   }
 
   @override
@@ -311,7 +318,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsCalibrationExplanation =>
-      'Handy-Mikrofone hören unterschiedlich gut. Lege ein Referenz-Schallpegelmessgerät direkt neben das Handy, sorge für ein gleichmäßiges Geräusch (z. B. Rauschen oder einen Lüfter) und verschiebe die Korrektur, bis Raumfreund denselben Wert zeigt wie das Messgerät. Die Anzeige bleibt trotzdem eine Schätzung.';
+      'Handy-Mikrofone sind unterschiedlich empfindlich. Lege ein Schallpegelmessgerät direkt neben das Handy und sorge für ein gleichmäßiges Geräusch (z. B. Rauschen oder einen Lüfter). Vergleiche die Anzeige von Raumfreund mit dem Messgerät, stelle hier die Differenz als Korrektur ein, speichere und prüfe erneut. Die Anzeige bleibt trotzdem eine Schätzung.';
 
   @override
   String get settingsAlarmHeading => 'Alarm';
@@ -334,7 +341,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String settingsAlarmDelayRule(int seconds, int min, int max, int standard) {
-    return 'So funktioniert der Alarm: Er ertönt erst, wenn es insgesamt $seconds Sekunden gelb oder rot bleibt – kurze Pausen zählen mit – und nur einmal pro Phase. Wechselt die Ampel die Farbe, beginnt die Zeit neu; wird sie wieder grün, wird alles zurückgesetzt. Einstellbar sind $min bis $max Sekunden, Standard sind $standard Sekunden.';
+    return 'So funktioniert der Alarm: Ist die Ampel $seconds Sekunden lang gelb (oder $seconds Sekunden lang rot), kommt der Alarm. Kurze leisere Momente unterbrechen die Zeit nicht. Springt die Ampel zwischen Gelb und Rot oder wird sie grün, beginnt die Zeit von vorn – und auch nach jedem Alarm: Bleibt es laut, kommt er erneut. Einstellbar sind $min bis $max Sekunden, Standard sind $standard Sekunden.';
   }
 
   @override
@@ -357,7 +364,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsStarTestModeHint =>
-      'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Standardmäßig aus; gesammelte Sterne bleiben erhalten.';
+      'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen. Standardmäßig aus; gesammelte Sterne bleiben erhalten.';
 
   @override
   String get settingsSave => 'Speichern';
@@ -417,7 +424,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutPrivacyBody =>
-      'Raumfreund arbeitet komplett offline. Es wird kein Ton aufgenommen, gespeichert oder versendet – das Mikrofonsignal wird nur kurz im Arbeitsspeicher zu einer Zahl verrechnet und sofort verworfen. Keine Konten, keine Werbung, kein Tracking.';
+      'Raumfreund arbeitet komplett offline. Das Mikrofonsignal wird nur kurz im Arbeitsspeicher zu einer Lautstärkezahl verrechnet und sofort verworfen – kein Ton wird gespeichert oder versendet. Auf dem Gerät bleiben nur Einstellungen und Sterne. Keine Konten, keine Werbung, kein Tracking.';
 
   @override
   String get aboutMeasurementHeading => 'Hinweis zur Messung';
@@ -449,7 +456,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get shopLoadFailed =>
-      'Sterne werden gerade nur zwischengespeichert. Kaufen und Anlegen gehen erst, wenn der Speicher wieder antwortet.';
+      'Die Sterne können gerade nicht geladen werden. Kaufen und Geben klappen erst wieder, wenn das funktioniert.';
 
   @override
   String get shopSaveFailed =>
@@ -462,10 +469,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get shopBuy => 'Kaufen';
 
   @override
-  String get shopEquip => 'Anlegen';
+  String get shopEquip => 'Geben';
 
   @override
-  String get shopUnequip => 'Ablegen';
+  String get shopUnequip => 'Wegnehmen';
 
   @override
   String shopMissing(int count) {
@@ -479,7 +486,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get shopWorn => 'Wird getragen';
+  String get shopWorn => 'Bei Mia';
 
   @override
   String get shopOwned => 'Gekauft';
@@ -537,5 +544,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsResetSaveFailed =>
-      'Die Sterne wurden zurückgesetzt, aber das Speichern hat nicht geklappt. Es wird später erneut versucht.';
+      'Die Sterne wurden zurückgesetzt, aber das Speichern hat nicht geklappt. Es wird später erneut versucht – bis dahin können die alten Sterne nach einem Neustart der App wieder auftauchen.';
+
+  @override
+  String get settingsLanguageHeading => 'Sprache';
+
+  @override
+  String get settingsLanguageHint =>
+      'Die Sprache wechselt sofort und wird gleich gespeichert – unabhängig von Speichern und Abbrechen.';
+
+  @override
+  String get settingsLanguageSaveFailed =>
+      'Die Sprache wurde gewechselt, aber nicht gespeichert. Beim nächsten Start der App gilt wieder die vorherige Sprache.';
+
+  @override
+  String get languageGerman => 'Deutsch';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageCroatian => 'Hrvatski';
+
+  @override
+  String get languageChinese => '中文（简体）';
 }

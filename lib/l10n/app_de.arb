@@ -47,7 +47,7 @@
     "description": "Countdown until the alarm fires.",
     "placeholders": {"seconds": {"type": "int"}}
   },
-  "alarmCountdownSemantics": "Alarm in {seconds} Sekunden",
+  "alarmCountdownSemantics": "{seconds, plural, =1{Alarm in 1 Sekunde} other{Alarm in {seconds} Sekunden}}",
   "@alarmCountdownSemantics": {
     "description": "Screen-reader text of the countdown.",
     "placeholders": {"seconds": {"type": "int"}}
@@ -56,7 +56,7 @@
   "@alarmImminent": {"description": "Countdown reached zero; the alarm fires with the next loud reading."},
   "alarmFired": "Alarm ausgelöst",
   "@alarmFired": {"description": "Shown after the alarm of the current phase fired."},
-  "alarmPlaying": "Alarmton läuft – kurze Messpause",
+  "alarmPlaying": "Alarm läuft – kurze Messpause",
   "@alarmPlaying": {"description": "Shown while the own alarm sound plays (measurement suppressed)."},
 
   "measureStart": "Messung starten",
@@ -108,7 +108,7 @@
   "alarmOutputFailed": "Der Alarmton konnte nicht wiedergegeben werden. Die Messung läuft weiter.",
   "@alarmOutputFailed": {"description": "Non-fatal warning after alarm output fails."},
 
-  "signalThin": "Messung gestört – zu wenige Messwerte. Das Handy drosselt vielleicht das Mikrofon.",
+  "signalThin": "Messung unsicher – zu wenige Messwerte. Das Handy drosselt vielleicht das Mikrofon.",
   "@signalThin": {"description": "Warning while microphone readings arrive too sparsely to judge the room; no alarm can fire then."},
 
   "kittyIdle": "Mia sitzt gemütlich da und wartet",
@@ -123,7 +123,7 @@
   "@kittySleeping": {"description": "Kitty mood sleeping while the app is in the background (screen reader)."},
   "kittyAwaySign": "Zu laut – Mia hat sich versteckt",
   "@kittyAwaySign": {"description": "Sign shown when the kitty walked away."},
-  "kittyWearing": "Mia trägt: {items}",
+  "kittyWearing": "Bei Mia: {items}",
   "@kittyWearing": {
     "description": "Appended to the kitty label (screen reader) when she wears shop items.",
     "placeholders": {"items": {"type": "String"}}
@@ -144,16 +144,16 @@
     "description": "Number of stars earned for quiet minutes.",
     "placeholders": {"count": {"type": "int"}}
   },
-  "starsWithTotal": "{count, plural, =0{Noch keine Sterne heute} =1{1 Stern heute} other{{count} Sterne heute}} · {total} im Sternenladen",
+  "starsWithTotal": "{count, plural, =0{Noch keine neuen Sterne} =1{1 neuer Stern} other{{count} neue Sterne}} · {total} im Sternenladen",
   "@starsWithTotal": {
     "description": "Session stars plus the persistent Sternenladen balance.",
     "placeholders": {"count": {"type": "int"}, "total": {"type": "int"}}
   },
-  "starsHint": "Für jede ruhige Minute gibt es einen Stern",
+  "starsHint": "Für jede Minute am Stück im grünen Bereich gibt es einen Stern",
   "@starsHint": {"description": "Explains the star counter."},
-  "starsHintQuickTest": "Stern-Testmodus: alle 5 ruhigen Sekunden ein Stern",
+  "starsHintQuickTest": "Stern-Testmodus: alle 5 Sekunden am Stück im grünen Bereich ein Stern",
   "@starsHintQuickTest": {"description": "Star counter hint while the five-second star test mode is on."},
-  "starsProgress": "{percent} % bis zum nächsten Stern",
+  "starsProgress": "Nächster Stern: {percent} % geschafft",
   "@starsProgress": {
     "description": "Progress towards the next star.",
     "placeholders": {"percent": {"type": "int"}}
@@ -163,7 +163,7 @@
 
   "errorPermissionDeniedTitle": "Mikrofon nicht erlaubt",
   "@errorPermissionDeniedTitle": {"description": "Error title."},
-  "errorPermissionDeniedBody": "Raumfreund braucht das Mikrofon, um die Lautstärke zu schätzen. Es wird nichts aufgenommen oder gespeichert.",
+  "errorPermissionDeniedBody": "Raumfreund braucht das Mikrofon, um die Lautstärke zu schätzen. Der Ton wird nur kurz ausgewertet – nie gespeichert oder verschickt.",
   "@errorPermissionDeniedBody": {"description": "Error body."},
   "errorPermanentlyDeniedTitle": "Mikrofon dauerhaft gesperrt",
   "@errorPermanentlyDeniedTitle": {"description": "Error title."},
@@ -203,12 +203,12 @@
     "description": "A threshold value.",
     "placeholders": {"value": {"type": "int"}}
   },
-  "settingsDecrease": "{name} um 1 dB verringern",
+  "settingsDecrease": "{name}: 1 dB weniger",
   "@settingsDecrease": {
     "description": "Tooltip of the minus button.",
     "placeholders": {"name": {"type": "String"}}
   },
-  "settingsIncrease": "{name} um 1 dB erhöhen",
+  "settingsIncrease": "{name}: 1 dB mehr",
   "@settingsIncrease": {
     "description": "Tooltip of the plus button.",
     "placeholders": {"name": {"type": "String"}}
@@ -224,7 +224,7 @@
     "description": "Signed calibration value, e.g. +3 dB.",
     "placeholders": {"value": {"type": "String"}}
   },
-  "settingsCalibrationExplanation": "Handy-Mikrofone hören unterschiedlich gut. Lege ein Referenz-Schallpegelmessgerät direkt neben das Handy, sorge für ein gleichmäßiges Geräusch (z. B. Rauschen oder einen Lüfter) und verschiebe die Korrektur, bis Raumfreund denselben Wert zeigt wie das Messgerät. Die Anzeige bleibt trotzdem eine Schätzung.",
+  "settingsCalibrationExplanation": "Handy-Mikrofone sind unterschiedlich empfindlich. Lege ein Schallpegelmessgerät direkt neben das Handy und sorge für ein gleichmäßiges Geräusch (z. B. Rauschen oder einen Lüfter). Vergleiche die Anzeige von Raumfreund mit dem Messgerät, stelle hier die Differenz als Korrektur ein, speichere und prüfe erneut. Die Anzeige bleibt trotzdem eine Schätzung.",
   "@settingsCalibrationExplanation": {"description": "How to calibrate."},
   "settingsAlarmHeading": "Alarm",
   "@settingsAlarmHeading": {"description": "Section heading."},
@@ -239,7 +239,7 @@
   "@settingsAlarmDelayDecrease": {"description": "Tooltip of the alarm delay minus button."},
   "settingsAlarmDelayIncrease": "Alarm-Wartezeit um 1 Sekunde verlängern",
   "@settingsAlarmDelayIncrease": {"description": "Tooltip of the alarm delay plus button."},
-  "settingsAlarmDelayRule": "So funktioniert der Alarm: Er ertönt erst, wenn es insgesamt {seconds} Sekunden gelb oder rot bleibt – kurze Pausen zählen mit – und nur einmal pro Phase. Wechselt die Ampel die Farbe, beginnt die Zeit neu; wird sie wieder grün, wird alles zurückgesetzt. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.",
+  "settingsAlarmDelayRule": "So funktioniert der Alarm: Ist die Ampel {seconds} Sekunden lang gelb (oder {seconds} Sekunden lang rot), kommt der Alarm. Kurze leisere Momente unterbrechen die Zeit nicht. Springt die Ampel zwischen Gelb und Rot oder wird sie grün, beginnt die Zeit von vorn – und auch nach jedem Alarm: Bleibt es laut, kommt er erneut. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.",
   "@settingsAlarmDelayRule": {
     "description": "Explains the alarm rule with the configured delay and its range.",
     "placeholders": {
@@ -261,7 +261,7 @@
   "@settingsStarTestHeading": {"description": "Heading of the quick star test section."},
   "settingsStarTestMode": "Schneller Stern-Testmodus",
   "@settingsStarTestMode": {"description": "Switch for the five-second star test mode."},
-  "settingsStarTestModeHint": "Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Standardmäßig aus; gesammelte Sterne bleiben erhalten.",
+  "settingsStarTestModeHint": "Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen. Standardmäßig aus; gesammelte Sterne bleiben erhalten.",
   "@settingsStarTestModeHint": {"description": "Explains the quick star test mode and persistence."},
   "settingsSave": "Speichern",
   "@settingsSave": {"description": "Save button."},
@@ -301,7 +301,7 @@
   "@aboutLicenseValue": {"description": "License name."},
   "aboutPrivacyHeading": "Datenschutz",
   "@aboutPrivacyHeading": {"description": "Heading."},
-  "aboutPrivacyBody": "Raumfreund arbeitet komplett offline. Es wird kein Ton aufgenommen, gespeichert oder versendet – das Mikrofonsignal wird nur kurz im Arbeitsspeicher zu einer Zahl verrechnet und sofort verworfen. Keine Konten, keine Werbung, kein Tracking.",
+  "aboutPrivacyBody": "Raumfreund arbeitet komplett offline. Das Mikrofonsignal wird nur kurz im Arbeitsspeicher zu einer Lautstärkezahl verrechnet und sofort verworfen – kein Ton wird gespeichert oder versendet. Auf dem Gerät bleiben nur Einstellungen und Sterne. Keine Konten, keine Werbung, kein Tracking.",
   "@aboutPrivacyBody": {"description": "Privacy statement."},
   "aboutMeasurementHeading": "Hinweis zur Messung",
   "@aboutMeasurementHeading": {"description": "Heading."},
@@ -319,7 +319,7 @@
   },
   "shopLoading": "Sterne werden geladen …",
   "@shopLoading": {"description": "Shown while the wallet is loading."},
-  "shopLoadFailed": "Sterne werden gerade nur zwischengespeichert. Kaufen und Anlegen gehen erst, wenn der Speicher wieder antwortet.",
+  "shopLoadFailed": "Die Sterne können gerade nicht geladen werden. Kaufen und Geben klappen erst wieder, wenn das funktioniert.",
   "@shopLoadFailed": {"description": "Non-blocking hint when loading the wallet failed."},
   "shopSaveFailed": "Speichern hat nicht geklappt. Deine Sterne bleiben erhalten; es wird beim nächsten Öffnen der App oder des Sternenladens und bei der nächsten Änderung erneut versucht.",
   "@shopSaveFailed": {"description": "Non-blocking hint when saving the wallet failed."},
@@ -327,16 +327,16 @@
   "@shopDismiss": {"description": "Hides the save error hint."},
   "shopBuy": "Kaufen",
   "@shopBuy": {"description": "Buy button of a shop item."},
-  "shopEquip": "Anlegen",
+  "shopEquip": "Geben",
   "@shopEquip": {"description": "Puts an owned item on Mia."},
-  "shopUnequip": "Ablegen",
+  "shopUnequip": "Wegnehmen",
   "@shopUnequip": {"description": "Takes an item off Mia."},
   "shopMissing": "{count, plural, =1{Noch 1 Stern} other{Noch {count} Sterne}}",
   "@shopMissing": {
     "description": "Disabled buy button: stars still missing.",
     "placeholders": {"count": {"type": "int"}}
   },
-  "shopWorn": "Wird getragen",
+  "shopWorn": "Bei Mia",
   "@shopWorn": {"description": "State of an equipped item."},
   "shopOwned": "Gekauft",
   "@shopOwned": {"description": "State of an owned but not worn item."},
@@ -371,6 +371,21 @@
   "@settingsResetDone": {"description": "Snackbar after a reset."},
   "settingsResetNotReady": "Die Sterne werden noch geladen. Bitte versuche es gleich noch einmal.",
   "@settingsResetNotReady": {"description": "Snackbar when the wallet is not loaded."},
-  "settingsResetSaveFailed": "Die Sterne wurden zurückgesetzt, aber das Speichern hat nicht geklappt. Es wird später erneut versucht.",
-  "@settingsResetSaveFailed": {"description": "Snackbar when the reset could not be stored."}
+  "settingsResetSaveFailed": "Die Sterne wurden zurückgesetzt, aber das Speichern hat nicht geklappt. Es wird später erneut versucht – bis dahin können die alten Sterne nach einem Neustart der App wieder auftauchen.",
+  "@settingsResetSaveFailed": {"description": "Snackbar when the reset could not be stored."},
+
+  "settingsLanguageHeading": "Sprache",
+  "@settingsLanguageHeading": {"description": "Heading of the language section in Settings."},
+  "settingsLanguageHint": "Die Sprache wechselt sofort und wird gleich gespeichert – unabhängig von Speichern und Abbrechen.",
+  "@settingsLanguageHint": {"description": "Explains that the language choice applies and is stored immediately, outside the Save/Cancel draft."},
+  "settingsLanguageSaveFailed": "Die Sprache wurde gewechselt, aber nicht gespeichert. Beim nächsten Start der App gilt wieder die vorherige Sprache.",
+  "@settingsLanguageSaveFailed": {"description": "Shown when the chosen language could not be stored."},
+  "languageGerman": "Deutsch",
+  "@languageGerman": {"description": "Name of German in German; identical in every language so speakers find it."},
+  "languageEnglish": "English",
+  "@languageEnglish": {"description": "Name of English in English; identical in every language."},
+  "languageCroatian": "Hrvatski",
+  "@languageCroatian": {"description": "Name of Croatian in Croatian; identical in every language."},
+  "languageChinese": "中文（简体）",
+  "@languageChinese": {"description": "Name of Simplified Chinese in Chinese; identical in every language."}
 }

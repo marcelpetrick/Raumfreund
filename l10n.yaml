@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 #
-# gen-l10n configuration. German is the template and currently only locale;
-# further languages are added as lib/l10n/app_<locale>.arb.
+# gen-l10n configuration. German is the template; English, Croatian and
+# Simplified Chinese translate it (lib/l10n/app_<locale>.arb). A further
+# language also needs an AppLanguage value (ADR 0006).
 arb-dir: lib/l10n
 template-arb-file: app_de.arb
 output-dir: lib/l10n/generated

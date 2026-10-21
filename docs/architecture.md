@@ -31,7 +31,7 @@ native recorder, and ADR 0003 fixes lifecycle and alarm semantics.
 ## Layers and dependency direction
 
 ```text
-presentation (Flutter widgets, German localized strings)
+presentation (Flutter widgets, localized strings in four languages)
        |
        v
 application (controller, immutable view state, ports)
@@ -64,7 +64,7 @@ must never import it.
 | `lib/features/settings/` | Valid settings, persistence and Settings view | Implemented with schema validation |
 | `lib/features/shop/` | Kitty accessory catalog, star wallet and inventory, persistence, shop controller and shop page | Implemented with schema validation |
 | `lib/features/about/` | App information and About view | Implemented |
-| `lib/l10n/` | All user-visible German strings | Implemented in ARB/generated files |
+| `lib/l10n/` | All user-visible strings: German template plus English, Croatian and Simplified Chinese ([ADR 0006](adr/0006-ui-languages.md)) | ARB files, generated code, consistency test |
 | `android/app/src/main/kotlin/` | Recorder, permission, alarm and channel host | Implemented with JVM tests |
 | `config/` | Linter configuration (detekt, markdownlint, yamllint) | Passed explicitly by the pipeline scripts |
 | `docker/` | `Dockerfile`, its `.dockerignore` and the nginx download page | Built from the repository root as context |
@@ -169,6 +169,13 @@ adds the off-by-default quick-star test flag; version 2 data migrates with that
 flag disabled. Applying it changes the `QuietStars` interval for the next
 measurement from 60 seconds to 5 seconds (or back), resets only partial
 progress and keeps every already-earned session and wallet star.
+
+The UI language is the exception to the draft
+([ADR 0006](adr/0006-ui-languages.md)): `LanguageController` switches
+`MaterialApp.locale` the moment a language is picked and stores its code
+under its own key `settings.language`, outside the settings snapshot, so a
+Save of an older draft cannot overwrite it. `main()` loads it before the
+first frame; anything unreadable means German.
 
 ## Star shop
 

@@ -28,6 +28,11 @@ void main() {
     expect(find.text('mail@marcelpetrick.it'), findsOneWidget);
     expect(find.text('github.com/marcelpetrick/Raumfreund'), findsOneWidget);
     expect(find.text(l10nDe.aboutPrivacyBody), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(l10nDe.aboutMeasurementBody),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text(l10nDe.aboutMeasurementBody), findsOneWidget);
   });
 
@@ -44,6 +49,8 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(find.text(l10nDe.aboutLicensesButton));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(l10nDe.aboutLicensesButton));
     await tester.pumpAndSettle();
     expect(find.byType(LicensePage), findsOneWidget);
