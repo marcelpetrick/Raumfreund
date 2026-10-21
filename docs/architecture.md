@@ -147,7 +147,9 @@ light, quiet stars and Mia never disagree with the alarm phase.
 A phase starts at the first sample of the loud run that led to its confirmed
 zone. Dips inside the phase count, a quiet tail does not, and the alarm fires
 only on a loud sample once the configured delay (3–60 s, default 10 s) has
-passed, at most once per phase. A confirmed green zone, gaps over one second,
+passed, at most once per phase. Because the end of the alarm output resets
+the machine, a room that stays loud alarms again after another delay. A
+confirmed green zone, gaps over one second,
 long stretches of too few samples and session termination reset continuity.
 
 While the app's own tone/vibration is active, readings are dropped entirely:

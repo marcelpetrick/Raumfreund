@@ -86,7 +86,7 @@ sliding windows:
   one per 0.4 s are poor (each covers at most 200 ms); once thin, the hint
   clears only at one per 0.33 s or faster. The flag does not change any zone or
   alarm decision; the alarm tone pause and stop/reset/error clear it. The
-  status panel shows a German hint (live region for TalkBack).
+  status panel shows a localized hint (live region for TalkBack).
 - The leave share 15 % lies between a quiet room with clicks (7 green : 1 red,
   at most 13.3 % over 3 s, must become green) and the worst 3 s alignment of
   0.6 s bursts every 2 s (20 %, must stay loud).

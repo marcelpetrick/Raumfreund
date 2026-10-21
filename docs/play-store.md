@@ -13,6 +13,11 @@ application, finish developer verification, supply store text/screenshots and
 a public privacy-policy URL, complete Data Safety/content-rating/target-audience
 forms, configure app signing and run the closed-test/device acceptance plan.
 
+The app itself is in German (default), English, Croatian and Simplified
+Chinese (ADR 0006). The store listing, its screenshots
+(`tool/render_screenshots.sh`) and the privacy policy still need to be
+written per listing language; German and English are the minimum.
+
 Play upload is intentionally not automated until those credentials and policy
 decisions exist. The GitHub release APK remains a separate direct-download
 channel.

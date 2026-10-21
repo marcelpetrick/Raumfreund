@@ -91,3 +91,4 @@ these lines (see docs/releasing.md).
 * v0.7.7 moves the vision, plan, prototype archive, CONTRIBUTING/SECURITY, linter configs and the Dockerfile out of the repository root
 * v0.8.0 adds English, Croatian and Mandarin texts with a live, persisted language switch in Settings (German stays the default) and corrects the red-teamed alarm, privacy, calibration and star texts
 * v0.8.1 records the 0.8.0 debug release
+* v0.8.2 updates the documentation for the languages, the repeating alarm, calibration and the star texts

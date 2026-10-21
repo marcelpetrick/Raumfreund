@@ -19,8 +19,8 @@ phone/tablet widgets, Settings and About. For the four UI languages
 (ADR 0006) `test/l10n/arb_consistency_test.dart` compares every translation
 with the German template (keys, placeholders, plural forms, nothing left in
 German) and `test/l10n/localized_layout_test.dart` renders every page in
-every language on a 360 px phone at normal and doubled text size. Golden assets are deterministic and
-use bundled test fonts.
+every language on a 360 px phone at normal and doubled text size. Golden
+assets are deterministic and use bundled test fonts.
 
 Open device acceptance work:
 

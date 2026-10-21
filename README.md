@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.8.1+88` — code-complete release candidate**
+Current version: **`0.8.2+89` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -41,7 +41,7 @@ living status and external blockers are in [`docs/plan.md`](docs/plan.md).
 
 The coverage badge shows the enforced minimum of 95% line coverage for the
 first-party Dart code; `./localPipeline.sh` prints the measured value (99.97%
-at `0.7.3`). Neither is a claim that every platform path or product
+with 644 tests at `0.8.0`). Neither is a claim that every platform path or product
 requirement is already covered. Real microphone and lifecycle tests on two
 Android devices remain mandatory before a production release.
 
@@ -88,10 +88,12 @@ build.
   so the colour does not flicker at a threshold and the text does not jump.
 - Configurable alarm delay (3–60 s, default 10 s) with one alarm per loud
   yellow/red phase, never before the delay, and protection against
-  retriggering on the app's own sound
+  retriggering on the app's own sound; if the room stays loud, the alarm
+  comes again after another delay
   ([ADR 0004](docs/adr/0004-zone-hysteresis.md)).
 - A 10-minute RAM-only timeline (one smoothed point per 10 s; peaks rise fast
-  and cool down slowly) and quiet-minute stars.
+  and cool down slowly) and quiet-minute stars (one per full minute of green
+  in a row).
 - Earned stars stay in the classroom's local wallet through noise, stops and
   restarts. A Settings test mode, off by default, shortens only the next-star
   interval from 60 seconds to 5 seconds.
@@ -123,8 +125,11 @@ yellow and red thresholds, the alarm delay (how long it may be too loud before
 the alarm), calibration correction, alarm sound, vibration and the optional
 **Schneller Stern-Testmodus**. That mode is off by default and awards a star
 after 5 seconds in green instead of 60, without resetting stars already
-earned; while it is on, the star line on the monitor says so. The view edits a working copy: **Speichern** validates and persists it,
-**Abbrechen** discards it, and **Standardwerte** restores the proposed defaults.
+earned; its stars land in the star shop like any other. While it is on, the
+star line on the monitor says so. The view edits a working copy:
+**Speichern** validates and persists it, **Abbrechen** discards it, and
+**Standardwerte** restores the proposed defaults (German labels; the other
+languages use their own words).
 Measurement stays stopped while settings are open and after returning.
 The **language** at the top of Settings (Deutsch, English, Hrvatski,
 中文（简体）) is the exception to the working copy: it switches the whole app
@@ -136,10 +141,10 @@ open-source license view. Opening and closing About follows the same stop and
 no-auto-restart rule.
 
 The **Sternenladen** button (shop icon) opens the star shop: the star balance,
-a preview of Mia with what she currently wears, and five items (bow, scarf,
+a preview of Mia with what she currently has, and five items (bow, scarf,
 party hat, cushion, toy mouse) with their prices. Buying asks for a short
 confirmation; with too few stars the button shows how many are missing.
-Bought items can be put on and taken off at any time. If the stars cannot be
+Bought items can be given to Mia and taken back at any time. If the stars cannot be
 stored, the shop says so and keeps working in memory. Opening and closing the
 shop follows the same stop and no-auto-restart rule.
 

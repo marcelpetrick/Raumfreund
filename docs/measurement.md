@@ -43,7 +43,7 @@ sample, at least the configured alarm delay after the phase start (Settings,
 delay applies from the next measurement start. Samples that arrive too sparsely to
 fill the three-second window (e.g. one per second) for more than three seconds
 are treated like a gap and never trigger an alarm. So that this is not silent,
-the status panel shows "Messung gestört – zu wenige Messwerte" once readings
+the status panel shows "Messung unsicher – zu wenige Messwerte" once readings
 have covered less than half of the last three seconds for at least two seconds
 (regular readings slower than one per 0.4 s); a single stall does not show it.
 The hint disappears after three seconds with at least 60 % coverage (about one
@@ -54,7 +54,9 @@ right after the start), the measurement ends with
 the headline "Keine Messwerte" and an explanation instead of keeping the last zone on screen; the own alarm
 tone pauses this check (ADR 0003). Confirmed green, a confirmed zone change, a gap
 over one second, session stop or the app's own alarm starts a new phase. Each
-phase alarms at most once. While the alarm tone plays, readings are ignored:
+phase alarms at most once; the end of the app's own alarm output also
+starts a new phase, so a room that stays loud gets the alarm again after
+another delay. While the alarm tone plays, readings are ignored:
 the displayed zone stays frozen and gauge and timeline do not show the tone.
 
 When the alarm of a red phase fires, Mia walks away. She stays away, even if
@@ -70,3 +72,14 @@ the open bucket is shown as a live point refreshed at most once per second.
 The gauge uses the same idea with a 100 ms attack and a 1 s release. Chart
 colour shares describe these smoothed points, not the alarm's confirmed zone.
 Quiet stars are session-local encouragement and are not an acoustic record.
+
+## Calibrating
+
+The calibration correction (Settings, −30 to +30 dB) is added to every
+estimated level. Settings stops the measurement, so there is no live value
+while the slider moves. To calibrate, put a sound level meter right next to
+the phone, make a steady sound (for example white noise or a fan), read both
+values during a measurement, enter the difference as the correction, save,
+and measure again to check. The result stays an estimate: the phone's
+microphone, its automatic processing and the room still differ from a
+certified meter.
