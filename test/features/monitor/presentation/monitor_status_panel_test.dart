@@ -65,16 +65,22 @@ void _totalTests() {
     tester,
   ) async {
     await _panelHeight(tester, _data(stars: 2, wallet: 7), 1);
-    expect(find.text('2 neue Sterne · 7 im Sternenladen'), findsOneWidget);
+    expect(
+      find.text('2 Sterne in dieser Messung · 7 im Sternenladen'),
+      findsOneWidget,
+    );
 
     await _panelHeight(tester, _data(stars: 0, wallet: 7), 1);
     expect(
-      find.text('Noch keine neuen Sterne · 7 im Sternenladen'),
+      find.text('Noch kein Stern in dieser Messung · 7 im Sternenladen'),
       findsOneWidget,
     );
 
     await _panelHeight(tester, _data(stars: 1, wallet: 7), 1);
-    expect(find.text('1 neuer Stern · 7 im Sternenladen'), findsOneWidget);
+    expect(
+      find.text('1 Stern in dieser Messung · 7 im Sternenladen'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('says when the five-second star test mode is on', (tester) async {
@@ -89,8 +95,50 @@ void _totalTests() {
   testWidgets('hides the total while the wallet is unknown', (tester) async {
     await _panelHeight(tester, _data(stars: 2), 1);
 
-    expect(find.text('2 Sterne'), findsOneWidget);
+    expect(find.text('2 Sterne in dieser Messung'), findsOneWidget);
     expect(find.textContaining('Sternenladen'), findsNothing);
+  });
+
+  testWidgets('without a running measurement only the total is shown', (
+    tester,
+  ) async {
+    for (final phase in [
+      MonitorPhase.idle,
+      MonitorPhase.stopping,
+      MonitorPhase.error,
+    ]) {
+      await _panelHeight(tester, _data(phase: phase, stars: 2, wallet: 7), 1);
+      expect(find.text('7 Sterne im Sternenladen'), findsOneWidget);
+      expect(find.textContaining('in dieser Messung'), findsNothing);
+    }
+    await _panelHeight(tester, _data(phase: MonitorPhase.idle, wallet: 1), 1);
+    expect(find.text('1 Stern im Sternenladen'), findsOneWidget);
+    await _panelHeight(tester, _data(phase: MonitorPhase.idle, wallet: 0), 1);
+    expect(find.text('Noch keine Sterne im Sternenladen'), findsOneWidget);
+  });
+
+  testWidgets('a paused or starting measurement keeps its stars', (
+    tester,
+  ) async {
+    for (final phase in [MonitorPhase.sleeping, MonitorPhase.starting]) {
+      await _panelHeight(tester, _data(phase: phase, stars: 2, wallet: 7), 1);
+      expect(
+        find.text('2 Sterne in dieser Messung · 7 im Sternenladen'),
+        findsOneWidget,
+      );
+    }
+  });
+
+  testWidgets('idle with an unknown wallet shows no count', (tester) async {
+    final handle = tester.ensureSemantics();
+    await _panelHeight(tester, _data(phase: MonitorPhase.idle, stars: 2), 1);
+
+    expect(find.textContaining('2 Sterne'), findsNothing);
+    expect(
+      find.bySemanticsLabel(RegExp('^${l10nDe.starsProgress(40)}')),
+      findsOneWidget,
+    );
+    handle.dispose();
   });
 
   testWidgets('the star semantics label includes the total', (tester) async {
@@ -98,7 +146,9 @@ void _totalTests() {
     await _panelHeight(tester, _data(stars: 2, wallet: 7), 1);
 
     expect(
-      find.bySemanticsLabel(RegExp('2 neue Sterne · 7 im Sternenladen')),
+      find.bySemanticsLabel(
+        RegExp('2 Sterne in dieser Messung · 7 im Sternenladen'),
+      ),
       findsOneWidget,
     );
     handle.dispose();

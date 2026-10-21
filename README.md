@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.8.2+89` — code-complete release candidate**
+Current version: **`0.8.3+90` — code-complete release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -86,14 +86,16 @@ build.
   room is calm again.
 - Zone hysteresis: peaks switch the light quickly, but it cools down slowly,
   so the colour does not flicker at a threshold and the text does not jump.
-- Configurable alarm delay (3–60 s, default 10 s) with one alarm per loud
-  yellow/red phase, never before the delay, and protection against
-  retriggering on the app's own sound; if the room stays loud, the alarm
-  comes again after another delay
+- Configurable alarm delay (3–60 s, default 10 s): the alarm never comes
+  before the delay and is protected against retriggering on the app's own
+  sound. Each alarm with sound or vibration starts the count over, so a room
+  that stays loud gets it again after another delay; with both off it is only
+  shown, once per loud phase
   ([ADR 0004](docs/adr/0004-zone-hysteresis.md)).
 - A 10-minute RAM-only timeline (one smoothed point per 10 s; peaks rise fast
   and cool down slowly) and quiet-minute stars (one per full minute of green
-  in a row).
+  in a row). While a measurement runs, the star line counts its stars next
+  to the Sternenladen total; otherwise it shows only the total.
 - Earned stars stay in the classroom's local wallet through noise, stops and
   restarts. A Settings test mode, off by default, shortens only the next-star
   interval from 60 seconds to 5 seconds.

@@ -38,7 +38,7 @@ final class QuietStars {
   double _progress = 0;
   bool _earnedNow = false;
 
-  /// Stars earned in this app session.
+  /// Stars earned in the current measurement (kept across a pause).
   int get stars => _stars;
 
   /// Progress (0..1) of the current green minute.
@@ -83,6 +83,13 @@ final class QuietStars {
   void reset() {
     _restartMinute();
     _lastSample = null;
+  }
+
+  /// Starts a new measurement: forgets the earned count and the minute.
+  /// The stars themselves are already in the Sternenladen wallet.
+  void clear() {
+    _stars = 0;
+    reset();
   }
 
   /// Changes the earning interval and restarts only the partial interval.

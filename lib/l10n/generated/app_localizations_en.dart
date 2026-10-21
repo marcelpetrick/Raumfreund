@@ -195,7 +195,7 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '1 star',
       zero: 'No stars yet',
     );
-    return '$_temp0';
+    return '$_temp0 in this measurement';
   }
 
   @override
@@ -203,11 +203,23 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count new stars',
-      one: '1 new star',
-      zero: 'No new stars yet',
+      other: '$count stars',
+      one: '1 star',
+      zero: 'No stars yet',
     );
-    return '$_temp0 · $total in the star shop';
+    return '$_temp0 in this measurement · $total in the star shop';
+  }
+
+  @override
+  String starsInShop(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stars in the star shop',
+      one: '1 star in the star shop',
+      zero: 'No stars in the star shop yet',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -317,7 +329,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsCalibrationExplanation =>
-      'Phone microphones differ in sensitivity. Put a sound level meter right next to the phone and make a steady sound (for example white noise or a fan). Compare Raumfreund with the meter, enter the difference here as the correction, save and check again. The display is still an estimate.';
+      'Phone microphones differ in sensitivity. Put a sound level meter right next to the phone (on C or Z weighting rather than A, if it offers them) and play steady noise through a speaker. Start a measurement on the main screen, read both values, then open Settings again. Subtract Raumfreund\'s value from the meter\'s and add the result to the correction here – for example: correction +5, meter 63 dB, Raumfreund 60 dB, so the new correction is +8. Save and check again. The display is still an estimate.';
 
   @override
   String get settingsAlarmHeading => 'Alarm';
@@ -340,7 +352,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String settingsAlarmDelayRule(int seconds, int min, int max, int standard) {
-    return 'How the alarm works: when the light stays yellow for $seconds seconds (or red for $seconds seconds), the alarm goes off. Short quieter moments do not stop the clock. If the light switches between yellow and red or turns green, the time starts over – and also after every alarm: if it stays loud, the alarm comes again. You can choose $min to $max seconds; the default is $standard seconds.';
+    return 'How the alarm works: when the light stays yellow for $seconds seconds (or red for $seconds seconds), the alarm goes off. Short quieter moments do not stop the clock. If the light switches between yellow and red or turns green, the time starts over – and also after every alarm with sound or vibration: if it stays loud, the alarm comes again. With sound and vibration both off, Raumfreund only shows the alarm, once per loud phase. You can choose $min to $max seconds; the default is $standard seconds.';
   }
 
   @override

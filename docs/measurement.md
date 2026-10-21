@@ -53,10 +53,12 @@ silence at the -100 dBFS floor arrives (a muted microphone), for 3 s (5 s
 right after the start), the measurement ends with
 the headline "Keine Messwerte" and an explanation instead of keeping the last zone on screen; the own alarm
 tone pauses this check (ADR 0003). Confirmed green, a confirmed zone change, a gap
-over one second, session stop or the app's own alarm starts a new phase. Each
-phase alarms at most once; the end of the app's own alarm output also
-starts a new phase, so a room that stays loud gets the alarm again after
-another delay. While the alarm tone plays, readings are ignored:
+over one second, session stop or the end of the app's own alarm output
+starts a new phase. Each phase alarms at most once. With sound or vibration
+on, the output ends the phase, so a room that stays loud gets the alarm
+again after another delay; with both off, nothing is played, the alarm is
+only shown and stays shown for the rest of that phase. While the alarm tone
+plays, readings are ignored:
 the displayed zone stays frozen and gauge and timeline do not show the tone.
 
 When the alarm of a red phase fires, Mia walks away. She stays away, even if
@@ -77,9 +79,18 @@ Quiet stars are session-local encouragement and are not an acoustic record.
 
 The calibration correction (Settings, −30 to +30 dB) is added to every
 estimated level. Settings stops the measurement, so there is no live value
-while the slider moves. To calibrate, put a sound level meter right next to
-the phone, make a steady sound (for example white noise or a fan), read both
-values during a measurement, enter the difference as the correction, save,
-and measure again to check. The result stays an estimate: the phone's
+while the slider moves. To calibrate:
+
+1. Put a sound level meter right next to the phone. Set it to C or Z
+   weighting if it can: the app measures the unweighted signal, and A
+   weighting reads lower for low-frequency sound such as a fan.
+2. Play steady broadband noise through a speaker and start a measurement
+   on the main screen.
+3. Read both values, compute meter minus Raumfreund and open Settings.
+4. Add that to the correction already set in Settings (correction +5,
+   meter 63 dB, Raumfreund 60 dB: new correction +8), save, and measure
+   again to check.
+
+The in-app explanation says the same in all four languages. The result stays an estimate: the phone's
 microphone, its automatic processing and the room still differ from a
 certified meter.

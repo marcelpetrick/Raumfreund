@@ -115,6 +115,7 @@ void main() {
     expect(find.text(l10nDe.starsHintQuickTest), findsOneWidget);
   });
   _shopTests();
+  _walletFailureTests();
   _sleepTest();
   _sleepNavigationTest();
 }
@@ -275,7 +276,7 @@ void _shopTests() {
       {KittyAccessory.bow},
     );
 
-    expect(find.text(l10nDe.starsWithTotal(0, 2)), findsOneWidget);
+    expect(find.text(l10nDe.starsInShop(2)), findsOneWidget);
 
     await tester.tap(find.text(l10nDe.measureStart));
     await _finishAsyncWork(tester);
@@ -292,7 +293,9 @@ void _shopTests() {
     await _finishWithRealAsync(tester);
     expect(find.text(l10nDe.shopBalance(3)), findsOneWidget);
   });
+}
 
+void _walletFailureTests() {
   testWidgets('the monitor shows no total while the wallet fails to load', (
     tester,
   ) async {
@@ -309,6 +312,12 @@ void _shopTests() {
     );
     await _finishAsyncWork(tester);
 
+    expect(find.text(l10nDe.starsCount(0)), findsNothing);
+    expect(find.textContaining('Sternenladen'), findsNothing);
+
+    // While measuring, the count shows without a total.
+    await tester.tap(find.text(l10nDe.measureStart));
+    await _finishAsyncWork(tester);
     expect(find.text(l10nDe.starsCount(0)), findsOneWidget);
     expect(find.textContaining('Sternenladen'), findsNothing);
   });

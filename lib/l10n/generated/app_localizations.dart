@@ -414,17 +414,23 @@ abstract class AppLocalizations {
   /// **'Spielzeugmaus'**
   String get accessoryMouse;
 
-  /// Number of stars earned for quiet minutes.
+  /// Stars earned in the running measurement while the Sternenladen total is unknown.
   ///
   /// In de, this message translates to:
-  /// **'{count, plural, =0{Noch keine Sterne} =1{1 Stern} other{{count} Sterne}}'**
+  /// **'{count, plural, =0{Noch kein Stern} =1{1 Stern} other{{count} Sterne}} in dieser Messung'**
   String starsCount(int count);
 
-  /// Session stars plus the persistent Sternenladen balance.
+  /// Stars earned in the running measurement plus the persistent Sternenladen balance.
   ///
   /// In de, this message translates to:
-  /// **'{count, plural, =0{Noch keine neuen Sterne} =1{1 neuer Stern} other{{count} neue Sterne}} · {total} im Sternenladen'**
+  /// **'{count, plural, =0{Noch kein Stern} =1{1 Stern} other{{count} Sterne}} in dieser Messung · {total} im Sternenladen'**
   String starsWithTotal(int count, int total);
+
+  /// Stars in the persistent Sternenladen, shown while no measurement runs.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Noch keine Sterne im Sternenladen} =1{1 Stern im Sternenladen} other{{count} Sterne im Sternenladen}}'**
+  String starsInShop(int count);
 
   /// Explains the star counter.
   ///
@@ -603,7 +609,7 @@ abstract class AppLocalizations {
   /// How to calibrate.
   ///
   /// In de, this message translates to:
-  /// **'Handy-Mikrofone sind unterschiedlich empfindlich. Lege ein Schallpegelmessgerät direkt neben das Handy und sorge für ein gleichmäßiges Geräusch (z. B. Rauschen oder einen Lüfter). Vergleiche die Anzeige von Raumfreund mit dem Messgerät, stelle hier die Differenz als Korrektur ein, speichere und prüfe erneut. Die Anzeige bleibt trotzdem eine Schätzung.'**
+  /// **'Handy-Mikrofone sind unterschiedlich empfindlich. Lege ein Schallpegelmessgerät direkt neben das Handy (wenn möglich mit C- oder Z-Bewertung statt A) und spiele über einen Lautsprecher ein gleichmäßiges Rauschen ab. Starte auf dem Hauptbildschirm eine Messung, lies beide Werte ab und öffne dann wieder die Einstellungen. Rechne Messgerät minus Raumfreund und addiere das Ergebnis zur hier eingestellten Korrektur – Beispiel: Korrektur +5, Messgerät 63 dB, Raumfreund 60 dB, also neue Korrektur +8. Speichere und prüfe erneut. Die Anzeige bleibt trotzdem eine Schätzung.'**
   String get settingsCalibrationExplanation;
 
   /// Section heading.
@@ -639,7 +645,7 @@ abstract class AppLocalizations {
   /// Explains the alarm rule with the configured delay and its range.
   ///
   /// In de, this message translates to:
-  /// **'So funktioniert der Alarm: Ist die Ampel {seconds} Sekunden lang gelb (oder {seconds} Sekunden lang rot), kommt der Alarm. Kurze leisere Momente unterbrechen die Zeit nicht. Springt die Ampel zwischen Gelb und Rot oder wird sie grün, beginnt die Zeit von vorn – und auch nach jedem Alarm: Bleibt es laut, kommt er erneut. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.'**
+  /// **'So funktioniert der Alarm: Ist die Ampel {seconds} Sekunden lang gelb (oder {seconds} Sekunden lang rot), kommt der Alarm. Kurze leisere Momente unterbrechen die Zeit nicht. Springt die Ampel zwischen Gelb und Rot oder wird sie grün, beginnt die Zeit von vorn – und auch nach jedem Alarm mit Ton oder Vibration: Bleibt es laut, kommt er erneut. Sind Ton und Vibration aus, zeigt Raumfreund den Alarm nur an, einmal pro lauter Phase. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.'**
   String settingsAlarmDelayRule(int seconds, int min, int max, int standard);
 
   /// Alarm sound switch.

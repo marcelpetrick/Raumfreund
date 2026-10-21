@@ -129,7 +129,7 @@ final class MonitorState {
   /// Monotonic time at which this state was created (x-axis reference).
   final Duration historyNow;
 
-  /// Quiet stars earned in this app session.
+  /// Quiet stars earned in the current measurement (kept across a pause).
   final int stars;
 
   /// Progress (0..1) to the next star.

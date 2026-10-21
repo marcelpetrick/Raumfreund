@@ -139,15 +139,20 @@
   "accessoryMouse": "Spielzeugmaus",
   "@accessoryMouse": {"description": "Shop item name: toy mouse."},
 
-  "starsCount": "{count, plural, =0{Noch keine Sterne} =1{1 Stern} other{{count} Sterne}}",
+  "starsCount": "{count, plural, =0{Noch kein Stern} =1{1 Stern} other{{count} Sterne}} in dieser Messung",
   "@starsCount": {
-    "description": "Number of stars earned for quiet minutes.",
+    "description": "Stars earned in the running measurement while the Sternenladen total is unknown.",
     "placeholders": {"count": {"type": "int"}}
   },
-  "starsWithTotal": "{count, plural, =0{Noch keine neuen Sterne} =1{1 neuer Stern} other{{count} neue Sterne}} · {total} im Sternenladen",
+  "starsWithTotal": "{count, plural, =0{Noch kein Stern} =1{1 Stern} other{{count} Sterne}} in dieser Messung · {total} im Sternenladen",
   "@starsWithTotal": {
-    "description": "Session stars plus the persistent Sternenladen balance.",
+    "description": "Stars earned in the running measurement plus the persistent Sternenladen balance.",
     "placeholders": {"count": {"type": "int"}, "total": {"type": "int"}}
+  },
+  "starsInShop": "{count, plural, =0{Noch keine Sterne im Sternenladen} =1{1 Stern im Sternenladen} other{{count} Sterne im Sternenladen}}",
+  "@starsInShop": {
+    "description": "Stars in the persistent Sternenladen, shown while no measurement runs.",
+    "placeholders": {"count": {"type": "int"}}
   },
   "starsHint": "Für jede Minute am Stück im grünen Bereich gibt es einen Stern",
   "@starsHint": {"description": "Explains the star counter."},
@@ -224,7 +229,7 @@
     "description": "Signed calibration value, e.g. +3 dB.",
     "placeholders": {"value": {"type": "String"}}
   },
-  "settingsCalibrationExplanation": "Handy-Mikrofone sind unterschiedlich empfindlich. Lege ein Schallpegelmessgerät direkt neben das Handy und sorge für ein gleichmäßiges Geräusch (z. B. Rauschen oder einen Lüfter). Vergleiche die Anzeige von Raumfreund mit dem Messgerät, stelle hier die Differenz als Korrektur ein, speichere und prüfe erneut. Die Anzeige bleibt trotzdem eine Schätzung.",
+  "settingsCalibrationExplanation": "Handy-Mikrofone sind unterschiedlich empfindlich. Lege ein Schallpegelmessgerät direkt neben das Handy (wenn möglich mit C- oder Z-Bewertung statt A) und spiele über einen Lautsprecher ein gleichmäßiges Rauschen ab. Starte auf dem Hauptbildschirm eine Messung, lies beide Werte ab und öffne dann wieder die Einstellungen. Rechne Messgerät minus Raumfreund und addiere das Ergebnis zur hier eingestellten Korrektur – Beispiel: Korrektur +5, Messgerät 63 dB, Raumfreund 60 dB, also neue Korrektur +8. Speichere und prüfe erneut. Die Anzeige bleibt trotzdem eine Schätzung.",
   "@settingsCalibrationExplanation": {"description": "How to calibrate."},
   "settingsAlarmHeading": "Alarm",
   "@settingsAlarmHeading": {"description": "Section heading."},
@@ -239,7 +244,7 @@
   "@settingsAlarmDelayDecrease": {"description": "Tooltip of the alarm delay minus button."},
   "settingsAlarmDelayIncrease": "Alarm-Wartezeit um 1 Sekunde verlängern",
   "@settingsAlarmDelayIncrease": {"description": "Tooltip of the alarm delay plus button."},
-  "settingsAlarmDelayRule": "So funktioniert der Alarm: Ist die Ampel {seconds} Sekunden lang gelb (oder {seconds} Sekunden lang rot), kommt der Alarm. Kurze leisere Momente unterbrechen die Zeit nicht. Springt die Ampel zwischen Gelb und Rot oder wird sie grün, beginnt die Zeit von vorn – und auch nach jedem Alarm: Bleibt es laut, kommt er erneut. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.",
+  "settingsAlarmDelayRule": "So funktioniert der Alarm: Ist die Ampel {seconds} Sekunden lang gelb (oder {seconds} Sekunden lang rot), kommt der Alarm. Kurze leisere Momente unterbrechen die Zeit nicht. Springt die Ampel zwischen Gelb und Rot oder wird sie grün, beginnt die Zeit von vorn – und auch nach jedem Alarm mit Ton oder Vibration: Bleibt es laut, kommt er erneut. Sind Ton und Vibration aus, zeigt Raumfreund den Alarm nur an, einmal pro lauter Phase. Einstellbar sind {min} bis {max} Sekunden, Standard sind {standard} Sekunden.",
   "@settingsAlarmDelayRule": {
     "description": "Explains the alarm rule with the configured delay and its range.",
     "placeholders": {

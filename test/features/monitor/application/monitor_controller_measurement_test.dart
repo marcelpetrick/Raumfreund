@@ -337,6 +337,11 @@ void starsTests() {
       await h.controller.stop();
       expect(h.state.stars, 1);
       expect(h.state.starProgress, 0);
+      // A new measurement counts its own stars.
+      await h.controller.start();
+      expect(h.state.stars, 0);
+      h.readings(greenDbfs, 601);
+      expect(h.state.stars, 1);
     });
 
     test(
@@ -371,9 +376,10 @@ void starsTests() {
         );
         expect(h.state.stars, 1);
         expect(h.state.starProgress, 0);
+        // The next measurement counts from zero; the wallet keeps the star.
         await h.controller.start();
         h.readings(greenDbfs, 51);
-        expect(h.state.stars, 2);
+        expect(h.state.stars, 1);
       },
     );
 
@@ -389,7 +395,7 @@ void starsTests() {
         await h.controller.applySettings(AppSettings.defaults);
         await h.controller.start();
         h.readings(greenDbfs, 51);
-        expect(h.state.stars, 1);
+        expect(h.state.stars, 0);
         expect(h.state.starProgress, closeTo(5 / 60, 1e-9));
       },
     );

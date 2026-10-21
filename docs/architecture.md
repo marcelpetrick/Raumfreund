@@ -88,7 +88,7 @@ Android AudioRecord
   -> calibration (raw estimated level)
   -> alarm state machine
        -> zone hysteresis: raw zone per sample -> confirmed zone
-       -> phases, countdown and the one alarm per phase
+       -> phases, countdown and at most one alarm per phase
   -> peak envelope -> calmer gauge value and 10-minute timeline
   -> immutable monitor state (confirmed zone drives UI, stars and Mia)
   -> Flutter widgets
@@ -148,7 +148,9 @@ A phase starts at the first sample of the loud run that led to its confirmed
 zone. Dips inside the phase count, a quiet tail does not, and the alarm fires
 only on a loud sample once the configured delay (3–60 s, default 10 s) has
 passed, at most once per phase. Because the end of the alarm output resets
-the machine, a room that stays loud alarms again after another delay. A
+the machine, a room that stays loud alarms again after another delay; with
+sound and vibration both off nothing is played, so the alarm is only shown,
+once for the whole phase. A
 confirmed green zone, gaps over one second,
 long stretches of too few samples and session termination reset continuity.
 

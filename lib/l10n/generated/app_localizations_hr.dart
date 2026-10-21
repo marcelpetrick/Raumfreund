@@ -204,7 +204,7 @@ class AppLocalizationsHr extends AppLocalizations {
       one: '$count zvjezdica',
       zero: 'Još nema zvjezdica',
     );
-    return '$_temp0';
+    return '$_temp0 u ovom mjerenju';
   }
 
   @override
@@ -212,12 +212,25 @@ class AppLocalizationsHr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count novih zvjezdica',
-      few: '$count nove zvjezdice',
-      one: '$count nova zvjezdica',
-      zero: 'Još nema novih zvjezdica',
+      other: '$count zvjezdica',
+      few: '$count zvjezdice',
+      one: '$count zvjezdica',
+      zero: 'Još nema zvjezdica',
     );
-    return '$_temp0 · $total u trgovini zvjezdica';
+    return '$_temp0 u ovom mjerenju · $total u trgovini zvjezdica';
+  }
+
+  @override
+  String starsInShop(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count zvjezdica u trgovini zvjezdica',
+      few: '$count zvjezdice u trgovini zvjezdica',
+      one: '$count zvjezdica u trgovini zvjezdica',
+      zero: 'U trgovini zvjezdica još nema zvjezdica',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -328,7 +341,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsCalibrationExplanation =>
-      'Mikrofoni mobitela nisu jednako osjetljivi. Stavi mjerač razine zvuka odmah uz mobitel i pusti ravnomjeran zvuk (npr. šum ili ventilator). Usporedi Raumfreund s mjeračem, ovdje upiši razliku kao korekciju, spremi i ponovno provjeri. Prikaz i dalje ostaje procjena.';
+      'Mikrofoni mobitela nisu jednako osjetljivi. Stavi mjerač razine zvuka odmah uz mobitel (ako može, s vrednovanjem C ili Z umjesto A) i preko zvučnika pusti ravnomjeran šum. Pokreni mjerenje na glavnom zaslonu, očitaj obje vrijednosti i zatim ponovno otvori postavke. Od vrijednosti mjerača oduzmi vrijednost Raumfreunda i rezultat dodaj trenutačnoj korekciji ovdje – primjer: korekcija +5, mjerač 63 dB, Raumfreund 60 dB, dakle nova korekcija +8. Spremi i ponovno provjeri. Prikaz i dalje ostaje procjena.';
 
   @override
   String get settingsAlarmHeading => 'Alarm';
@@ -357,7 +370,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String settingsAlarmDelayRule(int seconds, int min, int max, int standard) {
-    return 'Ovako radi alarm: ako semafor $seconds s ostane žut (ili $seconds s crven), oglasi se alarm. Kratki tiši trenuci ne prekidaju vrijeme. Ako semafor prijeđe između žutog i crvenog ili postane zelen, vrijeme kreće ispočetka – kao i nakon svakog alarma: ako i dalje bude glasno, alarm se ponovno oglasi. Može se namjestiti od $min do $max s, zadano je $standard s.';
+    return 'Ovako radi alarm: ako semafor $seconds s ostane žut (ili $seconds s crven), oglasi se alarm. Kratki tiši trenuci ne prekidaju vrijeme. Ako semafor prijeđe između žutog i crvenog ili postane zelen, vrijeme kreće ispočetka – kao i nakon svakog alarma sa zvukom ili vibracijom: ako i dalje bude glasno, alarm se ponovno oglasi. Ako su zvuk i vibracija isključeni, Raumfreund alarm samo prikazuje, jednom po glasnoj fazi. Može se namjestiti od $min do $max s, zadano je $standard s.';
   }
 
   @override

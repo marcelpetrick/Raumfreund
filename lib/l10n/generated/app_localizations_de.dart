@@ -193,9 +193,9 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other: '$count Sterne',
       one: '1 Stern',
-      zero: 'Noch keine Sterne',
+      zero: 'Noch kein Stern',
     );
-    return '$_temp0';
+    return '$_temp0 in dieser Messung';
   }
 
   @override
@@ -203,11 +203,23 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count neue Sterne',
-      one: '1 neuer Stern',
-      zero: 'Noch keine neuen Sterne',
+      other: '$count Sterne',
+      one: '1 Stern',
+      zero: 'Noch kein Stern',
     );
-    return '$_temp0 · $total im Sternenladen';
+    return '$_temp0 in dieser Messung · $total im Sternenladen';
+  }
+
+  @override
+  String starsInShop(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Sterne im Sternenladen',
+      one: '1 Stern im Sternenladen',
+      zero: 'Noch keine Sterne im Sternenladen',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -318,7 +330,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsCalibrationExplanation =>
-      'Handy-Mikrofone sind unterschiedlich empfindlich. Lege ein Schallpegelmessgerät direkt neben das Handy und sorge für ein gleichmäßiges Geräusch (z. B. Rauschen oder einen Lüfter). Vergleiche die Anzeige von Raumfreund mit dem Messgerät, stelle hier die Differenz als Korrektur ein, speichere und prüfe erneut. Die Anzeige bleibt trotzdem eine Schätzung.';
+      'Handy-Mikrofone sind unterschiedlich empfindlich. Lege ein Schallpegelmessgerät direkt neben das Handy (wenn möglich mit C- oder Z-Bewertung statt A) und spiele über einen Lautsprecher ein gleichmäßiges Rauschen ab. Starte auf dem Hauptbildschirm eine Messung, lies beide Werte ab und öffne dann wieder die Einstellungen. Rechne Messgerät minus Raumfreund und addiere das Ergebnis zur hier eingestellten Korrektur – Beispiel: Korrektur +5, Messgerät 63 dB, Raumfreund 60 dB, also neue Korrektur +8. Speichere und prüfe erneut. Die Anzeige bleibt trotzdem eine Schätzung.';
 
   @override
   String get settingsAlarmHeading => 'Alarm';
@@ -341,7 +353,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String settingsAlarmDelayRule(int seconds, int min, int max, int standard) {
-    return 'So funktioniert der Alarm: Ist die Ampel $seconds Sekunden lang gelb (oder $seconds Sekunden lang rot), kommt der Alarm. Kurze leisere Momente unterbrechen die Zeit nicht. Springt die Ampel zwischen Gelb und Rot oder wird sie grün, beginnt die Zeit von vorn – und auch nach jedem Alarm: Bleibt es laut, kommt er erneut. Einstellbar sind $min bis $max Sekunden, Standard sind $standard Sekunden.';
+    return 'So funktioniert der Alarm: Ist die Ampel $seconds Sekunden lang gelb (oder $seconds Sekunden lang rot), kommt der Alarm. Kurze leisere Momente unterbrechen die Zeit nicht. Springt die Ampel zwischen Gelb und Rot oder wird sie grün, beginnt die Zeit von vorn – und auch nach jedem Alarm mit Ton oder Vibration: Bleibt es laut, kommt er erneut. Sind Ton und Vibration aus, zeigt Raumfreund den Alarm nur an, einmal pro lauter Phase. Einstellbar sind $min bis $max Sekunden, Standard sind $standard Sekunden.';
   }
 
   @override

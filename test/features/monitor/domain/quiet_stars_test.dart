@@ -77,6 +77,14 @@ void main() {
     expect(stars.progress, 0);
   });
 
+  test('clear starts a new measurement at zero', () {
+    feed(stars, Zone.green, fromMs: 0, toMs: 90000);
+    stars.clear();
+    expect(stars.stars, 0);
+    expect(stars.progress, 0);
+    expect(stars.earnedStarNow, isFalse);
+  });
+
   test('noise after three stars resets progress but not earned stars', () {
     feed(stars, Zone.green, fromMs: 0, toMs: 180000);
     stars.onSample(timestamp: ms(180100), zone: Zone.red);

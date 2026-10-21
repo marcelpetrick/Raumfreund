@@ -185,7 +185,7 @@ class AppLocalizationsZh extends AppLocalizations {
       other: '$count 颗星星',
       zero: '还没有星星',
     );
-    return '$_temp0';
+    return '本次测量：$_temp0';
   }
 
   @override
@@ -193,10 +193,21 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '新得 $count 颗星星',
-      zero: '还没有新星星',
+      other: '$count 颗星星',
+      zero: '还没有星星',
     );
-    return '$_temp0 · 星星商店里共 $total 颗';
+    return '本次测量：$_temp0 · 星星商店里共 $total 颗';
+  }
+
+  @override
+  String starsInShop(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '星星商店里共 $count 颗星星',
+      zero: '星星商店里还没有星星',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -302,7 +313,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsCalibrationExplanation =>
-      '不同手机的麦克风灵敏度不同。把一台声级计直接放在手机旁边，制造一个稳定的声音（例如白噪声或风扇声）。比较 Raumfreund 和声级计的读数，在这里把差值设为修正值，保存后再检查一次。显示的数值仍然只是估计值。';
+      '不同手机的麦克风灵敏度不同。把一台声级计直接放在手机旁边（如果可以，请选 C 或 Z 计权，而不是 A 计权），并用音箱播放稳定的噪声。在主屏幕上开始测量，读出两个数值，然后再打开设置。用声级计的读数减去 Raumfreund 的读数，再把结果加到这里当前的修正值上——例如：修正值 +5，声级计 63 dB，Raumfreund 60 dB，新的修正值就是 +8。保存后再检查一次。显示的数值仍然只是估计值。';
 
   @override
   String get settingsAlarmHeading => '提醒';
@@ -323,7 +334,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String settingsAlarmDelayRule(int seconds, int min, int max, int standard) {
-    return '提醒规则：黄灯持续亮 $seconds 秒（或红灯持续亮 $seconds 秒）时会发出提醒。短暂安静一下不会中断计时。灯在黄、红之间切换或变回绿色时，计时重新开始；每次提醒后也会重新计时——如果一直很吵，会再次提醒。可设置 $min 到 $max 秒，默认 $standard 秒。';
+    return '提醒规则：黄灯持续亮 $seconds 秒（或红灯持续亮 $seconds 秒）时会发出提醒。短暂安静一下不会中断计时。灯在黄、红之间切换或变回绿色时，计时重新开始；每次有提示音或振动的提醒之后也会重新计时——如果一直很吵，会再次提醒。提示音和振动都关闭时，Raumfreund 只在屏幕上显示提醒，每个吵闹阶段一次。可设置 $min 到 $max 秒，默认 $standard 秒。';
   }
 
   @override

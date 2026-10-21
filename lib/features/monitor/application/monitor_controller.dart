@@ -277,11 +277,14 @@ final class MonitorController extends ChangeNotifier {
     _alarm = _alarmFor(_settings);
     _calibration = Calibration(correctionDb: _settings.calibrationCorrectionDb);
     _smoother.reset();
-    _stars.reset();
+    // A pause continues the measurement, so waking keeps its star count;
+    // a manual start begins a new one ("in dieser Messung").
+    waking ? _stars.reset() : _stars.clear();
     _sessionHadReading = false;
     _emit(
       _state.copyWith(
         status: MonitorStatus.permissionPending,
+        stars: _stars.stars,
         clearFailure: true,
         clearLevels: true,
         clearRemaining: true,

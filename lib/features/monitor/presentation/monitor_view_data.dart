@@ -119,7 +119,7 @@ final class MonitorViewData {
   /// Shop items Mia currently wears.
   final Set<KittyAccessory> kittyAccessories;
 
-  /// Quiet minutes earned during this app session.
+  /// Quiet stars earned in the running measurement (see [showsSessionStars]).
   final int stars;
 
   /// Stars in the persistent Sternenladen wallet, or null while unknown
@@ -150,6 +150,16 @@ final class MonitorViewData {
 
   /// Whether a measurement is active and the primary action stops it.
   bool get isActive => phase == MonitorPhase.measuring;
+
+  /// Whether the star line counts the stars of the running measurement.
+  /// Paused (sleeping) still counts as running; idle, stopping and error
+  /// show only the Sternenladen total.
+  bool get showsSessionStars => switch (phase) {
+    MonitorPhase.starting ||
+    MonitorPhase.measuring ||
+    MonitorPhase.sleeping => true,
+    MonitorPhase.idle || MonitorPhase.stopping || MonitorPhase.error => false,
+  };
 
   /// Whether Mia sleeps: paused, or a paused measurement is restarting.
   bool get kittySleeps =>

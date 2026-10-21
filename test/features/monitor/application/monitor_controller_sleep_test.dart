@@ -17,6 +17,7 @@ import '../../../fakes/settle.dart';
 void main() {
   sleepTests();
   wakeTests();
+  wakeStarTests();
   teardownRaceTests();
   explicitStopTests();
 }
@@ -297,6 +298,24 @@ void explicitStopTests() {
       expect(h.source.startCalls, [1]);
       await _lifecycle(h, AppLifecycleState.resumed);
       expect(h.state.status, MonitorStatus.measuring);
+    });
+  });
+}
+
+void wakeStarTests() {
+  group('waking up', () {
+    test('keeps the stars of the paused measurement', () async {
+      final h = await _measuring(
+        settings: AppSettings.defaults.copyWith(quickStarModeEnabled: true),
+      );
+      h.readings(greenDbfs, 60);
+      expect(h.state.stars, 1);
+      await _leave(h);
+      await _lifecycle(h, AppLifecycleState.resumed);
+      expect(h.state.status, MonitorStatus.measuring);
+      expect(h.state.stars, 1);
+      h.readings(greenDbfs, 60);
+      expect(h.state.stars, 2);
     });
   });
 }

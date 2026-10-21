@@ -185,9 +185,15 @@ class _QuietStars extends StatelessWidget {
 
   final MonitorViewData data;
 
-  /// Session stars, plus the wallet total once it is known.
-  String _sessionText(AppLocalizations l10n) {
+  /// While a measurement runs: its stars, plus the wallet total once it is
+  /// known. Otherwise only the wallet total, because the count of the last
+  /// measurement read like a daily total ("2 Sterne heute") and disagreed
+  /// with the Sternenladen after a reset; null while the wallet is unknown.
+  String? _starText(AppLocalizations l10n) {
     final total = data.walletStars;
+    if (!data.showsSessionStars) {
+      return total == null ? null : l10n.starsInShop(total);
+    }
     return total == null
         ? l10n.starsCount(data.stars)
         : l10n.starsWithTotal(data.stars, total);
@@ -197,8 +203,10 @@ class _QuietStars extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final percent = (data.starProgress * 100).round();
+    final starText = _starText(l10n);
+    final progress = l10n.starsProgress(percent);
     return Semantics(
-      label: '${_sessionText(l10n)}. ${l10n.starsProgress(percent)}',
+      label: starText == null ? progress : '$starText. $progress',
       child: Column(
         children: [
           Row(
@@ -211,14 +219,16 @@ class _QuietStars extends StatelessWidget {
                 child: StableText(
                   text: data.starJustEarned
                       ? l10n.starsJustEarned
-                      : _sessionText(l10n),
+                      : starText ?? '',
                   variants: [
                     l10n.starsJustEarned,
-                    _sessionText(l10n),
-                    // Longest realistic totals: 0 stars today with a 3-digit
-                    // wallet, and the widest session count with it.
+                    ?starText,
+                    // Longest realistic texts: no stars yet with a 3-digit
+                    // wallet, the widest session count with it, and the
+                    // wallet alone, so starting or stopping never jumps.
                     l10n.starsWithTotal(0, 999),
                     l10n.starsWithTotal(data.stars, 999),
+                    l10n.starsInShop(999),
                   ],
                   textAlign: TextAlign.center,
                 ),

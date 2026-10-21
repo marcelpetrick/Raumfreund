@@ -139,8 +139,8 @@ The implemented first-release behaviour is:
   no money, no ads).
 - A **shop page** (app bar action, stops measurement like Settings/About)
   lists five cosmetic items from `KittyAccessory`: bow 3, scarf 5, hat 8,
-  cushion 10, toy mouse 12 stars. Buying is one-time; owned items can be put
-  on and taken off for free. Items never affect zones or alarms.
+  cushion 10, toy mouse 12 stars. Buying is one-time; owned items can be given
+  to Mia and taken back for free. Items never affect zones or alarms.
 - Settings gets **"Sterne zurücksetzen"** with a confirmation dialog for the
   teacher; it clears the wallet and the owned items.
 - Mia draws one painter layer per equipped item in every mood, including
@@ -168,8 +168,9 @@ texts, switched live in Settings, persisted, German by default (ADR 0006).
 Red-team result (L10N4): the review found errors in the German source that
 the translations had copied. All of them are fixed in every language:
 
-- **Alarm rule:** it is not "once per phase"; yellow and red time do not add
-  up, and the alarm repeats while the room stays loud.
+- **Alarm rule:** it is not "once per phase" while sound or vibration is on;
+  yellow and red time do not add up, and the alarm repeats while the room
+  stays loud. With both off it is only shown, once per phase (`0.8.3`).
 - **Privacy:** "nothing is recorded" contradicted Android's permission
   dialog, which asks to record audio. The text now says the sound is
   analysed briefly and never saved or sent.
@@ -185,9 +186,11 @@ Chinese now says 提醒 instead of 报警 ("call the police"); Croatian uses
 Open for the owner:
 
 - a native-speaker read-through on a device;
-- whether the teacher's star reset should also clear the session's
-  new-star counter (after a reset the line can show "5 neue Sterne · 0 im
-  Sternenladen").
+- ~~whether the teacher's star reset should also clear the session's
+  new-star counter~~ resolved in `0.8.3`: the star line counts a
+  measurement's stars only while it runs ("2 Sterne in dieser Messung ·
+  7 im Sternenladen") and otherwise shows only the Sternenladen total, so a
+  reset (Settings stops the measurement) can no longer disagree with it.
 
 ## Open: automated quality evidence
 
