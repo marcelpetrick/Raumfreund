@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 #
 # yamllint configuration (version pinned in tool/requirements-dev.in).
-# Run: .toolchain/venv/bin/yamllint --strict .
+# Run: .toolchain/venv/bin/yamllint --strict -c config/yamllint.yaml .
 extends: default
 
 ignore: |

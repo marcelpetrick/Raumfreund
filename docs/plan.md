@@ -6,8 +6,8 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 # Raumfreund – execution plan
 
 This is the restart-safe plan for the Android app. The product specification
-is [`Raumfreund-VISION.md`](Raumfreund-VISION.md); the binding workflow is
-[`AGENTS.md`](AGENTS.md). Every package lands as an atomic Conventional Commit,
+is [`vision.md`](vision.md); the binding workflow is
+[`AGENTS.md`](../AGENTS.md). Every package lands as an atomic Conventional Commit,
 versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
 
 ## Product direction (first release)
@@ -95,7 +95,7 @@ integrates, bumps the version, runs the full pipeline and commits.
 ### Hysteresis decisions (package A)
 
 Four review rounds with probe tests shaped the rule; details are in
-[ADR 0004](docs/adr/0004-zone-hysteresis.md):
+[ADR 0004](adr/0004-zone-hysteresis.md):
 
 - A zone is entered when at least 50 % of the last 1 s is at or above it, and
   left only when it falls below 15 % of the last 3 s (and below 50 % of the

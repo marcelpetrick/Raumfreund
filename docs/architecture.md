@@ -66,6 +66,16 @@ must never import it.
 | `lib/features/about/` | App information and About view | Implemented |
 | `lib/l10n/` | All user-visible German strings | Implemented in ARB/generated files |
 | `android/app/src/main/kotlin/` | Recorder, permission, alarm and channel host | Implemented with JVM tests |
+| `config/` | Linter configuration (detekt, markdownlint, yamllint) | Passed explicitly by the pipeline scripts |
+| `docker/` | `Dockerfile`, its `.dockerignore` and the nginx download page | Built from the repository root as context |
+| `docs/` | Vision, plan, architecture, ADRs and guides; `docs/prototype/` keeps the unvalidated prototype archive | Maintained with every change |
+
+The repository root keeps only what tools expect there (Flutter and pub
+files, `localPipeline.sh`, `AGENTS.md`) and the files a visitor needs first
+(`README.md`, `CHANGELOG.md`, `LICENSE`). This deviates from the root layout
+listed in section 7 of the vision on purpose: `CONTRIBUTING.md` and
+`SECURITY.md` live in `.github/`, where GitHub still shows them, and the
+vision and plan live in `docs/`.
 
 ## Measurement data flow
 

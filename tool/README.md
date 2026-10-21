@@ -94,7 +94,8 @@ To update a tool: change version, URL and SHA-256 in the `tools` array of
 
 `node/package.json` and `node/package-lock.json` pin markdownlint-cli 0.49.1
 (lock file carries integrity hashes; requires Node.js ≥ 22). Configuration:
-`/.markdownlint.jsonc` and `/.markdownlintignore`.
+`/config/markdownlint.jsonc` and `/config/markdownlintignore`
+(passed explicitly by the `docs` step of `localPipeline.sh`).
 
 ```sh
 tool/node/node_modules/.bin/markdownlint "**/*.md"

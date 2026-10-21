@@ -5,7 +5,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 # Contributing
 
-Read `AGENTS.md`, `Raumfreund-VISION.md`, `docs/architecture.md` and the ADRs
+Read `AGENTS.md`, `docs/vision.md`, `docs/architecture.md` and the ADRs
 before changing code. Work on `main`, keep commits atomic and use Conventional
 Commit messages. Every commit needs a version/build bump through
 `tool/bump_version.sh` and a green `./localPipeline.sh` run.

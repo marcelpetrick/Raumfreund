@@ -8,7 +8,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 - Status: accepted (owner decision 2026-10-20, GitHub issue #7)
 - Date: 2026-10-20
 - Amends: [ADR 0003](0003-alarm-and-lifecycle-semantics.md) lifecycle rules
-  and section 3 of `Raumfreund-VISION.md` ("Kehre ohne automatischen Neustart
+  and section 3 of `docs/vision.md` ("Kehre ohne automatischen Neustart
   zurück")
 
 ## Context

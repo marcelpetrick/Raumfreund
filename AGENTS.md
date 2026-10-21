@@ -1,18 +1,18 @@
 # AGENTS.md – Working rules for Raumfreund
 
 These rules are binding for every human or AI agent working in this repository.
-They merge section 8 of [`Raumfreund-VISION.md`](Raumfreund-VISION.md) (the product
+They merge section 8 of [`docs/vision.md`](docs/vision.md) (the product
 specification) with the project owner's workflow rules. Where both define the same
 thing, the stricter rule applies.
 
 ## 1. Orientation before changing anything
 
-- Read `Raumfreund-VISION.md`, `README.md`, `docs/architecture.md` and the ADRs in
+- Read `docs/vision.md`, `README.md`, `docs/architecture.md` and the ADRs in
   `docs/adr/` before making changes. The vision is the source of truth for scope.
 - Scope is **one Android app** (phones and tablets) built with Flutter/Dart.
   iOS, desktop and web are out of scope. Document every necessary assumption in
   the relevant `docs/` page or an ADR.
-- `raumfreund-source.zip` is an unvalidated prototype. Nothing from it is taken over
+- `docs/prototype/raumfreund-source.zip` is an unvalidated prototype. Nothing from it is taken over
   without review; lifecycle, permission, concurrency and alarm handling must be
   re-done properly.
 
@@ -35,7 +35,7 @@ thing, the stricter rule applies.
   `ln -s <main checkout>/.toolchain .toolchain` instead of downloading again.
   Agents commit only on their own worktree branch, without version bumps or
   changelog edits; the coordinator integrates.
-- Track the work packages, their owners and status in `plan.md`.
+- Track the work packages, their owners and status in `docs/plan.md`.
 - If sub-agents are not available, do the work yourself and state that limitation.
 
 ## 3. Git workflow
@@ -100,7 +100,7 @@ thing, the stricter rule applies.
 - **No emulator testing** (owner decision 2026-10-08): the prototype runs and
   works, so no time goes into emulator acceptance runs, emulator matrices,
   soaks or emulator/instrumented (UiAutomator, `integration_test`) suites.
-  This waives the emulator integration tests of `Raumfreund-VISION.md`
+  This waives the emulator integration tests of `docs/vision.md`
   section 10. Behaviour that unit, widget and app tests cannot prove is
   checked by the owner on real devices; agents document such checks as open
   for the owner instead of automating them. The emulator is used only to

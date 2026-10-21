@@ -8,7 +8,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 Three artwork mockups of the Raumfreund main screen (phone portrait, design
 size 1080 × 2340). They are **design targets** created for this project. They
 show the planned look and feel, not pixel-exact specs. If the Flutter
-implementation and a mockup disagree, `Raumfreund-VISION.md` and `plan.md` win.
+implementation and a mockup disagree, `docs/vision.md` and `docs/plan.md` win.
 
 ![All three mockups side by side](overview.png)
 

@@ -19,7 +19,7 @@ green commits (see the weekly maintenance workflow).
 | targetSdk | 36 (Android 16) | Flutter default | meets Play requirement "new apps and updates must target API 36 from 2026-08-31" ([target-sdk](https://developer.android.com/google/play/requirements/target-sdk)) |
 | minSdk | 24 (Android 7.0) | Flutter default | Flutter 3.47.7 minimum supported Android version |
 | NDK | 28.2.13676358 | Flutter default | Flutter 3.47.7 `FlutterExtension.kt` |
-| CMake (Android SDK) | 3.22.1 | `Dockerfile` | default CMake of AGP 9.1, used for the native `libdartjni.so` of the `jni` package (via `shared_preferences_android` 2.5); Gradle installs it on demand where it is missing |
+| CMake (Android SDK) | 3.22.1 | `docker/Dockerfile` | default CMake of AGP 9.1, used for the native `libdartjni.so` of the `jni` package (via `shared_preferences_android` 2.5); Gradle installs it on demand where it is missing |
 | ABIs | arm64-v8a, armeabi-v7a, x86_64 | Flutter release defaults | Flutter Android release builds |
 
 AGP, Kotlin and Gradle follow the release lines of the template that

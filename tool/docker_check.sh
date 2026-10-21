@@ -51,7 +51,7 @@ build_image() {
 	local commit
 	commit="$(git -C "${root_dir}" rev-parse --short=12 HEAD)"
 	DOCKER_BUILDKIT=1 docker build --build-arg "GIT_COMMIT=${commit}" \
-		-t "${image}" "${root_dir}"
+		-f "${root_dir}/docker/Dockerfile" -t "${image}" "${root_dir}"
 }
 
 start_container() {

@@ -13,7 +13,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 [![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2.svg)](https://dart.dev/)
 [![Android 7+](https://img.shields.io/badge/Android-7.0%2B-3DDC84.svg)](docs/toolchain.md)
 [![Coverage gate: 95%](https://img.shields.io/badge/coverage%20gate-95%25-brightgreen.svg)](docs/testing.md)
-[![Status: release candidate](https://img.shields.io/badge/status-release%20candidate-blue.svg)](plan.md)
+[![Status: release candidate](https://img.shields.io/badge/status-release%20candidate-blue.svg)](docs/plan.md)
 
 Raumfreund is a child-friendly Android noise traffic light for shared rooms.
 It estimates the current sound level locally, shows an accessible green,
@@ -37,7 +37,7 @@ Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
 settings persistence, automated quality tooling, CI, Docker packaging and
 release workflow. A public production release additionally requires the
 owner's Android signing secrets and physical-device acceptance evidence. The
-living status and external blockers are in [`plan.md`](plan.md).
+living status and external blockers are in [`docs/plan.md`](docs/plan.md).
 
 The coverage badge shows the enforced minimum of 95% line coverage for the
 first-party Dart code; `./localPipeline.sh` prints the measured value (99.97%
@@ -181,7 +181,7 @@ evidence; the presence of this script is not proof of a green result.
 - [`docs/adr/`](docs/adr/) — accepted architecture decisions
 
 Contributor workflow and security reporting are documented in
-[`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md).
+[`CONTRIBUTING.md`](.github/CONTRIBUTING.md) and [`SECURITY.md`](.github/SECURITY.md).
 
 ## Privacy and accuracy in one minute
 

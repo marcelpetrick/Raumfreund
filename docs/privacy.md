@@ -51,4 +51,4 @@ reflection. Reviewers must still read dependency updates, and the claim that
 samples are only held in RAM rests on code review and the unit tests, not on
 the gate.
 
-Security or privacy reports should follow [`../SECURITY.md`](../SECURITY.md).
+Security or privacy reports should follow [`SECURITY.md`](../.github/SECURITY.md).

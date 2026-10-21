@@ -2,4 +2,4 @@
 **/build/**
 **/.dart_tool/**
 **/node_modules/**
-Raumfreund-VISION.md
+docs/vision.md

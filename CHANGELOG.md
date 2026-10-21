@@ -88,3 +88,4 @@ these lines (see docs/releasing.md).
 * v0.7.4 records a green fresh-checkout build and lists the sleeping state in the architecture docs
 * v0.7.5 gives the release build job the release environment so it receives the signing secrets, and documents creating the upload key
 * v0.7.6 tests that every workflow job using the signing secrets names the release environment
+* v0.7.7 moves the vision, plan, prototype archive, CONTRIBUTING/SECURITY, linter configs and the Dockerfile out of the repository root

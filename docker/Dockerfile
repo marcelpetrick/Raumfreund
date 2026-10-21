@@ -12,7 +12,7 @@
 #              and builds the release APK via tool/build_apk.sh
 #   runtime    unprivileged nginx serving a download page + APK on port 8080
 #
-# Build:  docker build -t raumfreund .
+# Build:  docker build -f docker/Dockerfile -t raumfreund .
 # Run:    docker run --rm -p 8080:8080 raumfreund   → http://localhost:8080
 # Signing material is passed as BuildKit secret "keystore_properties" plus
 # "keystore" (see docs/releasing.md); without it the APK is debug-signed and

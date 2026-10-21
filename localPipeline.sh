@@ -115,7 +115,9 @@ step_python() {
 }
 
 step_docs() {
-	run_logged docs "${ROOT_DIR}/tool/node/node_modules/.bin/markdownlint" '**/*.md'
+	run_logged docs "${ROOT_DIR}/tool/node/node_modules/.bin/markdownlint" \
+		--config "${ROOT_DIR}/config/markdownlint.jsonc" \
+		--ignore-path "${ROOT_DIR}/config/markdownlintignore" '**/*.md'
 }
 
 # The inventory checker uses only the standard library, so it runs with the
@@ -126,7 +128,7 @@ step_licenses() {
 }
 
 step_yaml() {
-	run_logged yaml "${VENV}/yamllint" --strict . &&
+	run_logged yaml "${VENV}/yamllint" --strict -c "${ROOT_DIR}/config/yamllint.yaml" . &&
 		run_logged yaml "${TOOLS}/actionlint"
 }
 

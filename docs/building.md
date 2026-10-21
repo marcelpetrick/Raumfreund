@@ -19,6 +19,6 @@ The second command writes a release-mode APK, checksum and version into
 That artifact can be installed directly for testing but is not a public
 production release.
 
-Run `docker build -t raumfreund .` to create the nginx download image, or
+Run `docker build -f docker/Dockerfile -t raumfreund .` to create the nginx download image, or
 `tool/docker_check.sh` to build and exercise its health page, APK and checksum.
 The Docker route is the portable choice on hosts without a local Android SDK.
