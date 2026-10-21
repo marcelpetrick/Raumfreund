@@ -87,3 +87,4 @@ these lines (see docs/releasing.md).
 * v0.7.3 tests the phone layout, the app wiring of About, settings save, star reset and Android settings, and settings edge cases
 * v0.7.4 records a green fresh-checkout build and lists the sleeping state in the architecture docs
 * v0.7.5 gives the release build job the release environment so it receives the signing secrets, and documents creating the upload key
+* v0.7.6 tests that every workflow job using the signing secrets names the release environment
