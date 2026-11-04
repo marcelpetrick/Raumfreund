@@ -267,3 +267,17 @@ must not claim a production-signed release or completed device certification.
 
 - No later feature is committed to the first release. New product ideas require
   a separate owner decision and plan entry.
+
+## Dependency refresh (2026-11-04)
+
+Verdict: in progress. Keep the full local gate green and update stable pins.
+
+| Work | Owner | State |
+| --- | --- | --- |
+| Python and Node tooling | Tooling agent | Updates and focused checks passed. |
+| Android build toolchain | Android agent | Gradle 9.8.2 and Android checks passed. |
+| Flutter, Dart and application dependencies | Coordinator | Flutter 3.47.9 and Dart 3.13.7 pass 649 tests and 99.97% coverage. |
+| Integrate, run the full gate and verify CI | Coordinator | Full local gate passed. Push and GitHub CI remain. |
+
+Resume here: the full local gate passed with Flutter 3.47.9, Gradle 9.8.2,
+649 tests and 99.97% coverage. Commit the dependency update, push, and check CI.

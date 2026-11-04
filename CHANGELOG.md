@@ -93,3 +93,4 @@ these lines (see docs/releasing.md).
 * v0.8.1 records the 0.8.0 debug release
 * v0.8.2 updates the documentation for the languages, the repeating alarm, calibration and the star texts
 * v0.8.3 counts a measurement's stars only while it runs and otherwise shows the Sternenladen total, explains that a silent alarm is shown once per phase, and gives step-by-step calibration with a worked example
+* v0.8.4 Update stable Flutter, build tools, and pinned development dependencies.

@@ -6,7 +6,7 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 # Third-party licenses
 
 This is the inventory of third-party software in Raumfreund `0.6.32+77`
-(Flutter `3.47.7`, Dart `3.13.5`). Raumfreund itself is GPL-3.0-only. All
+(Flutter `3.47.9`, Dart `3.13.7`). Raumfreund itself is GPL-3.0-only. All
 listed licenses are permissive (BSD-3-Clause, Apache-2.0, MIT for the
 `yaml` package, CC-BY-4.0 for the Material Icons font) and compatible with
 distribution under GPLv3 (see [GPL compatibility](#gpl-compatibility)).
@@ -43,11 +43,11 @@ Only `dependencies` (and their transitive closure) are part of the app; the
 
 | Component | Version | License | Source |
 | --- | --- | --- | --- |
-| Flutter framework (`flutter`, `flutter_localizations`, `sky_engine`) | 3.47.7 | BSD-3-Clause | [flutter/flutter](https://github.com/flutter/flutter), `LICENSE` of the SDK |
-| Flutter engine (`libflutter.so`, per ABI) | `deb287481e3ce9468f3434937ced4240a70539ca` | BSD-3-Clause plus bundled third-party code | [flutter/flutter `engine/`](https://github.com/flutter/flutter/tree/3.47.7/engine) |
-| Dart runtime (inside `libflutter.so` / `libapp.so`) | 3.13.5 | BSD-3-Clause | [dart-lang/sdk](https://github.com/dart-lang/sdk) |
-| Material Icons font (`MaterialIcons-Regular.otf`) | bundled with Flutter 3.47.7 | CC-BY-4.0 (the licence file the SDK ships with the font) | `bin/cache/artifacts/material_fonts/MaterialIcons_LICENSE.txt` in the SDK |
-| Fragment shaders `ink_sparkle.frag`, `stretch_effect.frag` | bundled with Flutter 3.47.7 | BSD-3-Clause | Flutter SDK |
+| Flutter framework (`flutter`, `flutter_localizations`, `sky_engine`) | 3.47.9 | BSD-3-Clause | [flutter/flutter](https://github.com/flutter/flutter), `LICENSE` of the SDK |
+| Flutter engine (`libflutter.so`, per ABI) | `89c39edfdfae2949f6806e4a315c0c08522238b7` | BSD-3-Clause plus bundled third-party code | [flutter/flutter `engine/`](https://github.com/flutter/flutter/tree/3.47.9/engine) |
+| Dart runtime (inside `libflutter.so` / `libapp.so`) | 3.13.7 | BSD-3-Clause | [dart-lang/sdk](https://github.com/dart-lang/sdk) |
+| Material Icons font (`MaterialIcons-Regular.otf`) | bundled with Flutter 3.47.9 | CC-BY-4.0 (the licence file the SDK ships with the font) | `bin/cache/artifacts/material_fonts/MaterialIcons_LICENSE.txt` in the SDK |
+| Fragment shaders `ink_sparkle.frag`, `stretch_effect.frag` | bundled with Flutter 3.47.9 | BSD-3-Clause | Flutter SDK |
 
 The engine statically bundles further third-party code (Skia, ICU, FreeType,
 HarfBuzz, libpng, libjpeg-turbo, libwebp, zlib, BoringSSL, Impeller
@@ -143,10 +143,10 @@ standard library and everything else is pulled in transitively.
 | --- | --- | --- | --- | --- |
 | `org.jetbrains.kotlin` | `kotlin-stdlib` | 2.4.21 | Apache-2.0 | Maven Central |
 | `org.jetbrains` | `annotations` | 23.0.0 | Apache-2.0 | Maven Central |
-| `io.flutter` | `armeabi_v7a_release` | 1.0.0-deb287481e3ce9468f3434937ced4240a70539ca | BSD-3-Clause | Flutter engine Maven repository |
-| `io.flutter` | `arm64_v8a_release` | 1.0.0-deb287481e3ce9468f3434937ced4240a70539ca | BSD-3-Clause | Flutter engine Maven repository |
-| `io.flutter` | `x86_64_release` | 1.0.0-deb287481e3ce9468f3434937ced4240a70539ca | BSD-3-Clause | Flutter engine Maven repository |
-| `io.flutter` | `flutter_embedding_release` | 1.0.0-deb287481e3ce9468f3434937ced4240a70539ca | BSD-3-Clause | Flutter engine Maven repository |
+| `io.flutter` | `armeabi_v7a_release` | 1.0.0-89c39edfdfae2949f6806e4a315c0c08522238b7 | BSD-3-Clause | Flutter engine Maven repository |
+| `io.flutter` | `arm64_v8a_release` | 1.0.0-89c39edfdfae2949f6806e4a315c0c08522238b7 | BSD-3-Clause | Flutter engine Maven repository |
+| `io.flutter` | `x86_64_release` | 1.0.0-89c39edfdfae2949f6806e4a315c0c08522238b7 | BSD-3-Clause | Flutter engine Maven repository |
+| `io.flutter` | `flutter_embedding_release` | 1.0.0-89c39edfdfae2949f6806e4a315c0c08522238b7 | BSD-3-Clause | Flutter engine Maven repository |
 | `androidx.lifecycle` | `lifecycle-common` | 2.7.0 | Apache-2.0 | Google Maven |
 | `androidx.annotation` | `annotation` | 1.9.1 | Apache-2.0 | Google Maven |
 | `androidx.annotation` | `annotation-jvm` | 1.9.1 | Apache-2.0 | Google Maven |
@@ -268,8 +268,8 @@ strictly ships.
 
 | Tool | Version | License | Where pinned |
 | --- | --- | --- | --- |
-| Flutter SDK / Dart SDK | 3.47.7 / 3.13.5 | BSD-3-Clause | `.flutter-version`, `.flutter-sha256` |
-| Gradle (wrapper) | 9.8.1 | Apache-2.0 | `android/gradle/wrapper/gradle-wrapper.properties` |
+| Flutter SDK / Dart SDK | 3.47.9 / 3.13.7 | BSD-3-Clause | `.flutter-version`, `.flutter-sha256` |
+| Gradle (wrapper) | 9.8.2 | Apache-2.0 | `android/gradle/wrapper/gradle-wrapper.properties` |
 | Android Gradle Plugin | 9.1.0 | Apache-2.0 | `android/settings.gradle.kts` |
 | Kotlin Gradle plugin and compiler | 2.4.21 | Apache-2.0 | `android/settings.gradle.kts` |
 | JDK (Eclipse Temurin 21 in Docker; Java 17 bytecode target) | 21 | GPL-2.0-with-classpath-exception | `Dockerfile` |
