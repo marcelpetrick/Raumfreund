@@ -41,7 +41,7 @@ final class ShopNewerSchemaException extends ShopStorageException {
 ///
 /// Balance and inventory belong together, so they are written as one JSON
 /// snapshot under [snapshotKey] (atomic replace). The snapshot holds the
-/// balance, the names of the owned and of the equipped items, and the
+/// balance, lifetime earned stars, owned and equipped item names, and the
 /// schema version. Nothing else is stored, and it never leaves the device.
 ///
 /// Loading follows the settings policy for *bad data* and throws for
@@ -55,6 +55,9 @@ final class ShopNewerSchemaException extends ShopStorageException {
 /// * Every field is validated on its own: a missing, mistyped or negative
 ///   balance becomes 0; unknown item names are ignored; equipped items that
 ///   are not owned are dropped.
+/// * Version 1 predates the lifetime total, so its balance and owned item
+///   prices reconstruct it. A malformed version 2 total is reconstructed;
+///   a total below the balance is repaired to the balance.
 /// * Unreadable JSON and a missing, non-integer or too old version are
 ///   genuinely corrupt and load an empty wallet (decided policy).
 final class SharedPreferencesShopRepository implements ShopRepository {
@@ -65,10 +68,20 @@ final class SharedPreferencesShopRepository implements ShopRepository {
   }) : _openStore = openStore ?? SharedPreferencesStore.open;
 
   /// Current schema version written by [save].
-  static const int schemaVersion = 1;
+  static const int schemaVersion = 2;
 
   /// Storage key of the snapshot.
   static const String snapshotKey = 'shop.snapshot';
+
+  // Version 1 stored no purchase prices. Freeze the original catalog here so
+  // future price changes cannot alter the migration of existing wallets.
+  static const Map<KittyAccessory, int> _versionOnePrices = {
+    KittyAccessory.bow: 3,
+    KittyAccessory.scarf: 5,
+    KittyAccessory.hat: 8,
+    KittyAccessory.cushion: 10,
+    KittyAccessory.mouse: 12,
+  };
 
   final Future<PreferencesStore> Function() _openStore;
   Future<PreferencesStore>? _store;
@@ -108,6 +121,7 @@ final class SharedPreferencesShopRepository implements ShopRepository {
   static Map<String, Object> encode(StarWallet wallet) => {
     'schemaVersion': schemaVersion,
     'balance': wallet.balance,
+    'totalEarned': wallet.totalEarned,
     'owned': [for (final item in wallet.owned) item.name],
     'equipped': [for (final item in wallet.equipped) item.name],
   };
@@ -123,10 +137,22 @@ final class SharedPreferencesShopRepository implements ShopRepository {
     }
     if (version is! int || version < 1) return StarWallet.empty();
     final balance = data['balance'];
+    final totalEarned = data['totalEarned'];
+    final owned = _items(data['owned']);
+    final safeBalance = balance is int && balance > 0 ? balance : 0;
+    final migratedTotal = owned.fold<int>(
+      safeBalance,
+      (total, item) => total + (_versionOnePrices[item] ?? 0),
+    );
     return StarWallet.sanitized(
-      balance: balance is int ? balance : 0,
-      owned: _items(data['owned']),
+      balance: safeBalance,
+      owned: owned,
       equipped: _items(data['equipped']),
+      totalEarned: version == 1
+          ? migratedTotal
+          : totalEarned is int && totalEarned >= 0
+          ? totalEarned
+          : null,
     );
   }
 

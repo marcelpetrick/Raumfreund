@@ -271,6 +271,8 @@ MonitorViewData _viewData(
   // Before a successful load the wallet only holds this session's stars, so
   // showing it as the total would be misleading.
   walletStars: shop.isLoading || shop.loadFailed ? null : shop.wallet.balance,
+  kittyLevel: shop.isReady ? shop.wallet.level : null,
+  levelUpSequence: shop.levelUpSequence,
   starProgress: state.starProgress,
   starJustEarned: state.starJustEarned,
   quickStarMode: quickStarMode,

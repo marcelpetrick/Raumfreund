@@ -376,7 +376,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsStarTestModeHint =>
-      'A star comes after 5 seconds in the green zone instead of after 60 seconds. These stars go to the star shop too. Off by default; collected stars are kept.';
+      'A star comes after 5 seconds in the green zone instead of after 60 seconds. These stars go to the star shop and raise Mia’s level too. Off by default; collected stars are kept.';
 
   @override
   String get settingsSave => 'Save';
@@ -450,6 +450,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shopTitle => 'Star shop';
+
+  @override
+  String levelUpMessage(int level) {
+    return 'Mia reaches level $level!';
+  }
+
+  @override
+  String shopLevel(int level) {
+    return 'Mia’s level: $level';
+  }
+
+  @override
+  String shopLevelProgress(int count, int total) {
+    return '$count of $total stars towards the next level';
+  }
+
+  @override
+  String get shopDance => 'Mia, dance!';
+
+  @override
+  String get shopDanceLocked => 'Mia will dance for you at level 2.';
+
+  @override
+  String get shopDanceReduced => 'Mia dances for you!';
 
   @override
   String shopBalance(int count) {
@@ -530,7 +554,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsResetBody =>
-      'Deletes all stars and everything bought in the star shop. This happens immediately and is not part of Save or Cancel – Cancel does not undo it either.';
+      'Deletes all stars and everything bought in the star shop and resets Mia’s level. This happens immediately and is not part of Save or Cancel – Cancel does not undo it either.';
 
   @override
   String get settingsResetButton => 'Reset stars';
@@ -539,14 +563,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsResetConfirmTitle => 'Delete all stars and bought items?';
 
   @override
-  String get settingsResetConfirmBody => 'This cannot be undone.';
+  String get settingsResetConfirmBody =>
+      'Mia’s level will also be reset. This cannot be undone.';
 
   @override
   String get settingsResetConfirm => 'Delete';
 
   @override
   String get settingsResetDone =>
-      'All stars and bought items have been deleted.';
+      'All stars and bought items have been deleted and Mia’s level has been reset.';
 
   @override
   String get settingsResetNotReady =>

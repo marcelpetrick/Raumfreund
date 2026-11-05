@@ -687,7 +687,7 @@ abstract class AppLocalizations {
   /// Explains the quick star test mode and persistence.
   ///
   /// In de, this message translates to:
-  /// **'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen. Standardmäßig aus; gesammelte Sterne bleiben erhalten.'**
+  /// **'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen und erhöhen Mias Level. Standardmäßig aus; gesammelte Sterne bleiben erhalten.'**
   String get settingsStarTestModeHint;
 
   /// Save button.
@@ -822,6 +822,42 @@ abstract class AppLocalizations {
   /// **'Sternenladen'**
   String get shopTitle;
 
+  /// Announcement when Mia reaches a new level.
+  ///
+  /// In de, this message translates to:
+  /// **'Mia erreicht Level {level}!'**
+  String levelUpMessage(int level);
+
+  /// Mia’s current level.
+  ///
+  /// In de, this message translates to:
+  /// **'Mias Level: {level}'**
+  String shopLevel(int level);
+
+  /// Earned stars in the current level and stars required for the next level.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} von {total} Sternen bis zum nächsten Level'**
+  String shopLevelProgress(int count, int total);
+
+  /// Button to play Mia’s dance.
+  ///
+  /// In de, this message translates to:
+  /// **'Mia tanzt!'**
+  String get shopDance;
+
+  /// Explains when Mia’s dance unlocks.
+  ///
+  /// In de, this message translates to:
+  /// **'Ab Level 2 tanzt Mia für dich.'**
+  String get shopDanceLocked;
+
+  /// Dance acknowledgement when reduced motion is enabled.
+  ///
+  /// In de, this message translates to:
+  /// **'Mia tanzt für dich!'**
+  String get shopDanceReduced;
+
   /// Star balance in the shop header.
   ///
   /// In de, this message translates to:
@@ -921,7 +957,7 @@ abstract class AppLocalizations {
   /// Explains the teacher reset.
   ///
   /// In de, this message translates to:
-  /// **'Löscht alle Sterne und gekauften Sachen im Sternenladen. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.'**
+  /// **'Löscht alle Sterne und gekauften Sachen im Sternenladen und setzt Mias Level zurück. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.'**
   String get settingsResetBody;
 
   /// Opens the reset confirmation.
@@ -939,7 +975,7 @@ abstract class AppLocalizations {
   /// Reset confirmation detail.
   ///
   /// In de, this message translates to:
-  /// **'Das kann nicht rückgängig gemacht werden.'**
+  /// **'Mias Level wird ebenfalls zurückgesetzt. Das kann nicht rückgängig gemacht werden.'**
   String get settingsResetConfirmBody;
 
   /// Confirms the reset.
@@ -951,7 +987,7 @@ abstract class AppLocalizations {
   /// Snackbar after a reset.
   ///
   /// In de, this message translates to:
-  /// **'Alle Sterne und gekauften Sachen wurden gelöscht.'**
+  /// **'Alle Sterne und gekauften Sachen wurden gelöscht und Mias Level wurde zurückgesetzt.'**
   String get settingsResetDone;
 
   /// Snackbar when the wallet is not loaded.

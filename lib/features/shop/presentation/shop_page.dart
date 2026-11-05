@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../app/theme/app_colors.dart';
@@ -75,7 +77,7 @@ class _ShopBody extends StatelessWidget {
   Widget _content(AppLocalizations l10n) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      _Header(wallet: controller.wallet),
+      _Header(wallet: controller.wallet, isReady: controller.isReady),
       if (controller.loadFailed) _Hint(text: l10n.shopLoadFailed),
       if (controller.saveFailed)
         _Hint(
@@ -92,14 +94,51 @@ class _ShopBody extends StatelessWidget {
   );
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.wallet});
+class _Header extends StatefulWidget {
+  const _Header({required this.wallet, required this.isReady});
 
   final StarWallet wallet;
+  final bool isReady;
+
+  @override
+  State<_Header> createState() => _HeaderState();
+}
+
+class _HeaderState extends State<_Header> with SingleTickerProviderStateMixin {
+  late final AnimationController _dance = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2400),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context) && _dance.isAnimating) {
+      _dance.reset();
+    }
+  }
+
+  @override
+  void dispose() {
+    _dance.dispose();
+    super.dispose();
+  }
+
+  void _startDance() {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).shopDanceReduced)),
+      );
+    } else {
+      _dance.forward(from: 0);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final wallet = widget.wallet;
+    final unlocked = widget.isReady && wallet.level >= 2;
     return GlowPanel(
       color: AppColors.yellow,
       child: Column(
@@ -120,18 +159,56 @@ class _Header extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
-            height: 220,
-            child: KittyCharacter(
-              mood: KittyMood.idle,
-              accessories: wallet.equipped,
-              reduceMotion: MediaQuery.disableAnimationsOf(context),
+          if (widget.isReady) ...[
+            const SizedBox(height: 12),
+            Text(
+              l10n.shopLevel(wallet.level),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-          ),
+            Text(
+              l10n.shopLevelProgress(
+                wallet.starsTowardNextLevel,
+                StarWallet.starsPerLevel,
+              ),
+            ),
+            const SizedBox(height: 6),
+            ExcludeSemantics(
+              child: LinearProgressIndicator(
+                value: wallet.starsTowardNextLevel / StarWallet.starsPerLevel,
+              ),
+            ),
+          ],
+          _dancingKitty(context),
+          if (widget.isReady) ...[
+            OutlinedButton.icon(
+              onPressed: unlocked ? _startDance : null,
+              icon: const Icon(Icons.celebration_outlined),
+              label: Text(l10n.shopDance),
+            ),
+            if (!unlocked) Text(l10n.shopDanceLocked),
+          ],
         ],
       ),
     );
   }
+
+  Widget _dancingKitty(BuildContext context) => SizedBox(
+    height: 220,
+    child: AnimatedBuilder(
+      animation: _dance,
+      child: KittyCharacter(
+        mood: KittyMood.idle,
+        accessories: widget.wallet.equipped,
+        reduceMotion: MediaQuery.disableAnimationsOf(context),
+      ),
+      builder: (context, child) {
+        final value = _dance.value;
+        final envelope = math.sin(math.pi * value);
+        final wobble = math.sin(value * math.pi * 8) * envelope;
+        return Transform.rotate(angle: 0.13 * wobble, child: child);
+      },
+    ),
+  );
 }
 
 /// Non-blocking notice; never hides the shop itself.

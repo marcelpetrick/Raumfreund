@@ -115,6 +115,7 @@ void main() {
     expect(find.text(l10nDe.starsHintQuickTest), findsOneWidget);
   });
   _shopTests();
+  _levelUpTests();
   _walletFailureTests();
   _sleepTest();
   _sleepNavigationTest();
@@ -292,6 +293,33 @@ void _shopTests() {
     await tester.tap(find.byTooltip(l10nDe.actionShop));
     await _finishWithRealAsync(tester);
     expect(find.text(l10nDe.shopBalance(3)), findsOneWidget);
+  });
+}
+
+void _levelUpTests() {
+  testWidgets('earning a star announces a new level during measurement', (
+    tester,
+  ) async {
+    final repository = InMemoryShopRepository(StarWallet(balance: 4));
+    late MonitorHarness monitor;
+    await tester.pumpWidget(
+      RaumfreundApp(
+        settingsController: SettingsController(InMemorySettingsRepository()),
+        monitorFactory: (onStarEarned) {
+          monitor = MonitorHarness(onStarEarned: onStarEarned);
+          return monitor.controller;
+        },
+        shopRepository: repository,
+        appInfoPort: const _FakeAppInfoPort(),
+      ),
+    );
+    await _finishAsyncWork(tester);
+    await tester.tap(find.text(l10nDe.measureStart));
+    await _finishAsyncWork(tester);
+    monitor.readings(greenDbfs, 601);
+    await _finishAsyncWork(tester);
+    expect(find.text(l10nDe.levelUpMessage(2)), findsOneWidget);
+    expect(repository.stored.totalEarned, 5);
   });
 }
 

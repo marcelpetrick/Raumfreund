@@ -20,6 +20,8 @@ MonitorViewData _data({
   bool starEarned = false,
   int stars = 3,
   int? wallet,
+  int? kittyLevel,
+  int levelUpSequence = 0,
   bool quickStars = false,
   bool waking = false,
 }) => MonitorViewData(
@@ -31,6 +33,8 @@ MonitorViewData _data({
   alarmPlaying: playing,
   stars: stars,
   walletStars: wallet,
+  kittyLevel: kittyLevel,
+  levelUpSequence: levelUpSequence,
   starProgress: .4,
   starJustEarned: starEarned,
   quickStarMode: quickStars,
@@ -204,7 +208,21 @@ void _errorHeadlineTests() {
   });
 }
 
+void _levelUpTests() {
+  testWidgets('announces a live level up briefly, but not on initial load', (
+    tester,
+  ) async {
+    await _panelHeight(tester, _data(kittyLevel: 2), 1);
+    expect(find.text(l10nDe.levelUpMessage(2)), findsNothing);
+    await _panelHeight(tester, _data(kittyLevel: 3, levelUpSequence: 1), 1);
+    expect(find.text(l10nDe.levelUpMessage(3)), findsOneWidget);
+    await tester.pump(const Duration(seconds: 4));
+    expect(find.text(l10nDe.levelUpMessage(3)), findsNothing);
+  });
+}
+
 void main() {
+  _levelUpTests();
   for (final scale in [1.0, 2.0]) {
     testWidgets('panel height is stable across zones at scale $scale', (
       tester,

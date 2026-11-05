@@ -39,6 +39,7 @@ final class ShopController extends ChangeNotifier {
   bool _disposed = false;
   bool _loaded = false;
   int _unsavedStars = 0;
+  int _levelUpSequence = 0;
   int _revision = 0;
   int _savedRevision = 0;
   Future<void>? _loading;
@@ -46,6 +47,9 @@ final class ShopController extends ChangeNotifier {
 
   /// Current stars and inventory.
   StarWallet get wallet => _wallet;
+
+  /// Changes only when newly earned stars cross a level after loading.
+  int get levelUpSequence => _levelUpSequence;
 
   /// True until the first [load] has completed.
   bool get isLoading => _isLoading;
@@ -69,6 +73,7 @@ final class ShopController extends ChangeNotifier {
   /// Adds [stars] (> 0), e.g. one quiet-minute star from the monitor.
   void earn(int stars) {
     final next = _wallet.earn(stars);
+    if (_loaded && next.level > _wallet.level) _levelUpSequence++;
     if (!_loaded) _unsavedStars += stars;
     _apply(next);
   }

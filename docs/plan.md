@@ -298,3 +298,34 @@ Verify the gauge and Mia at narrow and wide sizes, including accessories and
 animation. Keep intentional clipping when Mia leaves the stage. Record any
 remaining real-device checks as open. Abort a commit if the local gate fails;
 revert the change if a regression cannot be resolved.
+
+## Issue 9: Mia levels up (2026-11-05)
+
+Verdict: make earned stars grow Mia's level, independent of spending, and
+unlock a playful dance in the shop. Keep the existing cat, offline wallet and
+quiet-star rules; no second pet or consumable economy is needed for this first
+increment. Build on PR #15 while it awaits review.
+
+- D1: Persist lifetime earned stars with the wallet, independent of spending.
+  Migrate existing wallets from the balance plus owned item prices; items were
+  bought once and could not be sold. Reset clears progress with the wallet.
+- D2: One level per five earned stars, starting at level 1. Level 2 unlocks a
+  replayable dance; show level and progress towards the next level in the shop.
+  Respect reduced motion and localize every visible string in four languages.
+- D3: Adapt the requested six-stage issue workflow to GitHub and this project's
+  existing pipeline and versioning in `AGENTS.md`.
+- Q1: Real-device visual and accessibility checks remain open for the owner.
+
+| Work | Owner | Status |
+| --- | --- | --- |
+| Challenge level and wallet design | Review agent | done |
+| Wallet level calculations and persistence | Domain agent | done |
+| Shop level display, dance and localizations | UI agent | done |
+| Integrate tests, docs and independent review | Coordinator | done |
+| Adapt issue workflow in `AGENTS.md` | Coordinator | planned after feature commit |
+| Run full gate, commit, push and verify checks | Coordinator | in progress |
+
+Checks: prove progress survives purchases, reload and failed-load merging;
+verify reset, boundaries, translations, layout and reduced motion. Stop before
+commit if any gate fails. Rollback requires preserving the newer wallet schema;
+an older app will refuse to overwrite it rather than lose earned progress.

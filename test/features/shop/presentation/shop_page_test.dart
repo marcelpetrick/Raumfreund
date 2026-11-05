@@ -20,6 +20,7 @@ Future<ShopController> _pump(
   InMemoryShopRepository? repository,
   double textScale = 1,
   bool load = true,
+  bool disableAnimations = true,
 }) async {
   final repo = repository ?? InMemoryShopRepository(wallet);
   final controller = ShopController(repo);
@@ -29,7 +30,7 @@ Future<ShopController> _pump(
     testApp(
       ShopPage(controller: rt(controller)),
       scaffold: false,
-      disableAnimations: true,
+      disableAnimations: disableAnimations,
       textScale: textScale,
     ),
   );
@@ -103,6 +104,7 @@ void main() {
   });
 
   _purchaseTests();
+  _levelTests();
   testWidgets('owned items can be put on and taken off', (tester) async {
     final shop = await _pump(
       tester,
@@ -138,6 +140,90 @@ void main() {
   _hintAndLayoutTests();
 }
 
+void _levelTests() {
+  testWidgets('level and progress survive a purchase', (tester) async {
+    await _pump(tester, wallet: StarWallet(balance: 7));
+    expect(find.text(l10nDe.shopLevel(2)), findsOneWidget);
+    expect(find.text(l10nDe.shopLevelProgress(2, 5)), findsOneWidget);
+    await tester.tap(_button(l10nDe.shopBuy).first);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text(l10nDe.shopConfirmBuy),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text(l10nDe.shopLevel(2)), findsOneWidget);
+    expect(find.text(l10nDe.shopLevelProgress(2, 5)), findsOneWidget);
+  });
+
+  testWidgets('dance unlocks at level two and respects reduced motion', (
+    tester,
+  ) async {
+    final shop = await _pump(tester, wallet: StarWallet(balance: 4));
+    expect(find.text(l10nDe.shopDanceLocked), findsOneWidget);
+    expect(
+      tester.widget<ButtonStyleButton>(_button(l10nDe.shopDance)).onPressed,
+      isNull,
+    );
+    shop.earn(1);
+    await tester.pump();
+    expect(find.text(l10nDe.shopDanceLocked), findsNothing);
+    await tester.tap(_button(l10nDe.shopDance));
+    await tester.pump();
+    expect(find.text(l10nDe.shopDanceReduced), findsOneWidget);
+  });
+
+  testWidgets('dance animates Mia and returns to rest', (tester) async {
+    await _pump(
+      tester,
+      wallet: StarWallet(balance: 5),
+      disableAnimations: false,
+    );
+    final transform = find
+        .ancestor(
+          of: find.byType(KittyCharacter),
+          matching: find.byType(Transform),
+        )
+        .first;
+    await tester.tap(_button(l10nDe.shopDance));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.widget<Transform>(transform).transform[1], isNot(0));
+    await tester.pump(const Duration(milliseconds: 2200));
+    expect(
+      tester.widget<Transform>(transform).transform[1],
+      closeTo(0, 0.0001),
+    );
+  });
+
+  testWidgets('enabling reduced motion stops an ongoing dance', (tester) async {
+    final shop = await _pump(
+      tester,
+      wallet: StarWallet(balance: 5),
+      disableAnimations: false,
+    );
+    await tester.tap(_button(l10nDe.shopDance));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpWidget(
+      testApp(
+        ShopPage(controller: shop),
+        scaffold: false,
+        disableAnimations: true,
+      ),
+    );
+    final transform = find
+        .ancestor(
+          of: find.byType(KittyCharacter),
+          matching: find.byType(Transform),
+        )
+        .first;
+    expect(tester.widget<Transform>(transform).transform[1], 0);
+  });
+}
+
 void _hintAndLayoutTests() {
   testWidgets('a failed load shows a non-blocking hint', (tester) async {
     final repository = InMemoryShopRepository()
@@ -145,6 +231,8 @@ void _hintAndLayoutTests() {
     await _pump(tester, repository: repository);
     expect(find.text(l10nDe.shopLoadFailed), findsOneWidget);
     expect(find.text(l10nDe.shopBalance(0)), findsOneWidget);
+    expect(find.text(l10nDe.shopLevel(1)), findsNothing);
+    expect(find.text(l10nDe.shopDance), findsNothing);
     expect(find.byType(KittyCharacter), findsOneWidget);
   });
 
@@ -177,6 +265,8 @@ void _hintAndLayoutTests() {
     await shop.flush();
     await tester.pump();
     expect(find.text(l10nDe.shopSaveFailed), findsOneWidget);
+    await tester.ensureVisible(find.text(l10nDe.shopDismiss));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(l10nDe.shopDismiss));
     await tester.pump();
     expect(find.text(l10nDe.shopSaveFailed), findsNothing);

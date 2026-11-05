@@ -29,6 +29,19 @@ void main() {
   tearDown(() => controller.dispose());
 
   loadTests();
+  test('only a live earned level crossing emits a level-up event', () async {
+    controller.earn(1);
+    expect(controller.levelUpSequence, 0);
+    await controller.load();
+    expect(controller.levelUpSequence, 0);
+    controller.earn(5);
+    expect(controller.levelUpSequence, 1);
+    controller.buy(bow);
+    controller.toggleEquipped(bow);
+    expect(controller.levelUpSequence, 1);
+    controller.resetAll();
+    expect(controller.levelUpSequence, 1);
+  });
   changeTests();
   robustnessTests();
 }

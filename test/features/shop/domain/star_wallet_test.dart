@@ -11,7 +11,51 @@ const hat = KittyAccessory.hat;
 void main() {
   constructionTests();
   operationTests();
+  levelTests();
   equalityTests();
+}
+
+void levelTests() {
+  group('level progression', () {
+    test('starts at one and advances at each five-star boundary', () {
+      for (final (stars, level, progress) in [
+        (0, 1, 0),
+        (4, 1, 4),
+        (5, 2, 0),
+        (9, 2, 4),
+        (10, 3, 0),
+        (24, 5, 4),
+        (25, 6, 0),
+      ]) {
+        final wallet = StarWallet(balance: stars);
+        expect(wallet.totalEarned, stars);
+        expect(wallet.level, level);
+        expect(wallet.starsTowardNextLevel, progress);
+      }
+      expect(StarWallet.starsPerLevel, 5);
+    });
+
+    test('buying and equipping do not reduce progress', () {
+      final earned = StarWallet.empty().earn(13);
+      final bought = earned.buy(bow).wallet.buy(hat).wallet;
+      final equipped = bought.equip(bow).equip(hat);
+      for (final wallet in [earned, bought, equipped, equipped.unequip(bow)]) {
+        expect(wallet.totalEarned, 13);
+        expect(wallet.level, 3);
+        expect(wallet.starsTowardNextLevel, 3);
+      }
+      expect(bought.balance, 2);
+    });
+
+    test('existing inventory reconstructs progress and reset clears it', () {
+      final existing = StarWallet(balance: 2, owned: {bow, hat});
+      expect(existing.totalEarned, 13);
+      final reset = existing.reset();
+      expect(reset.totalEarned, 0);
+      expect(reset.level, 1);
+      expect(reset.starsTowardNextLevel, 0);
+    });
+  });
 }
 
 void constructionTests() {
@@ -25,6 +69,10 @@ void constructionTests() {
 
     test('rejects a negative balance', () {
       expect(() => StarWallet(balance: -1), throwsArgumentError);
+    });
+
+    test('rejects a total below the available balance', () {
+      expect(() => StarWallet(balance: 5, totalEarned: 4), throwsArgumentError);
     });
 
     test('rejects equipped items that are not owned', () {
@@ -130,6 +178,17 @@ void equalityTests() {
       expect(a, isNot(StarWallet(balance: 2, owned: {bow, hat})));
       expect(a, isNot(StarWallet(balance: 1, owned: {bow, hat})));
       expect(a, isNot(StarWallet(balance: 1, owned: {bow}, equipped: {bow})));
+      expect(
+        a,
+        isNot(
+          StarWallet(
+            balance: 1,
+            totalEarned: 99,
+            owned: {bow, hat},
+            equipped: {hat},
+          ),
+        ),
+      );
       expect(a == Object(), isFalse);
     });
 
