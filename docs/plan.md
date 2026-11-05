@@ -281,3 +281,20 @@ Verdict: in progress. Keep the full local gate green and update stable pins.
 
 Resume here: the full local gate passed with Flutter 3.47.9, Gradle 9.8.2,
 649 tests and 99.97% coverage. Commit the dependency update, push, and check CI.
+
+## Issue 8: artwork clipping (2026-11-05)
+
+Verdict: correct the clipped monitor artwork in a pull request. The dependency
+refresh was committed as `67aac6f`;
+its GitHub CI and Docker workflows passed.
+
+| Work | Owner | Status |
+| --- | --- | --- |
+| Inspect issue, screenshot and existing work; identify clipping | Reviewer agent | done |
+| Fix artwork bounds and add focused regression coverage | Coordinator | in progress |
+| Review changes, run local pipeline, commit, push and check CI | Coordinator | planned |
+
+Verify the gauge and Mia at narrow and wide sizes, including accessories and
+animation. Keep intentional clipping when Mia leaves the stage. Record any
+remaining real-device checks as open. Abort a commit if the local gate fails;
+revert the change if a regression cannot be resolved.
