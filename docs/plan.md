@@ -322,7 +322,7 @@ increment. Build on PR #15 while it awaits review.
 | Wallet level calculations and persistence | Domain agent | done |
 | Shop level display, dance and localizations | UI agent | done |
 | Integrate tests, docs and independent review | Coordinator | done |
-| Adapt issue workflow in `AGENTS.md` | Coordinator | planned after feature commit |
+| Adapt issue workflow in `AGENTS.md` | Coordinator | done |
 | Run full gate, commit, push and verify checks | Coordinator | in progress |
 
 Checks: prove progress survives purchases, reload and failed-load merging;
