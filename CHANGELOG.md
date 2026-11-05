@@ -96,3 +96,4 @@ these lines (see docs/releasing.md).
 * v0.8.4 Update stable Flutter, build tools, and pinned development dependencies.
 * v0.8.5 Fix clipped gauge and Mia artwork (issue #8).
 * v0.9.0 Add Mia level progression and a replayable dance (issue #9).
+* v0.9.1 Document the issue workflow for Raumfreund.
