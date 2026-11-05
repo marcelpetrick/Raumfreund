@@ -376,7 +376,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsStarTestModeHint =>
-      'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen. Standardmäßig aus; gesammelte Sterne bleiben erhalten.';
+      'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen und erhöhen Mias Level. Standardmäßig aus; gesammelte Sterne bleiben erhalten.';
 
   @override
   String get settingsSave => 'Speichern';
@@ -450,6 +450,30 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get shopTitle => 'Sternenladen';
+
+  @override
+  String levelUpMessage(int level) {
+    return 'Mia erreicht Level $level!';
+  }
+
+  @override
+  String shopLevel(int level) {
+    return 'Mias Level: $level';
+  }
+
+  @override
+  String shopLevelProgress(int count, int total) {
+    return '$count von $total Sternen bis zum nächsten Level';
+  }
+
+  @override
+  String get shopDance => 'Mia tanzt!';
+
+  @override
+  String get shopDanceLocked => 'Ab Level 2 tanzt Mia für dich.';
+
+  @override
+  String get shopDanceReduced => 'Mia tanzt für dich!';
 
   @override
   String shopBalance(int count) {
@@ -530,7 +554,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsResetBody =>
-      'Löscht alle Sterne und gekauften Sachen im Sternenladen. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.';
+      'Löscht alle Sterne und gekauften Sachen im Sternenladen und setzt Mias Level zurück. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.';
 
   @override
   String get settingsResetButton => 'Sterne zurücksetzen';
@@ -541,14 +565,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsResetConfirmBody =>
-      'Das kann nicht rückgängig gemacht werden.';
+      'Mias Level wird ebenfalls zurückgesetzt. Das kann nicht rückgängig gemacht werden.';
 
   @override
   String get settingsResetConfirm => 'Löschen';
 
   @override
   String get settingsResetDone =>
-      'Alle Sterne und gekauften Sachen wurden gelöscht.';
+      'Alle Sterne und gekauften Sachen wurden gelöscht und Mias Level wurde zurückgesetzt.';
 
   @override
   String get settingsResetNotReady =>

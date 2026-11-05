@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../app/theme/app_colors.dart';
@@ -180,16 +182,49 @@ class _PanelWarning extends StatelessWidget {
   );
 }
 
-class _QuietStars extends StatelessWidget {
+class _QuietStars extends StatefulWidget {
   const _QuietStars({required this.data});
 
   final MonitorViewData data;
+
+  @override
+  State<_QuietStars> createState() => _QuietStarsState();
+}
+
+class _QuietStarsState extends State<_QuietStars> {
+  Timer? _celebration;
+  int? _celebratedLevel;
+
+  @override
+  void didUpdateWidget(_QuietStars oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final data = widget.data;
+    if (data.levelUpSequence != oldWidget.data.levelUpSequence &&
+        data.isActive &&
+        data.kittyLevel != null) {
+      _celebration?.cancel();
+      _celebratedLevel = data.kittyLevel;
+      _celebration = Timer(const Duration(seconds: 4), () {
+        if (mounted) setState(() => _celebratedLevel = null);
+      });
+    } else if (!data.isActive) {
+      _celebration?.cancel();
+      _celebratedLevel = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _celebration?.cancel();
+    super.dispose();
+  }
 
   /// While a measurement runs: its stars, plus the wallet total once it is
   /// known. Otherwise only the wallet total, because the count of the last
   /// measurement read like a daily total ("2 Sterne heute") and disagreed
   /// with the Sternenladen after a reset; null while the wallet is unknown.
   String? _starText(AppLocalizations l10n) {
+    final data = widget.data;
     final total = data.walletStars;
     if (!data.showsSessionStars) {
       return total == null ? null : l10n.starsInShop(total);
@@ -202,11 +237,16 @@ class _QuietStars extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final data = widget.data;
     final percent = (data.starProgress * 100).round();
     final starText = _starText(l10n);
     final progress = l10n.starsProgress(percent);
+    final celebration = _celebratedLevel == null
+        ? null
+        : l10n.levelUpMessage(_celebratedLevel!);
     return Semantics(
-      label: starText == null ? progress : '$starText. $progress',
+      liveRegion: celebration != null,
+      label: [?celebration, ?starText, progress].join('. '),
       child: Column(
         children: [
           Row(
@@ -217,10 +257,13 @@ class _QuietStars extends StatelessWidget {
               // Flexible so large text scales wrap instead of overflowing.
               Flexible(
                 child: StableText(
-                  text: data.starJustEarned
-                      ? l10n.starsJustEarned
-                      : starText ?? '',
+                  text:
+                      celebration ??
+                      (data.starJustEarned
+                          ? l10n.starsJustEarned
+                          : starText ?? ''),
                   variants: [
+                    l10n.levelUpMessage(999),
                     l10n.starsJustEarned,
                     ?starText,
                     // Longest realistic texts: no stars yet with a 3-digit

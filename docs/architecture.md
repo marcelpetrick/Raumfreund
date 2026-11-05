@@ -184,9 +184,9 @@ first frame; anything unreadable means German.
 ## Star shop
 
 `lib/features/shop/` follows the settings pattern: an immutable, always-valid
-`StarWallet` (balance, owned and equipped items; typed `PurchaseResult`),
+`StarWallet` (balance, earned-star total, owned and equipped items; typed `PurchaseResult`),
 a `ShopRepository` port, `SharedPreferencesShopRepository` (own `shop.`
-namespace, one JSON snapshot, schema version 1, per-field repair, corrupt
+namespace, one JSON snapshot, schema version 2, per-field repair, corrupt
 data loads an empty wallet) and `ShopController`, which applies
 changes immediately, saves them serialized and coalesced, and reports save
 failures in `saveFailed` instead of throwing. Unavailable or unreadable
@@ -218,6 +218,16 @@ Save/Cancel draft, waits for the wallet save and reports storage failure. Until
 the wallet has loaded successfully, shop actions are disabled even if stars
 were earned in memory, so a button never offers an operation the controller
 must refuse.
+
+Five earned stars raise Mia's level by one, starting at level 1; purchases
+never reduce the stored earned-star total. Schema 1 wallets migrate using their
+balance and the original prices of the one-time owned items. The teacher reset
+clears levels along with the wallet. A live crossing after a successful load
+announces the new level on the monitor; loading, migration and reset do not
+emit an announcement. Stars earned while loading has failed are merged after
+recovery without a belated announcement; the resulting level is visible in
+the shop. The shop shows progress and offers a silent, replayable
+dance from level 2; reduced motion replaces movement with an acknowledgement.
 
 ## Composition and test seams
 

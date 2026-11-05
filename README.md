@@ -150,7 +150,12 @@ Bought items can be given to Mia and taken back at any time. If the stars cannot
 stored, the shop says so and keeps working in memory. Opening and closing the
 shop follows the same stop and no-auto-restart rule.
 
-Teachers can clear all stars and bought items in **Settings** under
+Every five earned stars Mia gains a level. Spending stars does not lower her
+level; the shop shows progress and unlocks a replayable dance at level 2.
+Quick-star test mode advances levels too. The monitor announces a new level
+when it is reached during a measurement.
+
+Teachers can clear all stars, levels and bought items in **Settings** under
 **Für Lehrkräfte** (**Sterne zurücksetzen**, with a confirmation). This acts
 immediately and is not part of Speichern/Abbrechen.
 

@@ -46,15 +46,24 @@ final class StarWallet {
   /// Creates a wallet; throws [ArgumentError] if an invariant is violated.
   StarWallet({
     this.balance = 0,
+    int? totalEarned,
     Set<KittyAccessory> owned = const {},
     Set<KittyAccessory> equipped = const {},
-  }) : owned = Set.unmodifiable(owned),
+  }) : totalEarned = totalEarned ?? _reconstructedTotal(balance, owned),
+       owned = Set.unmodifiable(owned),
        equipped = Set.unmodifiable(equipped) {
     if (balance < 0) {
       throw ArgumentError.value(balance, 'balance', 'must not be negative');
     }
     if (!owned.containsAll(equipped)) {
       throw ArgumentError.value(equipped, 'equipped', 'must be owned');
+    }
+    if (this.totalEarned < balance) {
+      throw ArgumentError.value(
+        totalEarned,
+        'totalEarned',
+        'must cover balance',
+      );
     }
   }
 
@@ -67,10 +76,16 @@ final class StarWallet {
     required int balance,
     required Set<KittyAccessory> owned,
     required Set<KittyAccessory> equipped,
+    int? totalEarned,
   }) => StarWallet(
     balance: balance < 0 ? 0 : balance,
     owned: owned,
     equipped: equipped.intersection(owned),
+    totalEarned: totalEarned == null
+        ? null
+        : totalEarned < (balance < 0 ? 0 : balance)
+        ? (balance < 0 ? 0 : balance)
+        : totalEarned,
   );
 
   /// Validating factory for persisted data: null if an invariant is
@@ -84,6 +99,9 @@ final class StarWallet {
     return StarWallet(balance: balance, owned: owned, equipped: equipped);
   }
 
+  /// Number of earned stars needed to advance each level.
+  static const int starsPerLevel = 5;
+
   /// Stars available to spend.
   final int balance;
 
@@ -93,6 +111,21 @@ final class StarWallet {
   /// Items Mia currently wears; always a subset of [owned].
   final Set<KittyAccessory> equipped;
 
+  /// Stars earned since the last reset, including those spent on items.
+  ///
+  /// When omitted on construction, the total is reconstructed from the
+  /// balance and item prices for migration from the original wallet format.
+  final int totalEarned;
+
+  static int _reconstructedTotal(int balance, Set<KittyAccessory> owned) =>
+      owned.fold(balance, (total, item) => total + item.price);
+
+  /// Mia starts at level one and advances for every [starsPerLevel] stars.
+  int get level => totalEarned ~/ starsPerLevel + 1;
+
+  /// Earned stars in the current level, from zero to [starsPerLevel] minus one.
+  int get starsTowardNextLevel => totalEarned % starsPerLevel;
+
   /// Adds [stars] (> 0) to the balance.
   StarWallet earn(int stars) {
     if (stars <= 0) {
@@ -100,6 +133,7 @@ final class StarWallet {
     }
     return StarWallet(
       balance: balance + stars,
+      totalEarned: totalEarned + stars,
       owned: owned,
       equipped: equipped,
     );
@@ -117,6 +151,7 @@ final class StarWallet {
     return PurchaseResult.bought(
       StarWallet(
         balance: balance - item.price,
+        totalEarned: totalEarned,
         owned: {...owned, item},
         equipped: equipped,
       ),
@@ -127,6 +162,7 @@ final class StarWallet {
   StarWallet equip(KittyAccessory item) => owned.contains(item)
       ? StarWallet(
           balance: balance,
+          totalEarned: totalEarned,
           owned: owned,
           equipped: {...equipped, item},
         )
@@ -136,6 +172,7 @@ final class StarWallet {
   StarWallet unequip(KittyAccessory item) => equipped.contains(item)
       ? StarWallet(
           balance: balance,
+          totalEarned: totalEarned,
           owned: owned,
           equipped: equipped.difference({item}),
         )
@@ -148,6 +185,7 @@ final class StarWallet {
   bool operator ==(Object other) =>
       other is StarWallet &&
       other.balance == balance &&
+      other.totalEarned == totalEarned &&
       other.owned.length == owned.length &&
       other.owned.containsAll(owned) &&
       other.equipped.length == equipped.length &&
@@ -156,6 +194,7 @@ final class StarWallet {
   @override
   int get hashCode => Object.hash(
     balance,
+    totalEarned,
     Object.hashAllUnordered(owned),
     Object.hashAllUnordered(equipped),
   );

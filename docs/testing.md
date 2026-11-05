@@ -30,6 +30,8 @@ Open device acceptance work:
 - background/foreground behavior and a 30-minute thermal soak, including
   the sleep and wake-up of ADR 0005 (see below);
 - TalkBack, large text and reduced-motion checks on real hardware;
+- check the level-up announcement and the shop dance, including reduced motion,
+  after earning stars and after restoring an existing wallet;
 - the four languages on a device (see below), and a read-through of the
   English, Croatian and Chinese texts by native speakers.
 

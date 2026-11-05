@@ -357,7 +357,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsStarTestModeHint =>
-      '在绿色区域保持 5 秒就能得到一颗星星，而不是 60 秒。这些星星也会进入星星商店。默认关闭；已收集的星星会保留。';
+      '在绿色区域保持 5 秒就能得到一颗星星，而不是 60 秒。这些星星也会进入星星商店，并提升米娅的等级。默认关闭；已收集的星星会保留。';
 
   @override
   String get settingsSave => '保存';
@@ -428,6 +428,30 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get shopTitle => '星星商店';
+
+  @override
+  String levelUpMessage(int level) {
+    return '米娅升到了 $level 级！';
+  }
+
+  @override
+  String shopLevel(int level) {
+    return '米娅的等级：$level';
+  }
+
+  @override
+  String shopLevelProgress(int count, int total) {
+    return '距离下一等级已获得 $count / $total 颗星星';
+  }
+
+  @override
+  String get shopDance => '米娅，跳个舞！';
+
+  @override
+  String get shopDanceLocked => '达到 2 级后，米娅会为你跳舞。';
+
+  @override
+  String get shopDanceReduced => '米娅正在为你跳舞！';
 
   @override
   String shopBalance(int count) {
@@ -503,7 +527,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsResetBody =>
-      '删除所有星星和在星星商店里买过的所有物品。此操作立即生效，不属于“保存”或“取消”——点“取消”也无法撤销。';
+      '删除所有星星和在星星商店里买过的所有物品，并重置米娅的等级。此操作立即生效，不属于“保存”或“取消”——点“取消”也无法撤销。';
 
   @override
   String get settingsResetButton => '重置星星';
@@ -512,13 +536,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsResetConfirmTitle => '删除所有星星和已购买的物品？';
 
   @override
-  String get settingsResetConfirmBody => '此操作无法撤销。';
+  String get settingsResetConfirmBody => '米娅的等级也会重置。此操作无法撤销。';
 
   @override
   String get settingsResetConfirm => '删除';
 
   @override
-  String get settingsResetDone => '所有星星和已购买的物品都已删除。';
+  String get settingsResetDone => '所有星星和已购买的物品都已删除，米娅的等级也已重置。';
 
   @override
   String get settingsResetNotReady => '星星还在加载中。请稍后再试。';

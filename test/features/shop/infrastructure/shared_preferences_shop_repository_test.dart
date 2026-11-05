@@ -28,6 +28,7 @@ final StarWallet sample = StarWallet(
 
 void main() {
   loadTests();
+  migrationTests();
   loadFailureTests();
   saveTests();
   test('works on top of real SharedPreferences', () async {
@@ -55,68 +56,143 @@ void loadTests() {
       expect(await repo.load(), sample);
     });
 
-    test('negative or mistyped balance becomes 0, items stay', () async {
-      for (final balance in [-3, 'x', 1.5, null]) {
+    _loadValidationTests();
+  });
+}
+
+void migrationTests() {
+  group('wallet migration', () {
+    test(
+      'version one reconstructs earned stars and version two keeps them',
+      () async {
         final wallet = await loadRaw(
           snapshot({
             'schemaVersion': 1,
-            'balance': balance,
-            'owned': ['bow'],
-            'equipped': <String>[],
+            'balance': 2,
+            'owned': ['bow', 'hat'],
+            'equipped': ['hat'],
           }),
         );
-        expect(wallet, StarWallet(owned: {KittyAccessory.bow}));
-      }
-    });
+        expect(wallet.totalEarned, 13);
+        final store = FakePreferencesStore();
+        final repo = Repo(openStore: () async => store);
+        await repo.save(wallet);
+        final json =
+            jsonDecode(store.values[Repo.snapshotKey]! as String) as Map;
+        expect(json['schemaVersion'], 2);
+        expect(json['totalEarned'], 13);
+        expect((await repo.load()).totalEarned, 13);
+      },
+    );
 
-    test('unknown, mistyped and duplicate items are ignored', () async {
+    test('version one migration uses the original catalog prices', () async {
       final wallet = await loadRaw(
         snapshot({
           'schemaVersion': 1,
           'balance': 2,
-          'owned': ['bow', 'dragon', 5, 'bow'],
-          'equipped': 'scarf',
+          'owned': ['bow', 'scarf', 'hat', 'cushion', 'mouse'],
         }),
       );
-      expect(wallet, StarWallet(balance: 2, owned: {KittyAccessory.bow}));
-    });
-
-    test('equipped but not owned is dropped', () async {
-      final wallet = await loadRaw(
-        snapshot({
-          'schemaVersion': 1,
-          'balance': 2,
-          'owned': ['bow'],
-          'equipped': ['bow', 'hat'],
-        }),
-      );
-      expect(wallet.equipped, {KittyAccessory.bow});
-    });
-
-    test('corrupt data gives an empty wallet', () async {
-      for (final raw in ['{not json', '[1]', '"x"', 42, true]) {
-        expect(await loadRaw(raw), StarWallet.empty());
-      }
+      expect(wallet.totalEarned, 2 + 3 + 5 + 8 + 10 + 12);
     });
 
     test(
-      'missing, mistyped or too old version gives an empty wallet',
+      'version two preserves the recorded total across price changes',
       () async {
-        for (final version in [null, '1', 0]) {
-          final wallet = await loadRaw(
-            snapshot({'schemaVersion': version, 'balance': 5}),
-          );
-          expect(wallet, StarWallet.empty());
-        }
+        final wallet = await loadRaw(
+          snapshot({
+            'schemaVersion': 2,
+            'balance': 2,
+            'totalEarned': 4,
+            'owned': ['hat'],
+            'equipped': <String>[],
+          }),
+        );
+        expect(wallet.totalEarned, 4);
+        expect(wallet.equip(KittyAccessory.hat).totalEarned, 4);
+        expect(wallet.earn(2).totalEarned, 6);
       },
     );
+
+    test('invalid totals recover without reducing the known balance', () async {
+      for (final total in [-1, 'bad', null]) {
+        final wallet = await loadRaw(
+          snapshot({
+            'schemaVersion': 2,
+            'balance': 4,
+            'totalEarned': total,
+            'owned': ['bow'],
+          }),
+        );
+        expect(wallet.totalEarned, 7);
+      }
+      final wallet = await loadRaw(
+        snapshot({'schemaVersion': 2, 'balance': 4, 'totalEarned': 1}),
+      );
+      expect(wallet.totalEarned, 4);
+    });
+  });
+}
+
+void _loadValidationTests() {
+  test('negative or mistyped balance becomes 0, items stay', () async {
+    for (final balance in [-3, 'x', 1.5, null]) {
+      final wallet = await loadRaw(
+        snapshot({
+          'schemaVersion': 1,
+          'balance': balance,
+          'owned': ['bow'],
+          'equipped': <String>[],
+        }),
+      );
+      expect(wallet, StarWallet(owned: {KittyAccessory.bow}));
+    }
+  });
+
+  test('unknown, mistyped and duplicate items are ignored', () async {
+    final wallet = await loadRaw(
+      snapshot({
+        'schemaVersion': 1,
+        'balance': 2,
+        'owned': ['bow', 'dragon', 5, 'bow'],
+        'equipped': 'scarf',
+      }),
+    );
+    expect(wallet, StarWallet(balance: 2, owned: {KittyAccessory.bow}));
+  });
+
+  test('equipped but not owned is dropped', () async {
+    final wallet = await loadRaw(
+      snapshot({
+        'schemaVersion': 1,
+        'balance': 2,
+        'owned': ['bow'],
+        'equipped': ['bow', 'hat'],
+      }),
+    );
+    expect(wallet.equipped, {KittyAccessory.bow});
+  });
+
+  test('corrupt data gives an empty wallet', () async {
+    for (final raw in ['{not json', '[1]', '"x"', 42, true]) {
+      expect(await loadRaw(raw), StarWallet.empty());
+    }
+  });
+
+  test('missing, mistyped or too old version gives an empty wallet', () async {
+    for (final version in [null, '1', 0]) {
+      final wallet = await loadRaw(
+        snapshot({'schemaVersion': version, 'balance': 5}),
+      );
+      expect(wallet, StarWallet.empty());
+    }
   });
 }
 
 void loadFailureTests() {
   group('load failures', () {
     test('a newer version is not loaded and stays untouched', () async {
-      final raw = snapshot({'schemaVersion': 2, 'balance': 5});
+      final raw = snapshot({'schemaVersion': 3, 'balance': 5});
       final store = FakePreferencesStore({Repo.snapshotKey: raw});
       await expectLater(
         Repo(openStore: () async => store).load(),

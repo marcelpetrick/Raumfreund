@@ -69,6 +69,8 @@ final class MonitorViewData {
     this.kittyAccessories = const <KittyAccessory>{},
     this.stars = 0,
     this.walletStars,
+    this.kittyLevel,
+    this.levelUpSequence = 0,
     this.starProgress = 0,
     this.starJustEarned = false,
     this.quickStarMode = false,
@@ -125,6 +127,12 @@ final class MonitorViewData {
   /// Stars in the persistent Sternenladen wallet, or null while unknown
   /// (still loading or failed to load) so no misleading total is shown.
   final int? walletStars;
+
+  /// The loaded wallet's level, or null while its data is unavailable.
+  final int? kittyLevel;
+
+  /// Changes when a live star award crosses a level boundary.
+  final int levelUpSequence;
 
   /// Progress from 0 to 1 toward the next quiet-minute star.
   final double starProgress;

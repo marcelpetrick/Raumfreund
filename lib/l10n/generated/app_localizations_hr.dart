@@ -393,7 +393,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsStarTestModeHint =>
-      'Zvjezdica se dobiva nakon 5 sekundi u zelenom području umjesto nakon 60 sekundi. I te zvjezdice idu u trgovinu zvjezdica. Zadano je isključeno; skupljene zvjezdice ostaju sačuvane.';
+      'Zvjezdica se dobiva nakon 5 sekundi u zelenom području umjesto nakon 60 sekundi. I te zvjezdice idu u trgovinu zvjezdica i povećavaju Mijinu razinu. Zadano je isključeno; skupljene zvjezdice ostaju sačuvane.';
 
   @override
   String get settingsSave => 'Spremi';
@@ -467,6 +467,30 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get shopTitle => 'Trgovina zvjezdica';
+
+  @override
+  String levelUpMessage(int level) {
+    return 'Mia je dosegla $level. razinu!';
+  }
+
+  @override
+  String shopLevel(int level) {
+    return 'Mijina razina: $level';
+  }
+
+  @override
+  String shopLevelProgress(int count, int total) {
+    return '$count od $total zvjezdica do sljedeće razine';
+  }
+
+  @override
+  String get shopDance => 'Mia, zapleši!';
+
+  @override
+  String get shopDanceLocked => 'Mia će zaplesati za tebe na 2. razini.';
+
+  @override
+  String get shopDanceReduced => 'Mia pleše za tebe!';
 
   @override
   String shopBalance(int count) {
@@ -550,7 +574,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsResetBody =>
-      'Briše sve zvjezdice i sve što je kupljeno u trgovini zvjezdica. To se događa odmah i nije dio radnji Spremi ili Odustani – ni Odustani to ne poništava.';
+      'Briše sve zvjezdice i sve što je kupljeno u trgovini zvjezdica te vraća Mijinu razinu na početak. To se događa odmah i nije dio radnji Spremi ili Odustani – ni Odustani to ne poništava.';
 
   @override
   String get settingsResetButton => 'Izbriši zvjezdice';
@@ -560,14 +584,15 @@ class AppLocalizationsHr extends AppLocalizations {
       'Izbrisati sve zvjezdice i kupljene stvari?';
 
   @override
-  String get settingsResetConfirmBody => 'Ovo se ne može poništiti.';
+  String get settingsResetConfirmBody =>
+      'Mijina razina također će se vratiti na početak. Ovo se ne može poništiti.';
 
   @override
   String get settingsResetConfirm => 'Izbriši';
 
   @override
   String get settingsResetDone =>
-      'Sve zvjezdice i kupljene stvari su izbrisane.';
+      'Sve zvjezdice i kupljene stvari su izbrisane, a Mijina razina vraćena je na početak.';
 
   @override
   String get settingsResetNotReady =>

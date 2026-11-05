@@ -51,7 +51,7 @@ void main() {
   });
 
   test('newer stored data is never overwritten', () async {
-    final raw = data({'schemaVersion': 2, 'balance': 50});
+    final raw = data({'schemaVersion': Repo.schemaVersion + 1, 'balance': 50});
     final store = FakePreferencesStore(raw);
     final controller = ShopController(Repo(openStore: () async => store));
     addTearDown(controller.dispose);
