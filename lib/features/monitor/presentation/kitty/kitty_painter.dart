@@ -21,10 +21,13 @@ const double kKittyWakeLead = 0.25;
 /// Size of the design box Mia is drawn in (scaled to fit the canvas).
 const Size kKittyDesignSize = Size(240, 224);
 
+// The hat, animated effects and blurred stage extend beyond the design box.
+const double _scenePadding = 40;
+
 /// Vector painter of Mia the chibi kitty on her little glowing stage.
 ///
-/// Everything is drawn in a 240×224 design box that is scaled uniformly and
-/// anchored to the bottom centre. [walk] moves her to the right until she has
+/// Everything is drawn in a 240×224 design box with space for the glows,
+/// scaled uniformly and centred. [walk] moves her to the right until she has
 /// completely left the visible canvas.
 class KittyPainter extends CustomPainter {
   /// Creates the painter.
@@ -79,12 +82,12 @@ class KittyPainter extends CustomPainter {
   /// Horizontal walk offset in design units for a canvas of [size].
   static double walkOffset(Size size, double walk) {
     final scale = _scaleFor(size);
-    return walk * (size.width / 2 / scale + kKittyDesignSize.width / 2 + 20);
+    return walk * (size.width / 2 / scale + kKittyDesignSize.width / 2 + 60);
   }
 
   static double _scaleFor(Size size) => math.min(
-    size.width / kKittyDesignSize.width,
-    size.height / kKittyDesignSize.height,
+    size.width / (kKittyDesignSize.width + 2 * _scenePadding),
+    size.height / (kKittyDesignSize.height + 2 * _scenePadding),
   );
 
   @override
@@ -103,7 +106,7 @@ class KittyPainter extends CustomPainter {
       ..save()
       ..translate(
         (size.width - kKittyDesignSize.width * scale) / 2,
-        size.height - kKittyDesignSize.height * scale,
+        (size.height - kKittyDesignSize.height * scale) / 2,
       )
       ..scale(scale);
     paintStage(canvas, _shown.glowColor);

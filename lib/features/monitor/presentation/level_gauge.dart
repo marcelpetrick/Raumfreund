@@ -113,10 +113,21 @@ class LevelGaugePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Leave room for the broad, blurred active stroke at the top and sides.
+    final radius = math.max(
+      0.0,
+      math.min(
+        165.0,
+        math.min(
+          size.width / 2 - 34,
+          (size.height - 68) / (1 + math.sin(_start)),
+        ),
+      ),
+    );
     final rect = Rect.fromCenter(
-      center: Offset(size.width / 2, size.height * 0.78),
-      width: math.min(size.width - 28, 330),
-      height: math.min(size.width - 28, 330),
+      center: Offset(size.width / 2, 34 + radius),
+      width: radius * 2,
+      height: radius * 2,
     );
     _drawTrack(canvas, rect);
     _drawThreshold(canvas, rect, thresholds.yellowDb, AppColors.yellow);
