@@ -282,6 +282,21 @@ Verdict: in progress. Keep the full local gate green and update stable pins.
 Resume here: the full local gate passed with Flutter 3.47.9, Gradle 9.8.2,
 649 tests and 99.97% coverage. Commit the dependency update, push, and check CI.
 
+## Docker login action update (2026-11-06)
+
+Verdict: replace Dependabot PR #13's stale v4.7.0 proposal with the current
+stable v4.8.0, pinned to the official tag's commit. The action is used to log
+in to the container registry on non-PR Docker workflow runs.
+
+| Work | Owner | Status |
+| --- | --- | --- |
+| Verify upstream release and commit | Coordinator | done |
+| Update action pin and version, run local quality gate | Coordinator | in progress |
+| Push, verify GitHub CI and Docker login, close superseded PR #13 | Coordinator | planned |
+
+If the local gate or GitHub checks fail, stop and investigate before closing
+the PR. Rollback is a revert of the pinned action and its version bump.
+
 ## Issue 8: artwork clipping (2026-11-05)
 
 Verdict: correct the clipped monitor artwork in a pull request. The dependency
