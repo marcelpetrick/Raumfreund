@@ -360,3 +360,20 @@ commitment to a level, price, final name, or implementation of a second pet.
 
 Verify the linked images render in the issue, and leave the parent open.
 Rollback by reverting the documentation and images; no app behavior changes.
+
+## Release settings persistence regression (2026-11-06)
+
+Verdict: update `shared_preferences_android` to the upstream-fixed 2.5.4 and
+check the minified release APK for the JNI symbols used by preferences. The
+published 0.9.1 APK has an obfuscated method descriptor; this explains a
+release-only save failure, but the owner's device retest remains open.
+
+| Work | Owner | Status |
+| --- | --- | --- |
+| Diagnose the published APK and upstream issue | Two independent reviewers | done |
+| Update plugin and add release-DEX regression gate | Settings agent | done in isolated worktree |
+| Integrate, run full gate, commit and verify remote checks | Coordinator | in progress |
+
+The checker must fail against the old APK and pass against the fixed release
+APK. Stop on a failed gate. Rollback by reverting the plugin and verifier;
+that restores the known broken release behavior and is not recommended.

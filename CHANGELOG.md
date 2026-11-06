@@ -100,3 +100,4 @@ these lines (see docs/releasing.md).
 * v0.9.2 Update the Docker registry login action to v4.8.0.
 * v0.9.3 Add husky concept art and ticket assignment guidance.
 * v0.9.4 Document GitHub assignment and reviewer preferences.
+* v0.9.5 Fix settings persistence in minified Android release builds.

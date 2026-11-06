@@ -115,7 +115,7 @@ Open Source Project it bundles (`third_party/jni.h`, Apache-2.0).
 | `plugin_platform_interface` | 2.1.8 | BSD-3-Clause | [pub.dev/packages/plugin_platform_interface](https://pub.dev/packages/plugin_platform_interface/versions/2.1.8) | compiled |
 | `pub_semver` | 2.2.1 | BSD-3-Clause | [pub.dev/packages/pub_semver](https://pub.dev/packages/pub_semver/versions/2.2.1) | graph only (build hook) |
 | `record_use` | 1.1.1 | BSD-3-Clause | [pub.dev/packages/record_use](https://pub.dev/packages/record_use/versions/1.1.1) | graph only (build hook) |
-| `shared_preferences_android` | 2.5.1 | BSD-3-Clause | [pub.dev/packages/shared_preferences_android](https://pub.dev/packages/shared_preferences_android/versions/2.5.1) | compiled |
+| `shared_preferences_android` | 2.5.4 | BSD-3-Clause | [pub.dev/packages/shared_preferences_android](https://pub.dev/packages/shared_preferences_android/versions/2.5.4) | compiled |
 | `shared_preferences_foundation` | 2.6.0 | BSD-3-Clause | [pub.dev/packages/shared_preferences_foundation](https://pub.dev/packages/shared_preferences_foundation/versions/2.6.0) | graph only |
 | `shared_preferences_linux` | 2.4.1 | BSD-3-Clause | [pub.dev/packages/shared_preferences_linux](https://pub.dev/packages/shared_preferences_linux/versions/2.4.1) | graph only |
 | `shared_preferences_platform_interface` | 2.4.2 | BSD-3-Clause | [pub.dev/packages/shared_preferences_platform_interface](https://pub.dev/packages/shared_preferences_platform_interface/versions/2.4.2) | compiled |
