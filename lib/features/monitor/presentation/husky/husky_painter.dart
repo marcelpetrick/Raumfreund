@@ -25,6 +25,7 @@ class HuskyPainter extends CustomPainter {
     this.running = false,
     this.accessories = const <KittyAccessory>{},
     this.wake,
+    this.danceProgress,
   });
 
   /// Current room mood.
@@ -44,6 +45,9 @@ class HuskyPainter extends CustomPainter {
 
   /// Wake-up progress, including the initial sleeping interval.
   final double? wake;
+
+  /// Optional 0..1 shop dance, ignored for sleeping, waking or moving away.
+  final double? danceProgress;
 
   static const double _padding = 40;
 
@@ -69,13 +73,15 @@ class HuskyPainter extends CustomPainter {
     final waking = wake == null || lead
         ? null
         : (wake! - kKittyWakeLead) / (1 - kKittyWakeLead);
-    final pose = KittyPose.of(
+    final basePose = KittyPose.of(
       drawn,
       phase,
       walk,
       running: running,
       wake: waking,
     );
+    final dance = _danceAmount(drawn);
+    final pose = dance == null ? basePose : _dancingPose(basePose, dance);
     final dx = walkOffset(size, walk);
     canvas
       ..save()
@@ -89,7 +95,10 @@ class HuskyPainter extends CustomPainter {
     if (accessories.contains(KittyAccessory.mouse)) paintMouse(canvas);
     canvas
       ..save()
-      ..translate(dx + pose.shakeDx, pose.bobDy);
+      ..translate(dx + pose.shakeDx, pose.bobDy)
+      ..translate(120, 185)
+      ..rotate(dance == null ? 0 : _danceSway(dance) * 0.08)
+      ..translate(-120, -185);
     for (final layer in KittyLayer.values) {
       _paintLayer(canvas, pose, layer);
     }
@@ -98,6 +107,42 @@ class HuskyPainter extends CustomPainter {
     canvas
       ..restore()
       ..restore();
+  }
+
+  double? _danceAmount(KittyMood drawn) {
+    final progress = danceProgress;
+    if (progress == null ||
+        !progress.isFinite ||
+        running ||
+        walk != 0 ||
+        wake != null ||
+        drawn == KittyMood.sleeping) {
+      return null;
+    }
+    return progress.clamp(0.0, 1.0);
+  }
+
+  double _danceSway(double progress) {
+    if (progress <= 0 || progress >= 1) return 0;
+    return math.sin(progress * math.pi) * math.sin(progress * math.pi * 8);
+  }
+
+  KittyPose _dancingPose(KittyPose base, double progress) {
+    final sway = _danceSway(progress);
+    return KittyPose(
+      eyeOpen: base.eyeOpen,
+      earDroop: base.earDroop,
+      tailAngle: base.tailAngle + sway * 0.5,
+      shakeDx: base.shakeDx,
+      bobDy: base.bobDy - sway.abs() * 3,
+      leftPawLift: base.leftPawLift + math.max(0, sway) * 7,
+      rightPawLift: base.rightPawLift + math.max(0, -sway) * 7,
+      lookDx: base.lookDx,
+      walking: base.walking,
+      tailPuff: base.tailPuff,
+      yawn: base.yawn,
+      wake: base.wake,
+    );
   }
 
   void _paintLayer(Canvas canvas, KittyPose pose, KittyLayer layer) {
@@ -127,7 +172,7 @@ class HuskyPainter extends CustomPainter {
     }
     switch (shown) {
       case KittyMood.happy:
-        paintPurr(canvas, phase);
+        paintHuskyJoy(canvas, phase);
       case KittyMood.uneasy:
         paintSweat(canvas, phase);
       case KittyMood.scared:
@@ -147,5 +192,6 @@ class HuskyPainter extends CustomPainter {
       oldDelegate.walk != walk ||
       oldDelegate.running != running ||
       oldDelegate.wake != wake ||
+      oldDelegate.danceProgress != danceProgress ||
       !setEquals(oldDelegate.accessories, accessories);
 }

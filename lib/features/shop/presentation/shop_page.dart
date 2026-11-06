@@ -162,6 +162,14 @@ class _HeaderState extends State<_Header> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didUpdateWidget(_Header oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.wallet.selectedPet != widget.wallet.selectedPet) {
+      _dance.reset();
+    }
+  }
+
+  @override
   void dispose() {
     _dance.dispose();
     super.dispose();
@@ -256,24 +264,31 @@ class _HeaderState extends State<_Header> with SingleTickerProviderStateMixin {
     height: 220,
     child: AnimatedBuilder(
       animation: _dance,
-      child: widget.wallet.selectedPet == PetKind.flocke
-          ? HuskyCharacter(
-              mood: KittyMood.idle,
-              semanticLabel: AppLocalizations.of(context).flockeIdle,
-              awayLabel: AppLocalizations.of(context).flockeAwaySign,
-              accessories: widget.wallet.equipped,
-              reduceMotion: MediaQuery.disableAnimationsOf(context),
-            )
-          : KittyCharacter(
-              mood: KittyMood.idle,
-              accessories: widget.wallet.equipped,
-              reduceMotion: MediaQuery.disableAnimationsOf(context),
-            ),
-      builder: (context, child) {
+      builder: (context, _) {
+        final reduceMotion = MediaQuery.disableAnimationsOf(context);
+        if (widget.wallet.selectedPet == PetKind.flocke) {
+          return HuskyCharacter(
+            mood: KittyMood.idle,
+            semanticLabel: AppLocalizations.of(context).flockeIdle,
+            awayLabel: AppLocalizations.of(context).flockeAwaySign,
+            accessories: widget.wallet.equipped,
+            reduceMotion: reduceMotion,
+            danceProgress: !reduceMotion && _dance.isAnimating
+                ? _dance.value
+                : null,
+          );
+        }
         final value = _dance.value;
         final envelope = math.sin(math.pi * value);
         final wobble = math.sin(value * math.pi * 8) * envelope;
-        return Transform.rotate(angle: 0.13 * wobble, child: child);
+        return Transform.rotate(
+          angle: 0.13 * wobble,
+          child: KittyCharacter(
+            mood: KittyMood.idle,
+            accessories: widget.wallet.equipped,
+            reduceMotion: reduceMotion,
+          ),
+        );
       },
     ),
   );

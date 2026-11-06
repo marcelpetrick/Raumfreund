@@ -157,6 +157,9 @@ the husky unlocks for free. The shop lets you select Mia or Flocke; the choice
 and shared accessories persist across restarts. The monitor announces a new
 level when it is reached during a measurement.
 
+Flocke has matching blue eyes, a wagging tail and her own playful dance. Her
+response to the room follows the same measurement and alarm rules as Mia's.
+
 For a quick phone test, turn on **Schneller Stern-Testmodus** in Settings and
 save. Start measuring in a quiet room: ten consecutive green intervals of five
 seconds unlock Flocke at level 3 (about 50 seconds after green is confirmed).

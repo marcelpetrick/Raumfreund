@@ -20,6 +20,7 @@ class HuskyCharacter extends StatefulWidget {
     this.walkedAway = false,
     this.reduceMotion = false,
     this.wakeUp = false,
+    this.danceProgress,
     this.accessories = const <KittyAccessory>{},
     super.key,
   });
@@ -41,6 +42,9 @@ class HuskyCharacter extends StatefulWidget {
 
   /// Whether leaving sleep should animate a successful wake-up.
   final bool wakeUp;
+
+  /// Optional shop dance progress from zero to one.
+  final double? danceProgress;
 
   /// Equipped cosmetic items shared with Mia.
   final Set<KittyAccessory> accessories;
@@ -181,6 +185,12 @@ class _HuskyCharacterState extends State<HuskyCharacter>
           accessories: widget.accessories,
           awayLabel: widget.awayLabel,
           wake: _wake.isAnimating ? _wake.value : null,
+          danceProgress:
+              widget.walkedAway ||
+                  mood == KittyMood.sleeping ||
+                  _wake.isAnimating
+              ? null
+              : widget.danceProgress,
         ),
       ),
     );
@@ -196,6 +206,7 @@ class _HuskyScene extends StatelessWidget {
     required this.accessories,
     required this.awayLabel,
     this.wake,
+    this.danceProgress,
     super.key,
   });
 
@@ -206,6 +217,7 @@ class _HuskyScene extends StatelessWidget {
   final Set<KittyAccessory> accessories;
   final String awayLabel;
   final double? wake;
+  final double? danceProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -221,6 +233,7 @@ class _HuskyScene extends StatelessWidget {
             running: running,
             accessories: accessories,
             wake: wake,
+            danceProgress: danceProgress,
           ),
         ),
         if (signOpacity > 0)

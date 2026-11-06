@@ -134,6 +134,7 @@ void main() {
 
   _purchaseTests();
   _levelTests();
+  _flockeDanceTests();
   testWidgets('owned items can be put on and taken off', (tester) async {
     final shop = await _pump(
       tester,
@@ -171,6 +172,83 @@ void main() {
     expect(find.byType(KittyCharacter), findsOneWidget);
   });
   _hintAndLayoutTests();
+}
+
+void _flockeDanceTests() {
+  StarWallet flockeWallet() =>
+      StarWallet(balance: 10, selectedPet: PetKind.flocke);
+
+  testWidgets('Flocke dances independently and returns to rest', (
+    tester,
+  ) async {
+    await _pump(tester, wallet: flockeWallet(), disableAnimations: false);
+    HuskyCharacter pet() => tester.widget(find.byType(HuskyCharacter));
+    expect(pet().danceProgress, isNull);
+    await tester.tap(_button(l10nDe.flockeDance));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(pet().danceProgress, greaterThan(0));
+    expect(pet().danceProgress, lessThan(1));
+    await tester.pump(const Duration(milliseconds: 2200));
+    expect(pet().danceProgress, isNull);
+  });
+
+  testWidgets('switching pets cancels the dance', (tester) async {
+    final shop = await _pump(
+      tester,
+      wallet: flockeWallet(),
+      disableAnimations: false,
+    );
+    await tester.tap(_button(l10nDe.flockeDance));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(
+      tester.widget<HuskyCharacter>(find.byType(HuskyCharacter)).danceProgress,
+      isNotNull,
+    );
+    expect(shop.selectPet(PetKind.mia), isTrue);
+    await tester.pump();
+    final transform = find
+        .ancestor(
+          of: find.byType(KittyCharacter),
+          matching: find.byType(Transform),
+        )
+        .first;
+    expect(tester.widget<Transform>(transform).transform[1], 0);
+    expect(shop.selectPet(PetKind.flocke), isTrue);
+    await tester.pump();
+    expect(
+      tester.widget<HuskyCharacter>(find.byType(HuskyCharacter)).danceProgress,
+      isNull,
+    );
+  });
+
+  testWidgets('reduced motion stops Flocke and offers an acknowledgement', (
+    tester,
+  ) async {
+    final shop = await _pump(
+      tester,
+      wallet: flockeWallet(),
+      disableAnimations: false,
+    );
+    await tester.tap(_button(l10nDe.flockeDance));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpWidget(
+      testApp(
+        ShopPage(controller: shop),
+        scaffold: false,
+        disableAnimations: true,
+      ),
+    );
+    expect(
+      tester.widget<HuskyCharacter>(find.byType(HuskyCharacter)).danceProgress,
+      isNull,
+    );
+    await tester.tap(_button(l10nDe.flockeDance));
+    await tester.pump();
+    expect(find.text(l10nDe.flockeDanceReduced), findsOneWidget);
+  });
 }
 
 void _levelTests() {

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/glow.dart';
@@ -15,7 +17,6 @@ const _ink = Color(0xFF24183F);
 const _cyan = Color(0xFF57F7FC);
 const _pink = Color(0xFFFF8DC3);
 const _blue = Color(0xFF168EE6);
-const _green = Color(0xFF1AAE8B);
 
 void _shape(Canvas canvas, Path path, KittyLayer layer, Color color) {
   if (layer == KittyLayer.neon) {
@@ -29,7 +30,16 @@ void _shape(Canvas canvas, Path path, KittyLayer layer, Color color) {
 
 Path _oval(Rect rect) => Path()..addOval(rect);
 
-/// Fluffy curved tail behind Flocke's body.
+/// Small movement marks emphasize the happy puppy's wagging tail.
+void paintHuskyJoy(Canvas canvas, double phase) {
+  final alpha = 0.35 + 0.45 * math.sin(phase * 2 * math.pi).abs();
+  final paint = Glow.stroke(_cyan.withValues(alpha: alpha), 2.5);
+  canvas
+    ..drawLine(const Offset(221, 119), const Offset(230, 112), paint)
+    ..drawLine(const Offset(226, 127), const Offset(236, 125), paint);
+}
+
+/// Full, upward-curled husky tail behind Flocke's body.
 void paintHuskyTail(Canvas canvas, KittyPose pose, KittyLayer layer) {
   canvas
     ..save()
@@ -37,19 +47,23 @@ void paintHuskyTail(Canvas canvas, KittyPose pose, KittyLayer layer) {
     ..rotate(-pose.tailAngle * 0.55)
     ..translate(-155, -185);
   final tail = Path()
-    ..moveTo(156, 185)
-    ..cubicTo(203, 213, 231, 179, 212, 145)
-    ..cubicTo(205, 130, 192, 126, 184, 136)
-    ..cubicTo(207, 141, 205, 166, 190, 168)
-    ..cubicTo(181, 170, 170, 165, 160, 162)
+    ..moveTo(157, 184)
+    ..cubicTo(196, 207, 226, 185, 221, 153)
+    ..cubicTo(218, 131, 203, 120, 187, 127)
+    ..cubicTo(173, 132, 169, 146, 157, 158)
     ..close();
   _shape(canvas, tail, layer, _fur);
   if (layer == KittyLayer.fill) {
     final tip = Path()
-      ..moveTo(184, 136)
-      ..cubicTo(200, 127, 209, 132, 215, 148)
-      ..lineTo(202, 153)
-      ..cubicTo(199, 143, 192, 139, 184, 136)
+      ..moveTo(187, 127)
+      ..cubicTo(202, 120, 218, 131, 221, 149)
+      ..lineTo(213, 146)
+      ..lineTo(211, 155)
+      ..lineTo(204, 149)
+      ..lineTo(199, 157)
+      ..lineTo(194, 149)
+      ..lineTo(186, 154)
+      ..quadraticBezierTo(177, 141, 187, 127)
       ..close();
     canvas.drawPath(tip, Paint()..color = _white);
   }
@@ -73,13 +87,29 @@ void paintHuskyBody(Canvas canvas, KittyPose pose, KittyLayer layer) {
       ..lineTo(96, 180)
       ..close();
     canvas.drawPath(chest, Paint()..color = _white);
+    for (final x in [82.0, 134.0]) {
+      final leg = RRect.fromRectAndRadius(
+        Rect.fromLTWH(x, 159, 24, 41),
+        const Radius.circular(10),
+      );
+      canvas.drawRRect(leg, Paint()..color = _furLight);
+    }
+  }
+  // Hind paws flank two longer front legs, giving a dog-like sitting stance.
+  for (final x in [75.0, 165.0]) {
+    _shape(
+      canvas,
+      _oval(Rect.fromCenter(center: Offset(x, 199), width: 27, height: 16)),
+      layer,
+      _furLight,
+    );
   }
   for (final (x, lift) in [
     (92.0, pose.leftPawLift),
     (148.0, pose.rightPawLift),
   ]) {
     final paw = _oval(
-      Rect.fromCenter(center: Offset(x, 198 - lift), width: 33, height: 19),
+      Rect.fromCenter(center: Offset(x, 199 - lift), width: 34, height: 20),
     );
     _shape(canvas, paw, layer, _furLight);
   }
@@ -137,14 +167,11 @@ void _paintMask(Canvas canvas) {
   }
 }
 
-/// Flocke's face; her left eye is blue and right eye is green.
+/// Flocke's face, with two matching blue eyes.
 void paintHuskyFace(Canvas canvas, KittyMood mood, KittyPose pose) {
   final awakeMood = pose.wake != null ? KittyMood.idle : mood;
-  for (final (center, color) in [
-    (const Offset(88, 96), _blue),
-    (const Offset(152, 96), _green),
-  ]) {
-    _eye(canvas, center, color, awakeMood, pose);
+  for (final center in [const Offset(88, 96), const Offset(152, 96)]) {
+    _eye(canvas, center, _blue, awakeMood, pose);
   }
   if (awakeMood == KittyMood.uneasy || awakeMood == KittyMood.scared) {
     final pen = Glow.stroke(_ink, 3);
@@ -195,23 +222,43 @@ void _eye(
 
 void _muzzle(Canvas canvas, KittyMood mood, double yawn) {
   canvas
-    ..drawOval(const Rect.fromLTWH(95, 108, 50, 28), Paint()..color = _furLight)
-    ..drawOval(const Rect.fromLTWH(112, 110, 16, 10), Paint()..color = _ink);
-  final mouth = Path()..moveTo(120, 119);
-  if (mood == KittyMood.scared || yawn > 0.05) {
+    // The broad light muzzle reaches below the mask, like a puppy's snout.
+    ..drawOval(const Rect.fromLTWH(89, 105, 62, 37), Paint()..color = _furLight)
+    ..drawOval(const Rect.fromLTWH(92, 106, 56, 31), Paint()..color = _white)
+    ..drawOval(const Rect.fromLTWH(96, 113, 27, 21), Paint()..color = _furLight)
+    ..drawOval(
+      const Rect.fromLTWH(117, 113, 27, 21),
+      Paint()..color = _furLight,
+    )
+    ..drawPath(
+      Path()
+        ..moveTo(107, 110)
+        ..quadraticBezierTo(120, 104, 133, 110)
+        ..quadraticBezierTo(131, 119, 120, 122)
+        ..quadraticBezierTo(109, 119, 107, 110)
+        ..close(),
+      Paint()..color = _ink,
+    );
+  if (mood == KittyMood.happy || mood == KittyMood.idle || yawn > 0.05) {
     canvas.drawOval(
-      const Rect.fromLTWH(114, 122, 12, 13),
+      const Rect.fromLTWH(107, 120, 26, 19),
+      Paint()..color = _ink,
+    );
+    canvas.drawOval(
+      const Rect.fromLTWH(113, 130, 14, 8),
+      Paint()..color = _pink,
+    );
+    return;
+  }
+  if (mood == KittyMood.scared) {
+    canvas.drawOval(
+      const Rect.fromLTWH(115, 122, 10, 12),
       Paint()..color = _ink,
     );
     return;
   }
-  final smile = mood == KittyMood.uneasy ? -2.0 : 5.0;
-  mouth
-    ..quadraticBezierTo(114, 128 + smile, 107, 121)
-    ..moveTo(120, 119)
-    ..quadraticBezierTo(126, 128 + smile, 133, 121);
+  final mouth = Path()
+    ..moveTo(109, 123)
+    ..quadraticBezierTo(120, mood == KittyMood.uneasy ? 120 : 134, 131, 123);
   canvas.drawPath(mouth, Glow.stroke(_ink, 3));
-  if (mood == KittyMood.happy) {
-    canvas.drawCircle(const Offset(120, 132), 4, Paint()..color = _pink);
-  }
 }

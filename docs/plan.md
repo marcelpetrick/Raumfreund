@@ -28,9 +28,9 @@ can naturally have blue or brown eyes; matching blue eyes are the chosen design.
 | --- | --- | --- |
 | Review existing artwork, dance, source and natural husky features | Coordinator and reviewers | done |
 | Generate, compare and review new design ideas | Coordinator and reviewer | done; mood sheet selected, play sheet informs movement |
-| Save concepts and decisions in the repository and commit | Coordinator | included in this commit |
-| Implement selected appearance, dog behavior and dance with tests | Art/UI agents and coordinator | planned |
-| Independent review, full gate, minor version bump, push and verify CI | Coordinator/reviewer | planned |
+| Save concepts and decisions in the repository and commit | Coordinator | done, `a9b0617` |
+| Implement selected appearance, dog behavior and dance with tests | Art/UI agents and coordinator | integrated; focused tests passed |
+| Independent review, full gate, minor version bump, push and verify CI | Coordinator/reviewer | independent visual and code review passed; full gate next |
 | Publish and verify public debug APK from the checked commit | Coordinator | planned |
 | Check visual design, dance, accessibility and persistence on a real device | Owner | open after release |
 
@@ -106,7 +106,7 @@ Decisions and assumptions:
   unknown or locked selections to Mia. Reset returns to Mia. Never overwrite
   an unavailable wallet; merge stars earned before loading as before.
 - D3: Recreate the approved husky design in the existing vector painter style,
-  with one blue and one green eye, happy/uneasy/scared/sleeping moods, alarm
+  with matching blue eyes (owner's later redesign decision), happy/uneasy/scared/sleeping moods, alarm
   escape, return and wake-up. Use the same controller and motion semantics as
   Mia; no microphone, alarm, or background-recording rules change.
 - D4: Existing levels, earned stars and shop items are shared. Pet selection

@@ -233,6 +233,12 @@ automatically changing the selection. Wallet schemas 1 and 2 migrate to Mia;
 unknown or locked selections also fall back to Mia. Reset selects Mia. Both
 companions share levels, accessories and measurement behavior.
 
+Flocke's vector artwork uses matching blue eyes and a canine muzzle, paws and
+tail. Her shop dance adds a bounded dog-specific bounce, paw movement and tail
+wag inside the character transform; the stage and toy stay still. Mia retains
+her own sway. Reduced motion disables the dance, and the dog dance is ignored
+while sleeping, waking or away, so it cannot replace monitor state.
+
 ## Composition and test seams
 
 The composition root constructs production clocks, repositories and adapters,

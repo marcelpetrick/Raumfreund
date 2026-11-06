@@ -31,6 +31,7 @@ Widget _husky({
   bool away = false,
   bool reduced = false,
   bool wake = false,
+  double? danceProgress,
   Set<KittyAccessory> accessories = const {},
 }) => testApp(
   Center(
@@ -44,6 +45,7 @@ Widget _husky({
         walkedAway: away,
         reduceMotion: reduced,
         wakeUp: wake,
+        danceProgress: danceProgress,
         accessories: accessories,
       ),
     ),
@@ -60,7 +62,9 @@ HuskyPainter _visiblePainter(WidgetTester tester) => tester
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   _eyeTests();
+  _danceTests();
   _paintingTests();
+  _boundsTests();
   _characterTests();
 }
 
@@ -86,7 +90,7 @@ void _eyeTests() {
     expect(running, isNot(equals(returning)));
   });
 
-  test('both eyes have their distinct blue and green colours', () async {
+  test('both eyes have matching blue irises', () async {
     const size = Size(320, 304);
     final pixels = await _pixels(
       const HuskyPainter(mood: KittyMood.idle, phase: 0, walk: 0),
@@ -98,9 +102,77 @@ void _eyeTests() {
     }
 
     final blue = pixel(128, 136);
-    final green = pixel(192, 136);
+    final right = pixel(192, 136);
     expect(blue[2], greaterThan(blue[1]));
-    expect(green[1], greaterThan(green[2]));
+    expect(right[2], greaterThan(right[1]));
+    expect(right, blue);
+  });
+}
+
+void _danceTests() {
+  test('dance moves the dog and returns exactly to its rest frame', () async {
+    const size = Size(320, 304);
+    Future<Uint8List> frame(double? progress) => _pixels(
+      HuskyPainter(
+        mood: KittyMood.idle,
+        phase: 0,
+        walk: 0,
+        danceProgress: progress,
+      ),
+      size,
+    );
+    final rest = await frame(null);
+    expect(await frame(0), rest);
+    expect(await frame(1), rest);
+    expect(await frame(0.18), isNot(equals(rest)));
+  });
+
+  test('dance leaves the stage and toy on the floor', () async {
+    const size = Size(320, 304);
+    Future<Uint8List> frame(double progress) => _pixels(
+      HuskyPainter(
+        mood: KittyMood.idle,
+        phase: 0,
+        walk: 0,
+        accessories: const {KittyAccessory.mouse},
+        danceProgress: progress,
+      ),
+      size,
+    );
+    final rest = await frame(0);
+    final dancing = await frame(0.18);
+    for (var y = 225; y < 264; y++) {
+      for (var x = 20; x < 90; x++) {
+        final offset = (y * size.width.toInt() + x) * 4;
+        for (var channel = 0; channel < 4; channel++) {
+          // A faint moving silhouette halo may overlap the stationary stage.
+          expect(
+            (dancing[offset + channel] - rest[offset + channel]).abs(),
+            lessThan(12),
+            reason: 'stage/toy pixel at $x,$y',
+          );
+        }
+      }
+    }
+  });
+
+  test('sleeping, walking away and waking suppress the dance', () async {
+    const size = Size(320, 304);
+    for (final (mood, walk, wake) in [
+      (KittyMood.sleeping, 0.0, null),
+      (KittyMood.idle, 0.5, null),
+      (KittyMood.idle, 0.0, 0.7),
+    ]) {
+      final base = HuskyPainter(mood: mood, phase: 0, walk: walk, wake: wake);
+      final dance = HuskyPainter(
+        mood: mood,
+        phase: 0,
+        walk: walk,
+        wake: wake,
+        danceProgress: 0.18,
+      );
+      expect(await _pixels(dance, size), await _pixels(base, size));
+    }
   });
 }
 
@@ -167,6 +239,44 @@ void _paintingTests() {
       }
     }
   });
+}
+
+void _boundsTests() {
+  test('dance and all accessories stay inside the scene', () async {
+    for (final size in [const Size(240, 230), const Size(500, 250)]) {
+      for (final progress in [0.1, 0.18, 0.4, 0.7, 0.9]) {
+        final pixels = await _pixels(
+          HuskyPainter(
+            mood: KittyMood.idle,
+            phase: 0,
+            walk: 0,
+            accessories: KittyAccessory.values.toSet(),
+            danceProgress: progress,
+          ),
+          size,
+        );
+        final width = size.width.toInt();
+        final height = size.height.toInt();
+        final topAndBottom = [
+          for (var x = 0; x < width; x++) ...[
+            pixels[x * 4 + 3],
+            pixels[((height - 1) * width + x) * 4 + 3],
+          ],
+        ];
+        final sides = [
+          for (var y = 0; y < height; y++) ...[
+            pixels[(y * width) * 4 + 3],
+            pixels[(y * width + width - 1) * 4 + 3],
+          ],
+        ];
+        expect(
+          [...topAndBottom, ...sides].reduce((a, b) => a > b ? a : b),
+          lessThan(12),
+          reason: '$size at dance progress $progress',
+        );
+      }
+    }
+  });
 
   test('repaint and walk displacement follow the frame inputs', () {
     const initial = HuskyPainter(mood: KittyMood.idle, phase: 0, walk: 0);
@@ -179,10 +289,34 @@ void _paintingTests() {
     );
     expect(HuskyPainter.walkOffset(Size.zero, 1), 0);
     expect(HuskyPainter.walkOffset(const Size(240, 230), 1), greaterThan(240));
+    expect(
+      initial.shouldRepaint(
+        const HuskyPainter(
+          mood: KittyMood.idle,
+          phase: 0,
+          walk: 0,
+          danceProgress: 0.5,
+        ),
+      ),
+      isTrue,
+    );
   });
 }
 
 void _characterTests() {
+  testWidgets('reduced motion and away state suppress the shop dance', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_husky(danceProgress: 0.18));
+    expect(_visiblePainter(tester).danceProgress, 0.18);
+    await tester.pumpWidget(_husky(danceProgress: 0.18, reduced: true));
+    await tester.pump(KittyCharacter.fadeDuration);
+    expect(_visiblePainter(tester).danceProgress, isNull);
+    await tester.pumpWidget(_husky(danceProgress: 0.18, away: true));
+    await tester.pump(KittyCharacter.fadeDuration);
+    expect(_visiblePainter(tester).danceProgress, isNull);
+  });
+
   testWidgets('initially away is immediately hidden, including on remount', (
     tester,
   ) async {
