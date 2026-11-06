@@ -37,6 +37,10 @@ thing, the stricter rule applies.
   changelog edits; the coordinator integrates.
 - Track the work packages, their owners and status in `docs/plan.md`.
 - If sub-agents are not available, do the work yourself and state that limitation.
+- Assign GitHub issues and pull requests to the repository owner
+  (`marcelpetrick`) when working on them. Request that owner as reviewer when
+  GitHub permits it; GitHub cannot request the pull request's author as its
+  own reviewer. Report any platform limitation instead of leaving it implicit.
 
 ### Issue workflow
 
