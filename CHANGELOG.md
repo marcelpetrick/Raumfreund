@@ -101,3 +101,4 @@ these lines (see docs/releasing.md).
 * v0.9.3 Add husky concept art and ticket assignment guidance.
 * v0.9.4 Document GitHub assignment and reviewer preferences.
 * v0.9.5 Fix settings persistence in minified Android release builds.
+* v0.9.6 Keep the execution plan restart-safe and record release status.

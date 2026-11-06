@@ -10,6 +10,42 @@ is [`vision.md`](vision.md); the binding workflow is
 [`AGENTS.md`](../AGENTS.md). Every package lands as an atomic Conventional Commit,
 versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
 
+## Current handover and public debug release (2026-11-06)
+
+Verdict: publish the independently checked preferences fix as a public debug
+APK so the owner can retest settings on a real phone. The owner explicitly
+requested this release. It is not a production or Google Play release.
+
+- Last verified main before this documentation update: `abea6bd`, version
+  `0.9.5+98`; GitHub CI and Docker checks passed and the working tree was clean.
+- The public debug release `debug-v0.9.1-build94` predates the settings fix.
+  Its minified APK has broken preferences JNI descriptors. The updated plugin
+  and release-DEX gate are in `abea6bd`; 666 tests and 99.97% coverage passed.
+- PRs #15 and #16 were merged, issue #8 closed, and parent issue #9 remains
+  open. Child [#17](https://github.com/marcelpetrick/Raumfreund/issues/17)
+  contains the husky concepts, is assigned to the owner and remains open.
+- Docker login v4.8.0 is in `7e1a792`, with green GitHub checks; superseded
+  Dependabot PR #13 is closed. GitHub issues and PRs are assigned to the owner;
+  GitHub cannot request an author as reviewer of their own PR.
+
+| Work | Owner | Status |
+| --- | --- | --- |
+| Reconcile this plan and require an update in every commit | Coordinator | included in this commit |
+| Run full local gate, commit and push plan update | Coordinator | next |
+| Verify CI and Docker on the exact pushed commit | Coordinator | planned |
+| Preview and publish the matching debug release using `tool/release_debug.sh` | Coordinator | planned |
+| Verify release assets, checksum, signature and source commit | Coordinator | planned |
+| Retest settings save and restart on a physical Android device | Owner | open after release |
+
+Continue after a restart by checking `git status`, the current version,
+GitHub checks and the latest release before repeating any action. Use
+`tool/bump_version.sh` for this documentation commit, then the full local gate
+and push. Stop publication if a gate, certificate, checksum or version check
+fails. Do not create a production tag or use production signing. The local
+debug keystore must match the previous debug release to allow in-place updates.
+The plan is updated before each commit; post-commit check results are recorded
+at the next legitimate change rather than by an endless chain of status commits.
+
 ## Product direction (first release)
 
 - One offline Flutter/Dart Android app for phones and tablets. Microphone
@@ -270,17 +306,17 @@ must not claim a production-signed release or completed device certification.
 
 ## Dependency refresh (2026-11-04)
 
-Verdict: in progress. Keep the full local gate green and update stable pins.
+Verdict: completed in `67aac6f`; local and GitHub checks passed.
 
 | Work | Owner | State |
 | --- | --- | --- |
 | Python and Node tooling | Tooling agent | Updates and focused checks passed. |
 | Android build toolchain | Android agent | Gradle 9.8.2 and Android checks passed. |
 | Flutter, Dart and application dependencies | Coordinator | Flutter 3.47.9 and Dart 3.13.7 pass 649 tests and 99.97% coverage. |
-| Integrate, run the full gate and verify CI | Coordinator | Full local gate passed. Push and GitHub CI remain. |
+| Integrate, run the full gate and verify CI | Coordinator | done, `67aac6f` |
 
-Resume here: the full local gate passed with Flutter 3.47.9, Gradle 9.8.2,
-649 tests and 99.97% coverage. Commit the dependency update, push, and check CI.
+The full local gate passed with Flutter 3.47.9, Gradle 9.8.2, 649 tests and
+99.97% coverage; GitHub CI and Docker passed on the committed update.
 
 ## Docker login action update (2026-11-06)
 
@@ -291,8 +327,8 @@ in to the container registry on non-PR Docker workflow runs.
 | Work | Owner | Status |
 | --- | --- | --- |
 | Verify upstream release and commit | Coordinator | done |
-| Update action pin and version, run local quality gate | Coordinator | in progress |
-| Push, verify GitHub CI and Docker login, close superseded PR #13 | Coordinator | planned |
+| Update action pin and version, run local quality gate | Coordinator | done, `7e1a792` |
+| Push, verify GitHub CI and Docker login, close superseded PR #13 | Coordinator | done |
 
 If the local gate or GitHub checks fail, stop and investigate before closing
 the PR. Rollback is a revert of the pinned action and its version bump.
@@ -306,8 +342,8 @@ its GitHub CI and Docker workflows passed.
 | Work | Owner | Status |
 | --- | --- | --- |
 | Inspect issue, screenshot and existing work; identify clipping | Reviewer agent | done |
-| Fix artwork bounds and add focused regression coverage | Coordinator | in progress |
-| Review changes, run local pipeline, commit, push and check CI | Coordinator | planned |
+| Fix artwork bounds and add focused regression coverage | Coordinator | done, PR #15 merged |
+| Review changes, run local pipeline, commit, push and check CI | Coordinator | done, issue #8 closed |
 
 Verify the gauge and Mia at narrow and wide sizes, including accessories and
 animation. Keep intentional clipping when Mia leaves the stage. Record any
@@ -319,7 +355,7 @@ revert the change if a regression cannot be resolved.
 Verdict: make earned stars grow Mia's level, independent of spending, and
 unlock a playful dance in the shop. Keep the existing cat, offline wallet and
 quiet-star rules; no second pet or consumable economy is needed for this first
-increment. Build on PR #15 while it awaits review.
+increment. PR #16 was merged after PR #15; issue #9 remains open for ideas.
 
 - D1: Persist lifetime earned stars with the wallet, independent of spending.
   Migrate existing wallets from the balance plus owned item prices; items were
@@ -338,7 +374,7 @@ increment. Build on PR #15 while it awaits review.
 | Shop level display, dance and localizations | UI agent | done |
 | Integrate tests, docs and independent review | Coordinator | done |
 | Adapt issue workflow in `AGENTS.md` | Coordinator | done |
-| Run full gate, commit, push and verify checks | Coordinator | in progress |
+| Run full gate, commit, push and verify checks | Coordinator | done, PR #16 merged |
 
 Checks: prove progress survives purchases, reload and failed-load merging;
 verify reset, boundaries, translations, layout and reduced motion. Stop before
@@ -354,9 +390,9 @@ commitment to a level, price, final name, or implementation of a second pet.
 | Work | Owner | Status |
 | --- | --- | --- |
 | Create visual concepts in Mia's style | Coordinator | done |
-| Save concepts, name ideas and design assumptions in the repo | Coordinator | in progress |
-| Create assigned GitHub child issue under #9 with the designs | Coordinator | planned |
-| Verify, commit and push project workflow and design documentation | Coordinator | planned |
+| Save concepts, name ideas and design assumptions in the repo | Coordinator | done, `5763a7e` |
+| Create assigned GitHub child issue under #9 with the designs | Coordinator | done, #17 |
+| Verify, commit and push project workflow and design documentation | Coordinator | done; image URLs returned HTTP 200 |
 
 Verify the linked images render in the issue, and leave the parent open.
 Rollback by reverting the documentation and images; no app behavior changes.
@@ -371,8 +407,8 @@ release-only save failure, but the owner's device retest remains open.
 | Work | Owner | Status |
 | --- | --- | --- |
 | Diagnose the published APK and upstream issue | Two independent reviewers | done |
-| Update plugin and add release-DEX regression gate | Settings agent | done in isolated worktree |
-| Integrate, run full gate, commit and verify remote checks | Coordinator | in progress |
+| Update plugin and add release-DEX regression gate | Settings agent | done and independently reviewed |
+| Integrate, run full gate, commit and verify remote checks | Coordinator | done, `abea6bd` |
 
 The checker must fail against the old APK and pass against the fixed release
 APK. Stop on a failed gate. Rollback by reverting the plugin and verifier;

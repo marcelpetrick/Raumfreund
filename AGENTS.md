@@ -35,7 +35,12 @@ thing, the stricter rule applies.
   `ln -s <main checkout>/.toolchain .toolchain` instead of downloading again.
   Agents commit only on their own worktree branch, without version bumps or
   changelog edits; the coordinator integrates.
-- Track the work packages, their owners and status in `docs/plan.md`.
+- Keep `docs/plan.md` restart-safe and update it with every commit: record the
+  objective, package owners and status, completed evidence, next steps, open
+  decisions and external blockers. Before each commit, reconcile the plan
+  with that commit's changes; after a restart verify Git and remote state
+  before repeating actions. Record post-commit checks in the next plan update
+  without inventing results or creating a commit solely to report success.
 - If sub-agents are not available, do the work yourself and state that limitation.
 - Assign GitHub issues and pull requests to the repository owner
   (`marcelpetrick`) when working on them. Request that owner as reviewer when
