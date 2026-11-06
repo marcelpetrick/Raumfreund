@@ -98,3 +98,4 @@ these lines (see docs/releasing.md).
 * v0.9.0 Add Mia level progression and a replayable dance (issue #9).
 * v0.9.1 Document the issue workflow for Raumfreund.
 * v0.9.2 Update the Docker registry login action to v4.8.0.
+* v0.9.3 Add husky concept art and ticket assignment guidance.

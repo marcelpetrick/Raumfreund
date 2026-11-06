@@ -344,3 +344,19 @@ Checks: prove progress survives purchases, reload and failed-load merging;
 verify reset, boundaries, translations, layout and reduced motion. Stop before
 commit if any gate fails. Rollback requires preserving the newer wallet schema;
 an older app will refuse to overwrite it rather than lose earned progress.
+
+## Husky concept and child issue (2026-11-06)
+
+Verdict: propose a friendly husky as a future level-based unlock, with two
+concept sheets and ten possible names. These are design references, not a
+commitment to a level, price, final name, or implementation of a second pet.
+
+| Work | Owner | Status |
+| --- | --- | --- |
+| Create visual concepts in Mia's style | Coordinator | done |
+| Save concepts, name ideas and design assumptions in the repo | Coordinator | in progress |
+| Create assigned GitHub child issue under #9 with the designs | Coordinator | planned |
+| Verify, commit and push project workflow and design documentation | Coordinator | planned |
+
+Verify the linked images render in the issue, and leave the parent open.
+Rollback by reverting the documentation and images; no app behavior changes.
