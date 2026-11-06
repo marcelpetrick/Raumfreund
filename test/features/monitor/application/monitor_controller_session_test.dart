@@ -15,10 +15,154 @@ void main() {
   startStopTests();
   permissionTests();
   permissionLifecycleTests();
+  detachedPermissionTests();
+  detachedPermissionRaceTests();
   lifecycleTests();
   staleSessionTests();
   failureTests();
   disposeTests();
+}
+
+void detachedPermissionRaceTests() {
+  test('return during detached teardown never restarts the session', () async {
+    final h = MonitorHarness();
+    final teardown = Completer<void>();
+    h.source.stopGate = teardown;
+    h.permission
+      ..currentStatus = MicrophonePermissionStatus.denied
+      ..holdRequest = true;
+    final starting = h.controller.start();
+    await settle();
+    h.controller.onLifecycleChanged(AppLifecycleState.detached);
+    await settle();
+    expect(h.state.status, MonitorStatus.stopping);
+    h.controller.onLifecycleChanged(AppLifecycleState.resumed);
+    h.permission.completeRequest(MicrophonePermissionStatus.granted);
+    await starting;
+    expect(h.source.startCalls, isEmpty);
+    teardown.complete();
+    await settle();
+    expect(h.state.status, MonitorStatus.stopped);
+    expect(h.source.startCalls, isEmpty);
+    expect(h.screen.isOn, isFalse);
+    h.controller.dispose();
+  });
+
+  test('failed shared request is cleared so a later start can retry', () async {
+    final errors = captureFlutterErrors();
+    final h = MonitorHarness();
+    h.permission
+      ..currentStatus = MicrophonePermissionStatus.denied
+      ..holdRequest = true;
+    final first = h.controller.start();
+    await settle();
+    h.controller.onLifecycleChanged(AppLifecycleState.detached);
+    await settle();
+    h.controller.onLifecycleChanged(AppLifecycleState.resumed);
+    final second = h.controller.start();
+    await settle();
+    expect(h.permission.requestCalls, 1);
+    h.permission.failRequest(const FormatException('request failed'));
+    await Future.wait([first, second]);
+    expect(errors, hasLength(1));
+    expect(h.state.status, MonitorStatus.error);
+    expect(h.state.failure, MonitorFailure.unavailable);
+    expect(h.source.startCalls, isEmpty);
+
+    await h.controller.start();
+    expect(h.permission.requestCalls, 2);
+    expect(h.state.status, MonitorStatus.measuring);
+    expect(h.source.startCalls, [3]);
+    h.controller.dispose();
+  });
+}
+
+void detachedPermissionTests() {
+  for (final result in [
+    MicrophonePermissionStatus.granted,
+    MicrophonePermissionStatus.denied,
+    MicrophonePermissionStatus.permanentlyDenied,
+  ]) {
+    test(
+      'detach cancels pending permission even when it returns $result',
+      () async {
+        final h = MonitorHarness();
+        h.permission
+          ..currentStatus = MicrophonePermissionStatus.denied
+          ..holdRequest = true;
+        final starting = h.controller.start();
+        await settle();
+        expect(h.permission.isRequestPending, isTrue);
+
+        h.controller.onLifecycleChanged(AppLifecycleState.detached);
+        await settle();
+        expect(h.state.status, MonitorStatus.stopped);
+        h.controller.onLifecycleChanged(AppLifecycleState.resumed);
+        h.permission.completeRequest(result);
+        await starting;
+        await settle();
+
+        expect(h.state.status, MonitorStatus.stopped);
+        expect(h.state.failure, isNull);
+        expect(h.source.startCalls, isEmpty);
+        expect(h.source.recordingSession, isNull);
+        expect(h.screen.isOn, isFalse);
+        h.controller.dispose();
+      },
+    );
+  }
+  test('detach during a status query does not open a stale dialog', () async {
+    final h = MonitorHarness();
+    final gate = Completer<void>();
+    h.permission
+      ..currentStatus = MicrophonePermissionStatus.denied
+      ..statusGate = gate;
+    final starting = h.controller.start();
+    await settle();
+    h.controller.onLifecycleChanged(AppLifecycleState.detached);
+    await settle();
+    h.controller.onLifecycleChanged(AppLifecycleState.resumed);
+    gate.complete();
+    await starting;
+    await settle();
+    expect(h.state.status, MonitorStatus.stopped);
+    expect(h.permission.requestCalls, 0);
+    expect(h.source.startCalls, isEmpty);
+    h.controller.dispose();
+  });
+  for (final result in [
+    MicrophonePermissionStatus.granted,
+    MicrophonePermissionStatus.denied,
+  ]) {
+    test(
+      'new explicit start shares an outstanding request returning $result',
+      () async {
+        final h = MonitorHarness();
+        h.permission
+          ..currentStatus = MicrophonePermissionStatus.denied
+          ..holdRequest = true;
+        final first = h.controller.start();
+        await settle();
+        h.controller.onLifecycleChanged(AppLifecycleState.detached);
+        await settle();
+        h.controller.onLifecycleChanged(AppLifecycleState.resumed);
+        final second = h.controller.start();
+        await settle();
+        expect(h.permission.requestCalls, 1);
+        h.permission.completeRequest(result);
+        await Future.wait([first, second]);
+        if (result == MicrophonePermissionStatus.granted) {
+          expect(h.state.status, MonitorStatus.measuring);
+          expect(h.source.startCalls, [2]);
+        } else {
+          expect(h.state.status, MonitorStatus.error);
+          expect(h.state.failure, MonitorFailure.permissionDenied);
+          expect(h.source.startCalls, isEmpty);
+        }
+        h.controller.dispose();
+      },
+    );
+  }
 }
 
 void startStopTests() {

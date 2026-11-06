@@ -84,6 +84,7 @@ final class MonitorController extends ChangeNotifier {
   int? _activeSession;
   bool _alarmOutputActive = false;
   bool _disposed = false;
+  Future<MicrophonePermissionStatus>? _pendingPermissionRequest;
 
   /// Whether a measurement ended by backgrounding should resume on return.
   /// Set when it falls asleep; every explicit stop clears it, also while the
@@ -135,7 +136,7 @@ final class MonitorController extends ChangeNotifier {
     final session = ++_lastSessionId;
     _activeSession = session;
     _prepareSession(waking: waking);
-    final permission = await _obtainPermission();
+    final permission = await _obtainPermission(session);
     if (!_isCurrent(session)) return;
     switch (permission) {
       case null:
@@ -197,7 +198,6 @@ final class MonitorController extends ChangeNotifier {
       case AppLifecycleState.paused:
         _sleep();
       case AppLifecycleState.detached:
-        if (_state.status == MonitorStatus.permissionPending) return;
         unawaited(stop());
       case AppLifecycleState.resumed:
       case AppLifecycleState.inactive:
@@ -301,14 +301,30 @@ final class MonitorController extends ChangeNotifier {
     );
   }
 
-  Future<MicrophonePermissionStatus?> _obtainPermission() async {
+  Future<MicrophonePermissionStatus?> _obtainPermission(int session) async {
     try {
       final status = await _permission.status();
+      if (!_isCurrent(session)) return null;
       if (status == MicrophonePermissionStatus.granted) return status;
-      return await _permission.request();
+      return await _requestPermission();
     } on Exception catch (error, stack) {
-      _report(error, stack, 'while obtaining the microphone permission');
+      if (_isCurrent(session)) {
+        _report(error, stack, 'while obtaining the microphone permission');
+      }
       return null;
+    }
+  }
+
+  Future<MicrophonePermissionStatus> _requestPermission() async {
+    // Android only accepts one permission request at a time. A session may
+    // have stopped while its dialog remains open; a new start shares it.
+    final request = _pendingPermissionRequest ??= _permission.request();
+    try {
+      return await request;
+    } finally {
+      if (identical(_pendingPermissionRequest, request)) {
+        _pendingPermissionRequest = null;
+      }
     }
   }
 

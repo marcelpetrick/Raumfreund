@@ -26,6 +26,9 @@ final class FakePermission implements MicrophonePermissionPort {
   /// When true, the next [request] waits for [completeRequest].
   bool holdRequest = false;
 
+  /// When set, [status] waits until this gate completes.
+  Completer<void>? statusGate;
+
   /// When set, [status] throws it.
   Exception? statusException;
 
@@ -49,6 +52,7 @@ final class FakePermission implements MicrophonePermissionPort {
   @override
   Future<MicrophonePermissionStatus> status() async {
     statusCalls++;
+    await statusGate?.future;
     final exception = statusException;
     if (exception != null) throw exception;
     return currentStatus;
@@ -68,6 +72,13 @@ final class FakePermission implements MicrophonePermissionPort {
     final pending = _pending!;
     _pending = null;
     pending.complete(result);
+  }
+
+  /// Fails a held request with [error].
+  void failRequest(Exception error) {
+    final pending = _pending!;
+    _pending = null;
+    pending.completeError(error);
   }
 
   @override

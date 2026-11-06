@@ -104,3 +104,4 @@ these lines (see docs/releasing.md).
 * v0.9.6 Keep the execution plan restart-safe and record release status.
 * v0.9.7 Add the owner's step-by-step Google Play guide (docs/toTheMoonAkaPlaystore.md).
 * v0.10.0 Add Flocke the husky as an unlockable companion (issue #17).
+* v0.10.1 Fix microphone permission cancellation on detach and prevent overlapping permission requests.

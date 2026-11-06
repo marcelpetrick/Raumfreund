@@ -42,6 +42,11 @@ thing, the stricter rule applies.
   before repeating actions. Record post-commit checks in the next plan update
   without inventing results or creating a commit solely to report success.
 - If sub-agents are not available, do the work yourself and state that limitation.
+- When the owner asks to review the current code or work already committed to
+  the integration branch, review the requested code even if a branch diff is
+  empty. Identify the scope and, for recently committed work, its earlier
+  baseline; an empty branch comparison is not a substitute for that review.
+  Follow the owner's scope when a review skill's default scope differs.
 - Assign GitHub issues and pull requests to the repository owner
   (`marcelpetrick`) when working on them. Request that owner as reviewer when
   GitHub permits it; GitHub cannot request the pull request's author as its

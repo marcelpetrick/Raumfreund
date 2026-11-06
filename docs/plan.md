@@ -10,6 +10,38 @@ is [`vision.md`](vision.md); the binding workflow is
 [`AGENTS.md`](../AGENTS.md). Every package lands as an atomic Conventional Commit,
 versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
 
+## Active: post-release review and lifecycle fix (2026-11-06)
+
+Verdict: correct the confirmed detached-during-permission race and verify the
+Flocke selection flow end to end. The owner requested a review of the current
+code, focused on the new Flocke work, fixes for confirmed issues, and updates
+to this plan and AGENTS.md. Issue #17 remains open. No additional release is
+assumed from this review request.
+
+The current `0.10.0+101` debug release is `debug-v0.10.0-build101` at
+`4c93985`; local gate (696 tests, 99.75% coverage), GitHub CI and Docker passed.
+Review found that `detached` is ignored while permission is pending: a later
+permission grant can put the session to sleep and resume recording on return,
+contrary to ADR 0005. Stop on detach even during the dialog; ordinary hidden and
+paused permission-dialog transitions still keep the request alive. Reject stale
+status results before opening a dialog, and share an already-pending request
+with a later explicit start to avoid Android reporting a second request as busy.
+Verify late results, foreground return and teardown races stay safe.
+
+| Work | Owner | Status |
+| --- | --- | --- |
+| Review Flocke persistence, UI, animation and localization | Independent reviewers | done; no confirmed feature defect |
+| Update review guidance and restart-safe plan | Coordinator | integrated; full gate required before commit |
+| Fix detach/permission race and add regression tests | Lifecycle agent | integrated; 72 focused session and sleep tests passed |
+| Test Flocke selection, stopped navigation and restart persistence together | UI test agent | integrated; focused test passed |
+| Independently review critical fix and integrate | Coordinator/reviewer | independent final review found no blocking race; 73 integrated focused tests passed |
+| Full local gate, version bump, commit, push and check GitHub | Coordinator | version bumped; full gate required before commit |
+| Real-device permissions, lifecycle and Flocke accessibility checks | Owner | open |
+
+Stop before commit if regression tests or `./localPipeline.sh` fail. Preserve
+permission-dialog handling for hidden/paused events; rollback is a revert. The
+physical-device behavior and production signing remain unverified.
+
 ## Active: Flocke the husky (issue #17, 2026-11-06)
 
 Verdict: implement Flocke as a selectable second companion with the same
