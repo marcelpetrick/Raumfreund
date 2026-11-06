@@ -106,3 +106,4 @@ these lines (see docs/releasing.md).
 * v0.10.0 Add Flocke the husky as an unlockable companion (issue #17).
 * v0.10.1 Fix microphone permission cancellation on detach and prevent overlapping permission requests.
 * v0.10.2 Explain the five-second star test: earn 10 stars in green to unlock Flocke in about 50 seconds.
+* v0.10.3 Document the reviewed Flocke husky redesign concepts.

@@ -10,6 +10,49 @@ is [`vision.md`](vision.md); the binding workflow is
 [`AGENTS.md`](../AGENTS.md). Every package lands as an atomic Conventional Commit,
 versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
 
+## Active: Flocke redesign and public debug release (2026-11-06)
+
+Verdict: make Flocke unmistakably a cute husky, with matching natural blue
+eyes and dog-specific movements, while preserving Mia's cuddly character and
+the existing measurement, alarm and sleep behavior. The owner explicitly
+requested a minor feature-version bump and a public debug release. Google Play
+publication remains deferred.
+
+The owner found the first implementation too cat-like and requested new
+visual ideas, their documentation as an intermediate step, a review of those
+ideas, and a more suitable dance. The original issue #17 concept sheets are
+references, not a constraint to keep different-coloured eyes. Siberian huskies
+can naturally have blue or brown eyes; matching blue eyes are the chosen design.
+
+| Work | Owner | Status |
+| --- | --- | --- |
+| Review existing artwork, dance, source and natural husky features | Coordinator and reviewers | done |
+| Generate, compare and review new design ideas | Coordinator and reviewer | done; mood sheet selected, play sheet informs movement |
+| Save concepts and decisions in the repository and commit | Coordinator | included in this commit |
+| Implement selected appearance, dog behavior and dance with tests | Art/UI agents and coordinator | planned |
+| Independent review, full gate, minor version bump, push and verify CI | Coordinator/reviewer | planned |
+| Publish and verify public debug APK from the checked commit | Coordinator | planned |
+| Check visual design, dance, accessibility and persistence on a real device | Owner | open after release |
+
+Design decision after independent review: use the first sheet's broad nose,
+panting smile, sturdy paws and full tail; take the second sheet's play bow and
+wag as movement ideas. Avoid relying on an upright paw pose alone, which can
+still look feline. The illustrations are concepts, not final raster assets.
+
+Design criteria: clearly canine muzzle and nose, rounded puppy proportions,
+upright husky ears, full tail, two matching blue eyes, matching the warm neon
+visual style; make happy tail wag, alert ears and playful paws feel like a dog.
+Keep the stage and toy still during Flocke's dance, respect reduced motion and
+keep all accessories visible. Mia's existing behaviour remains unchanged.
+
+Before each commit update this plan, bump the version with `tool/bump_version.sh`
+and pass the complete local gate. The intermediate design commit uses a patch
+bump; the implemented feature uses a minor bump. Verify GitHub checks for the
+release commit, preview and publish only with `tool/release_debug.sh`, then
+verify the downloaded APK, checksum, signing certificate and source commit.
+Stop and fix failures. Rollback is a revert; the previous debug release remains
+available. Real-device checks remain open and no production signing is implied.
+
 ## Active: post-release review and lifecycle fix (2026-11-06)
 
 Verdict: correct the confirmed detached-during-permission race and verify the
