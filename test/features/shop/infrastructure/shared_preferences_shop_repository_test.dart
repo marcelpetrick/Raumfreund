@@ -79,7 +79,7 @@ void migrationTests() {
         await repo.save(wallet);
         final json =
             jsonDecode(store.values[Repo.snapshotKey]! as String) as Map;
-        expect(json['schemaVersion'], 2);
+        expect(json['schemaVersion'], Repo.schemaVersion);
         expect(json['totalEarned'], 13);
         expect((await repo.load()).totalEarned, 13);
       },
@@ -192,7 +192,10 @@ void _loadValidationTests() {
 void loadFailureTests() {
   group('load failures', () {
     test('a newer version is not loaded and stays untouched', () async {
-      final raw = snapshot({'schemaVersion': 3, 'balance': 5});
+      final raw = snapshot({
+        'schemaVersion': Repo.schemaVersion + 1,
+        'balance': 5,
+      });
       final store = FakePreferencesStore({Repo.snapshotKey: raw});
       await expectLater(
         Repo(openStore: () async => store).load(),

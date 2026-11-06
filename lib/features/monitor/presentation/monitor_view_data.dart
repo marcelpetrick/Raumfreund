@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 import '../../shop/domain/kitty_accessory.dart';
+import '../../shop/domain/pet_kind.dart';
 import '../domain/level_history_point.dart';
 import '../domain/thresholds.dart';
 import '../domain/zone.dart';
@@ -65,6 +66,7 @@ final class MonitorViewData {
     this.alarmPlaying = false,
     this.alarmOutputFailed = false,
     this.signalThin = false,
+    this.pet = PetKind.mia,
     this.kittyWalkedAway = false,
     this.kittyAccessories = const <KittyAccessory>{},
     this.stars = 0,
@@ -115,7 +117,10 @@ final class MonitorViewData {
   /// fire until they recover).
   final bool signalThin;
 
-  /// Whether Mia completed her walk out of the scene.
+  /// Selected companion.
+  final PetKind pet;
+
+  /// Whether the companion completed their walk out of the scene.
   final bool kittyWalkedAway;
 
   /// Shop items Mia currently wears.

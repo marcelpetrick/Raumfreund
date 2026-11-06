@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/night_sky_background.dart';
+import '../../shop/domain/pet_kind.dart';
 import '../domain/zone.dart';
+import 'husky/husky_character.dart';
 import 'kitty/kitty_character.dart';
 import 'level_gauge.dart';
 import 'level_timeline.dart';
@@ -107,16 +109,7 @@ class MonitorPage extends StatelessWidget {
         zone: data.zone,
         thresholds: data.thresholds,
       ),
-      SizedBox(
-        height: 230,
-        child: KittyCharacter(
-          mood: _kittyMood,
-          walkedAway: data.kittyWalkedAway,
-          accessories: data.kittyAccessories,
-          reduceMotion: MediaQuery.disableAnimationsOf(context),
-          wakeUp: data.isActive,
-        ),
-      ),
+      SizedBox(height: 230, child: _companion(context)),
       const SizedBox(height: 12),
       _statusPanel,
       const SizedBox(height: 16),
@@ -135,16 +128,7 @@ class MonitorPage extends StatelessWidget {
               zone: data.zone,
               thresholds: data.thresholds,
             ),
-            SizedBox(
-              height: 250,
-              child: KittyCharacter(
-                mood: _kittyMood,
-                walkedAway: data.kittyWalkedAway,
-                accessories: data.kittyAccessories,
-                reduceMotion: MediaQuery.disableAnimationsOf(context),
-                wakeUp: data.isActive,
-              ),
-            ),
+            SizedBox(height: 250, child: _companion(context)),
           ],
         ),
       ),
@@ -160,6 +144,35 @@ class MonitorPage extends StatelessWidget {
       ),
     ],
   );
+
+  Widget _companion(BuildContext context) {
+    final reduced = MediaQuery.disableAnimationsOf(context);
+    if (data.pet == PetKind.mia) {
+      return KittyCharacter(
+        mood: _kittyMood,
+        walkedAway: data.kittyWalkedAway,
+        accessories: data.kittyAccessories,
+        reduceMotion: reduced,
+        wakeUp: data.isActive,
+      );
+    }
+    final l10n = AppLocalizations.of(context);
+    return HuskyCharacter(
+      mood: _kittyMood,
+      walkedAway: data.kittyWalkedAway,
+      accessories: data.kittyAccessories,
+      reduceMotion: reduced,
+      wakeUp: data.isActive,
+      awayLabel: l10n.flockeAwaySign,
+      semanticLabel: switch (_kittyMood) {
+        KittyMood.idle => l10n.flockeIdle,
+        KittyMood.happy => l10n.flockeHappy,
+        KittyMood.uneasy => l10n.flockeUneasy,
+        KittyMood.scared => l10n.flockeScared,
+        KittyMood.sleeping => l10n.flockeSleeping,
+      },
+    );
+  }
 
   Widget get _statusPanel => MonitorStatusPanel(
     data: data,

@@ -30,7 +30,7 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.8.3+90` — code-complete release candidate**
+Current version: **`0.10.0+101` — release candidate**
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -150,10 +150,12 @@ Bought items can be given to Mia and taken back at any time. If the stars cannot
 stored, the shop says so and keeps working in memory. Opening and closing the
 shop follows the same stop and no-auto-restart rule.
 
-Every five earned stars Mia gains a level. Spending stars does not lower her
-level; the shop shows progress and unlocks a replayable dance at level 2.
-Quick-star test mode advances levels too. The monitor announces a new level
-when it is reached during a measurement.
+Every five earned stars the companions gain a shared level. Spending stars does
+not lower it; the shop shows progress and unlocks a replayable dance at level 2.
+Quick-star test mode advances levels too. At level 3 (10 earned stars), Flocke
+the husky unlocks for free. The shop lets you select Mia or Flocke; the choice
+and shared accessories persist across restarts. The monitor announces a new
+level when it is reached during a measurement.
 
 Teachers can clear all stars, levels and bought items in **Settings** under
 **Für Lehrkräfte** (**Sterne zurücksetzen**, with a confirmation). This acts

@@ -9,10 +9,12 @@ import '../../../app/theme/app_colors.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/glow_panel.dart';
 import '../../../shared/widgets/night_sky_background.dart';
+import '../../monitor/presentation/husky/husky_character.dart';
 import '../../monitor/presentation/kitty/kitty_accessories.dart';
 import '../../monitor/presentation/kitty/kitty_character.dart';
 import '../application/shop_controller.dart';
 import '../domain/kitty_accessory.dart';
+import '../domain/pet_kind.dart';
 import '../domain/star_wallet.dart';
 
 /// The star shop: children spend quiet-minute stars on items for Mia.
@@ -78,6 +80,7 @@ class _ShopBody extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       _Header(wallet: controller.wallet, isReady: controller.isReady),
+      _PetSelector(controller: controller),
       if (controller.loadFailed) _Hint(text: l10n.shopLoadFailed),
       if (controller.saveFailed)
         _Hint(
@@ -92,6 +95,46 @@ class _ShopBody extends StatelessWidget {
       ],
     ],
   );
+}
+
+class _PetSelector extends StatelessWidget {
+  const _PetSelector({required this.controller});
+  final ShopController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final wallet = controller.wallet;
+    return RadioGroup<PetKind>(
+      groupValue: wallet.selectedPet,
+      onChanged: (pet) {
+        if (pet != null) controller.selectPet(pet);
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 16),
+          Text(
+            l10n.shopPetHeading,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          RadioListTile<PetKind>(
+            title: Text(l10n.shopPetMia),
+            value: PetKind.mia,
+            enabled: controller.isReady,
+          ),
+          RadioListTile<PetKind>(
+            title: Text(l10n.shopPetFlocke),
+            subtitle: wallet.isFlockeUnlocked
+                ? null
+                : Text(l10n.shopPetFlockeLocked),
+            value: PetKind.flocke,
+            enabled: controller.isReady && wallet.isFlockeUnlocked,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Header extends StatefulWidget {
@@ -127,7 +170,13 @@ class _HeaderState extends State<_Header> with SingleTickerProviderStateMixin {
   void _startDance() {
     if (MediaQuery.disableAnimationsOf(context)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).shopDanceReduced)),
+        SnackBar(
+          content: Text(
+            widget.wallet.selectedPet == PetKind.flocke
+                ? AppLocalizations.of(context).flockeDanceReduced
+                : AppLocalizations.of(context).shopDanceReduced,
+          ),
+        ),
       );
     } else {
       _dance.forward(from: 0);
@@ -162,7 +211,9 @@ class _HeaderState extends State<_Header> with SingleTickerProviderStateMixin {
           if (widget.isReady) ...[
             const SizedBox(height: 12),
             Text(
-              l10n.shopLevel(wallet.level),
+              wallet.selectedPet == PetKind.flocke
+                  ? l10n.flockeShopLevel(wallet.level)
+                  : l10n.shopLevel(wallet.level),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             Text(
@@ -183,9 +234,18 @@ class _HeaderState extends State<_Header> with SingleTickerProviderStateMixin {
             OutlinedButton.icon(
               onPressed: unlocked ? _startDance : null,
               icon: const Icon(Icons.celebration_outlined),
-              label: Text(l10n.shopDance),
+              label: Text(
+                wallet.selectedPet == PetKind.flocke
+                    ? l10n.flockeDance
+                    : l10n.shopDance,
+              ),
             ),
-            if (!unlocked) Text(l10n.shopDanceLocked),
+            if (!unlocked)
+              Text(
+                wallet.selectedPet == PetKind.flocke
+                    ? l10n.flockeDanceLocked
+                    : l10n.shopDanceLocked,
+              ),
           ],
         ],
       ),
@@ -196,11 +256,19 @@ class _HeaderState extends State<_Header> with SingleTickerProviderStateMixin {
     height: 220,
     child: AnimatedBuilder(
       animation: _dance,
-      child: KittyCharacter(
-        mood: KittyMood.idle,
-        accessories: widget.wallet.equipped,
-        reduceMotion: MediaQuery.disableAnimationsOf(context),
-      ),
+      child: widget.wallet.selectedPet == PetKind.flocke
+          ? HuskyCharacter(
+              mood: KittyMood.idle,
+              semanticLabel: AppLocalizations.of(context).flockeIdle,
+              awayLabel: AppLocalizations.of(context).flockeAwaySign,
+              accessories: widget.wallet.equipped,
+              reduceMotion: MediaQuery.disableAnimationsOf(context),
+            )
+          : KittyCharacter(
+              mood: KittyMood.idle,
+              accessories: widget.wallet.equipped,
+              reduceMotion: MediaQuery.disableAnimationsOf(context),
+            ),
       builder: (context, child) {
         final value = _dance.value;
         final envelope = math.sin(math.pi * value);
@@ -319,7 +387,11 @@ class _ItemSummary extends StatelessWidget {
 
   // A text next to the icon keeps the state readable without colour.
   String? _stateText(AppLocalizations l10n) {
-    if (wallet.equipped.contains(item)) return l10n.shopWorn;
+    if (wallet.equipped.contains(item)) {
+      return wallet.selectedPet == PetKind.flocke
+          ? l10n.flockeShopWorn
+          : l10n.shopWorn;
+    }
     if (wallet.owned.contains(item)) return l10n.shopOwned;
     return null;
   }
@@ -365,7 +437,11 @@ class _ItemAction extends StatelessWidget {
       return FilledButton(
         style: FilledButton.styleFrom(minimumSize: size),
         onPressed: () => controller.toggleEquipped(item),
-        child: Text(l10n.shopEquip),
+        child: Text(
+          wallet.selectedPet == PetKind.flocke
+              ? l10n.flockeShopEquip
+              : l10n.shopEquip,
+        ),
       );
     }
     final missing = item.price - wallet.balance;

@@ -687,7 +687,7 @@ abstract class AppLocalizations {
   /// Explains the quick star test mode and persistence.
   ///
   /// In de, this message translates to:
-  /// **'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen und erhöhen Mias Level. Standardmäßig aus; gesammelte Sterne bleiben erhalten.'**
+  /// **'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen und erhöhen das gemeinsame Level. Standardmäßig aus; gesammelte Sterne bleiben erhalten.'**
   String get settingsStarTestModeHint;
 
   /// Save button.
@@ -957,7 +957,7 @@ abstract class AppLocalizations {
   /// Explains the teacher reset.
   ///
   /// In de, this message translates to:
-  /// **'Löscht alle Sterne und gekauften Sachen im Sternenladen und setzt Mias Level zurück. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.'**
+  /// **'Löscht alle Sterne und gekauften Sachen im Sternenladen und setzt das gemeinsame Level und die Tierauswahl zurück. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.'**
   String get settingsResetBody;
 
   /// Opens the reset confirmation.
@@ -975,7 +975,7 @@ abstract class AppLocalizations {
   /// Reset confirmation detail.
   ///
   /// In de, this message translates to:
-  /// **'Mias Level wird ebenfalls zurückgesetzt. Das kann nicht rückgängig gemacht werden.'**
+  /// **'Das gemeinsame Level und die Tierauswahl werden ebenfalls zurückgesetzt. Das kann nicht rückgängig gemacht werden.'**
   String get settingsResetConfirmBody;
 
   /// Confirms the reset.
@@ -987,7 +987,7 @@ abstract class AppLocalizations {
   /// Snackbar after a reset.
   ///
   /// In de, this message translates to:
-  /// **'Alle Sterne und gekauften Sachen wurden gelöscht und Mias Level wurde zurückgesetzt.'**
+  /// **'Alle Sterne und gekauften Sachen wurden gelöscht, das Level und die Tierauswahl zurückgesetzt.'**
   String get settingsResetDone;
 
   /// Snackbar when the wallet is not loaded.
@@ -1043,6 +1043,132 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'中文（简体）'**
   String get languageChinese;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke sitzt gemütlich da und wartet'**
+  String get flockeIdle;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke ist fröhlich und wedelt'**
+  String get flockeHappy;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke ist unruhig, es wird zu laut'**
+  String get flockeUneasy;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke hat Angst – es ist viel zu laut'**
+  String get flockeScared;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke schläft, bis du zurückkommst'**
+  String get flockeSleeping;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Zu laut – Flocke hat sich versteckt'**
+  String get flockeAwaySign;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Bei Flocke: {items}'**
+  String flockeWearing(String items);
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke schläft – Messung pausiert'**
+  String get flockeStatusSleeping;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke wacht auf …'**
+  String get flockeStatusWaking;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Im Hintergrund hört Raumfreund nicht zu. Sobald du die App wieder öffnest, wacht Flocke auf und misst weiter.'**
+  String get flockeSleepingHint;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke erreicht Level {level}!'**
+  String flockeLevelUpMessage(int level);
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flockes Level: {level}'**
+  String flockeShopLevel(int level);
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke tanzt!'**
+  String get flockeDance;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Ab Level 2 tanzt Flocke für dich.'**
+  String get flockeDanceLocked;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke tanzt für dich!'**
+  String get flockeDanceReduced;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein tierischer Freund'**
+  String get shopPetHeading;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Mia, die Katze'**
+  String get shopPetMia;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke, der Husky'**
+  String get shopPetFlocke;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Flocke wird ab Level 3 freigeschaltet.'**
+  String get shopPetFlockeLocked;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Bei Flocke'**
+  String get flockeShopWorn;
+
+  /// Husky companion or pet selection text.
+  ///
+  /// In de, this message translates to:
+  /// **'Für Flocke'**
+  String get flockeShopEquip;
 }
 
 class _AppLocalizationsDelegate

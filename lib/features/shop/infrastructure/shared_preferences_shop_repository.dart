@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import '../../settings/infrastructure/preferences_store.dart';
 import '../domain/kitty_accessory.dart';
+import '../domain/pet_kind.dart';
 import '../domain/shop_repository.dart';
 import '../domain/star_wallet.dart';
 
@@ -41,8 +42,9 @@ final class ShopNewerSchemaException extends ShopStorageException {
 ///
 /// Balance and inventory belong together, so they are written as one JSON
 /// snapshot under [snapshotKey] (atomic replace). The snapshot holds the
-/// balance, lifetime earned stars, owned and equipped item names, and the
-/// schema version. Nothing else is stored, and it never leaves the device.
+/// balance, lifetime earned stars, owned and equipped item names, the selected
+/// pet and the schema version. Nothing else is stored, and it never leaves
+/// the device.
 ///
 /// Loading follows the settings policy for *bad data* and throws for
 /// *unavailable or unreadable storage* and for *newer data*, so the caller
@@ -58,6 +60,8 @@ final class ShopNewerSchemaException extends ShopStorageException {
 /// * Version 1 predates the lifetime total, so its balance and owned item
 ///   prices reconstruct it. A malformed version 2 total is reconstructed;
 ///   a total below the balance is repaired to the balance.
+/// * Version 3 stores the selected pet; earlier versions default to Mia.
+///   Unknown or still-locked selections also fall back to Mia.
 /// * Unreadable JSON and a missing, non-integer or too old version are
 ///   genuinely corrupt and load an empty wallet (decided policy).
 final class SharedPreferencesShopRepository implements ShopRepository {
@@ -68,7 +72,7 @@ final class SharedPreferencesShopRepository implements ShopRepository {
   }) : _openStore = openStore ?? SharedPreferencesStore.open;
 
   /// Current schema version written by [save].
-  static const int schemaVersion = 2;
+  static const int schemaVersion = 3;
 
   /// Storage key of the snapshot.
   static const String snapshotKey = 'shop.snapshot';
@@ -122,6 +126,7 @@ final class SharedPreferencesShopRepository implements ShopRepository {
     'schemaVersion': schemaVersion,
     'balance': wallet.balance,
     'totalEarned': wallet.totalEarned,
+    'selectedPet': wallet.selectedPet.name,
     'owned': [for (final item in wallet.owned) item.name],
     'equipped': [for (final item in wallet.equipped) item.name],
   };
@@ -153,6 +158,9 @@ final class SharedPreferencesShopRepository implements ShopRepository {
           : totalEarned is int && totalEarned >= 0
           ? totalEarned
           : null,
+      selectedPet: version >= 3 && data['selectedPet'] == PetKind.flocke.name
+          ? PetKind.flocke
+          : PetKind.mia,
     );
   }
 

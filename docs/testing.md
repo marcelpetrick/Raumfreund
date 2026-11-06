@@ -32,6 +32,9 @@ Open device acceptance work:
 - TalkBack, large text and reduced-motion checks on real hardware;
 - check the level-up announcement and the shop dance, including reduced motion,
   after earning stars and after restoring an existing wallet;
+- unlock Flocke at level 3, select each pet and restart; check all moods,
+  accessories, alarm departure and return, sleep and wake, TalkBack and
+  reduced motion on a physical device;
 - the four languages on a device (see below), and a read-through of the
   English, Croatian and Chinese texts by native speakers.
 

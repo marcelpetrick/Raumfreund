@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 import 'kitty_accessory.dart';
+import 'pet_kind.dart';
 
 /// Why [StarWallet.buy] did not buy an item.
 enum PurchaseFailure {
@@ -39,7 +40,8 @@ final class PurchaseResult {
 /// Immutable stars balance plus inventory of the child's shop.
 ///
 /// Invariants (enforced in the constructor): the balance is not negative
-/// and every equipped item is owned. All operations return new values, so
+/// every equipped item is owned, and the selected pet is unlocked. All
+/// operations return new values, so
 /// the wallet is trivially safe to share and to compare in tests. Pure
 /// domain code: no Flutter, no storage, no clock.
 final class StarWallet {
@@ -47,6 +49,7 @@ final class StarWallet {
   StarWallet({
     this.balance = 0,
     int? totalEarned,
+    this.selectedPet = PetKind.mia,
     Set<KittyAccessory> owned = const {},
     Set<KittyAccessory> equipped = const {},
   }) : totalEarned = totalEarned ?? _reconstructedTotal(balance, owned),
@@ -65,28 +68,42 @@ final class StarWallet {
         'must cover balance',
       );
     }
+    if (selectedPet == PetKind.flocke && !isFlockeUnlocked) {
+      throw ArgumentError.value(selectedPet, 'selectedPet', 'is locked');
+    }
   }
 
   /// A wallet without stars and items.
   factory StarWallet.empty() => StarWallet();
 
   /// Repairing factory for persisted data: a negative balance becomes 0
-  /// and equipped items that are not owned are dropped.
+  /// equipped items that are not owned are dropped, and a locked selected
+  /// pet is replaced by Mia.
   factory StarWallet.sanitized({
     required int balance,
     required Set<KittyAccessory> owned,
     required Set<KittyAccessory> equipped,
     int? totalEarned,
-  }) => StarWallet(
-    balance: balance < 0 ? 0 : balance,
-    owned: owned,
-    equipped: equipped.intersection(owned),
-    totalEarned: totalEarned == null
-        ? null
-        : totalEarned < (balance < 0 ? 0 : balance)
-        ? (balance < 0 ? 0 : balance)
-        : totalEarned,
-  );
+    PetKind selectedPet = PetKind.mia,
+  }) {
+    final safeBalance = balance < 0 ? 0 : balance;
+    final effectiveTotal = totalEarned == null
+        ? _reconstructedTotal(safeBalance, owned)
+        : totalEarned < safeBalance
+        ? safeBalance
+        : totalEarned;
+    return StarWallet(
+      balance: safeBalance,
+      owned: owned,
+      equipped: equipped.intersection(owned),
+      totalEarned: effectiveTotal,
+      selectedPet:
+          selectedPet == PetKind.flocke &&
+              effectiveTotal ~/ starsPerLevel + 1 < flockeUnlockLevel
+          ? PetKind.mia
+          : selectedPet,
+    );
+  }
 
   /// Validating factory for persisted data: null if an invariant is
   /// violated.
@@ -101,6 +118,12 @@ final class StarWallet {
 
   /// Number of earned stars needed to advance each level.
   static const int starsPerLevel = 5;
+
+  /// Flocke becomes available after ten earned stars.
+  static const int flockeUnlockLevel = 3;
+
+  /// Companion shown on the monitor; Flocke must be unlocked first.
+  final PetKind selectedPet;
 
   /// Stars available to spend.
   final int balance;
@@ -123,6 +146,9 @@ final class StarWallet {
   /// Mia starts at level one and advances for every [starsPerLevel] stars.
   int get level => totalEarned ~/ starsPerLevel + 1;
 
+  /// Whether Flocke may be selected without spending stars.
+  bool get isFlockeUnlocked => level >= flockeUnlockLevel;
+
   /// Earned stars in the current level, from zero to [starsPerLevel] minus one.
   int get starsTowardNextLevel => totalEarned % starsPerLevel;
 
@@ -134,6 +160,7 @@ final class StarWallet {
     return StarWallet(
       balance: balance + stars,
       totalEarned: totalEarned + stars,
+      selectedPet: selectedPet,
       owned: owned,
       equipped: equipped,
     );
@@ -152,6 +179,7 @@ final class StarWallet {
       StarWallet(
         balance: balance - item.price,
         totalEarned: totalEarned,
+        selectedPet: selectedPet,
         owned: {...owned, item},
         equipped: equipped,
       ),
@@ -163,6 +191,7 @@ final class StarWallet {
       ? StarWallet(
           balance: balance,
           totalEarned: totalEarned,
+          selectedPet: selectedPet,
           owned: owned,
           equipped: {...equipped, item},
         )
@@ -173,10 +202,25 @@ final class StarWallet {
       ? StarWallet(
           balance: balance,
           totalEarned: totalEarned,
+          selectedPet: selectedPet,
           owned: owned,
           equipped: equipped.difference({item}),
         )
       : this;
+
+  /// Selects an unlocked companion; a locked or unchanged selection is a no-op.
+  StarWallet selectPet(PetKind pet) {
+    if (pet == selectedPet || (pet == PetKind.flocke && !isFlockeUnlocked)) {
+      return this;
+    }
+    return StarWallet(
+      balance: balance,
+      totalEarned: totalEarned,
+      owned: owned,
+      equipped: equipped,
+      selectedPet: pet,
+    );
+  }
 
   /// Teacher reset: no stars, no items.
   StarWallet reset() => StarWallet.empty();
@@ -186,6 +230,7 @@ final class StarWallet {
       other is StarWallet &&
       other.balance == balance &&
       other.totalEarned == totalEarned &&
+      other.selectedPet == selectedPet &&
       other.owned.length == owned.length &&
       other.owned.containsAll(owned) &&
       other.equipped.length == equipped.length &&
@@ -195,6 +240,7 @@ final class StarWallet {
   int get hashCode => Object.hash(
     balance,
     totalEarned,
+    selectedPet,
     Object.hashAllUnordered(owned),
     Object.hashAllUnordered(equipped),
   );

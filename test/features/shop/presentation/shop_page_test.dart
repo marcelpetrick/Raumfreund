@@ -5,9 +5,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:raumfreund/features/monitor/presentation/husky/husky_character.dart';
 import 'package:raumfreund/features/monitor/presentation/kitty/kitty_character.dart';
 import 'package:raumfreund/features/shop/application/shop_controller.dart';
 import 'package:raumfreund/features/shop/domain/kitty_accessory.dart';
+import 'package:raumfreund/features/shop/domain/pet_kind.dart';
 import 'package:raumfreund/features/shop/domain/star_wallet.dart';
 import 'package:raumfreund/features/shop/presentation/shop_page.dart';
 
@@ -46,6 +48,8 @@ Finder _button(String label) => find.ancestor(
 void _purchaseTests() {
   testWidgets('buying asks first and cancel keeps the stars', (tester) async {
     final shop = await _pump(tester, wallet: StarWallet(balance: 5));
+    await tester.ensureVisible(_button(l10nDe.shopBuy).first);
+    await tester.pump();
     await tester.tap(_button(l10nDe.shopBuy).first);
     await tester.pumpAndSettle();
     expect(find.text('Schleife für 3 Sterne kaufen?'), findsOneWidget);
@@ -59,6 +63,8 @@ void _purchaseTests() {
     tester,
   ) async {
     final shop = await _pump(tester, wallet: StarWallet(balance: 5));
+    await tester.ensureVisible(_button(l10nDe.shopBuy).first);
+    await tester.pump();
     await tester.tap(_button(l10nDe.shopBuy).first);
     await tester.pumpAndSettle();
     await tester.tap(
@@ -92,6 +98,29 @@ void _purchaseTests() {
 }
 
 void main() {
+  testWidgets('Flocke unlocks and can be selected without spending stars', (
+    tester,
+  ) async {
+    final shop = await _pump(tester, wallet: StarWallet(balance: 9));
+    await tester.ensureVisible(find.text(l10nDe.shopPetFlocke));
+    expect(find.text(l10nDe.shopPetFlockeLocked), findsOneWidget);
+    await tester.tap(find.text(l10nDe.shopPetFlocke));
+    expect(shop.wallet.selectedPet, PetKind.mia);
+    shop.earn(1);
+    await tester.pump();
+    await tester.tap(find.text(l10nDe.shopPetFlocke));
+    await tester.pump();
+    expect(shop.wallet.selectedPet, PetKind.flocke);
+    expect(shop.wallet.balance, 10);
+    expect(find.byType(HuskyCharacter), findsOneWidget);
+    expect(find.text(l10nDe.flockeShopLevel(3)), findsOneWidget);
+    await tester.ensureVisible(find.text(l10nDe.shopPetMia));
+    await tester.pump();
+    await tester.tap(find.text(l10nDe.shopPetMia));
+    await tester.pump();
+    expect(shop.wallet.selectedPet, PetKind.mia);
+  });
+
   testWidgets('shows balance, Mia and all five items', (tester) async {
     await _pump(tester, wallet: StarWallet(balance: 4));
     expect(find.text(l10nDe.shopBalance(4)), findsOneWidget);
@@ -110,6 +139,8 @@ void main() {
       tester,
       wallet: StarWallet(owned: {KittyAccessory.bow}),
     );
+    await tester.ensureVisible(_button(l10nDe.shopEquip));
+    await tester.pump();
     await tester.tap(_button(l10nDe.shopEquip));
     await tester.pump();
     expect(shop.wallet.equipped, {KittyAccessory.bow});
@@ -118,6 +149,8 @@ void main() {
       tester.widget<KittyCharacter>(find.byType(KittyCharacter)).accessories,
       {KittyAccessory.bow},
     );
+    await tester.ensureVisible(_button(l10nDe.shopUnequip));
+    await tester.pump();
     await tester.tap(_button(l10nDe.shopUnequip));
     await tester.pump();
     expect(shop.wallet.equipped, isEmpty);
@@ -145,6 +178,8 @@ void _levelTests() {
     await _pump(tester, wallet: StarWallet(balance: 7));
     expect(find.text(l10nDe.shopLevel(2)), findsOneWidget);
     expect(find.text(l10nDe.shopLevelProgress(2, 5)), findsOneWidget);
+    await tester.ensureVisible(_button(l10nDe.shopBuy).first);
+    await tester.pump();
     await tester.tap(_button(l10nDe.shopBuy).first);
     await tester.pumpAndSettle();
     await tester.tap(
@@ -260,6 +295,8 @@ void _hintAndLayoutTests() {
       StarWallet(owned: {KittyAccessory.bow}),
     )..saveException = Exception('disk full');
     final shop = await _pump(tester, repository: repository);
+    await tester.ensureVisible(_button(l10nDe.shopEquip));
+    await tester.pump();
     await tester.tap(_button(l10nDe.shopEquip));
     await tester.pump();
     await shop.flush();

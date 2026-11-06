@@ -4,6 +4,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../domain/kitty_accessory.dart';
+import '../domain/pet_kind.dart';
 import '../domain/shop_repository.dart';
 import '../domain/star_wallet.dart';
 
@@ -97,6 +98,16 @@ final class ShopController extends ChangeNotifier {
           ? _wallet.unequip(item)
           : _wallet.equip(item),
     );
+    return true;
+  }
+
+  /// Selects an unlocked pet after the stored wallet has loaded.
+  bool selectPet(PetKind pet) {
+    if (!_loaded || (pet == PetKind.flocke && !_wallet.isFlockeUnlocked)) {
+      return false;
+    }
+    final next = _wallet.selectPet(pet);
+    if (next != _wallet) _apply(next);
     return true;
   }
 

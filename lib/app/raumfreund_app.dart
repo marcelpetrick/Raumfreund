@@ -265,6 +265,7 @@ MonitorViewData _viewData(
   alarmPlaying: state.alarmPlaying,
   alarmOutputFailed: state.alarmOutputFailed,
   signalThin: state.signalThin,
+  pet: shop.wallet.selectedPet,
   kittyWalkedAway: state.kittyAway,
   kittyAccessories: shop.wallet.equipped,
   stars: state.stars,

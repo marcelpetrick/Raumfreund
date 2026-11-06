@@ -103,3 +103,4 @@ these lines (see docs/releasing.md).
 * v0.9.5 Fix settings persistence in minified Android release builds.
 * v0.9.6 Keep the execution plan restart-safe and record release status.
 * v0.9.7 Add the owner's step-by-step Google Play guide (docs/toTheMoonAkaPlaystore.md).
+* v0.10.0 Add Flocke the husky as an unlockable companion (issue #17).

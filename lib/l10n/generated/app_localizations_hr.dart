@@ -393,7 +393,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsStarTestModeHint =>
-      'Zvjezdica se dobiva nakon 5 sekundi u zelenom području umjesto nakon 60 sekundi. I te zvjezdice idu u trgovinu zvjezdica i povećavaju Mijinu razinu. Zadano je isključeno; skupljene zvjezdice ostaju sačuvane.';
+      'Zvjezdica se dobiva nakon 5 sekundi u zelenom području umjesto nakon 60 sekundi. I te zvjezdice idu u trgovinu i povećavaju zajedničku razinu. Zadano je isključeno; skupljene zvjezdice ostaju sačuvane.';
 
   @override
   String get settingsSave => 'Spremi';
@@ -510,7 +510,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get shopLoadFailed =>
-      'Zvjezdice se trenutačno ne mogu učitati. Kupnja i davanje dodataka Miji opet će raditi kad to uspije.';
+      'Zvjezdice se trenutačno ne mogu učitati. Kupnja i davanje dodataka opet će raditi kad to uspije.';
 
   @override
   String get shopSaveFailed =>
@@ -574,7 +574,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsResetBody =>
-      'Briše sve zvjezdice i sve što je kupljeno u trgovini zvjezdica te vraća Mijinu razinu na početak. To se događa odmah i nije dio radnji Spremi ili Odustani – ni Odustani to ne poništava.';
+      'Briše sve zvjezdice i kupljene stvari te vraća zajedničku razinu i odabir ljubimca na početak. To se događa odmah i radnja Odustani to ne poništava.';
 
   @override
   String get settingsResetButton => 'Izbriši zvjezdice';
@@ -585,14 +585,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsResetConfirmBody =>
-      'Mijina razina također će se vratiti na početak. Ovo se ne može poništiti.';
+      'Zajednička razina i odabir ljubimca također će se vratiti na početak. Ovo se ne može poništiti.';
 
   @override
   String get settingsResetConfirm => 'Izbriši';
 
   @override
   String get settingsResetDone =>
-      'Sve zvjezdice i kupljene stvari su izbrisane, a Mijina razina vraćena je na početak.';
+      'Sve zvjezdice i kupljene stvari su izbrisane, a razina i odabir ljubimca vraćeni na početak.';
 
   @override
   String get settingsResetNotReady =>
@@ -624,4 +624,74 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get languageChinese => '中文（简体）';
+
+  @override
+  String get flockeIdle => 'Flocke mirno sjedi i čeka';
+
+  @override
+  String get flockeHappy => 'Flocke je veseo i maše repom';
+
+  @override
+  String get flockeUneasy => 'Flocke je nemiran jer postaje glasno';
+
+  @override
+  String get flockeScared => 'Flocke se boji – preglasno je';
+
+  @override
+  String get flockeSleeping => 'Flocke spava dok se ne vratiš';
+
+  @override
+  String get flockeAwaySign => 'Preglasno je – Flocke se sakrio';
+
+  @override
+  String flockeWearing(String items) {
+    return 'Kod Flockea: $items';
+  }
+
+  @override
+  String get flockeStatusSleeping => 'Flocke spava – mjerenje je pauzirano';
+
+  @override
+  String get flockeStatusWaking => 'Flocke se budi …';
+
+  @override
+  String get flockeSleepingHint =>
+      'Raumfreund ne sluša u pozadini. Kad se vratiš, Flocke se budi i nastavlja mjeriti.';
+
+  @override
+  String flockeLevelUpMessage(int level) {
+    return 'Flocke doseže razinu $level!';
+  }
+
+  @override
+  String flockeShopLevel(int level) {
+    return 'Flockeova razina: $level';
+  }
+
+  @override
+  String get flockeDance => 'Flocke pleše!';
+
+  @override
+  String get flockeDanceLocked => 'Od razine 2 Flocke pleše za tebe.';
+
+  @override
+  String get flockeDanceReduced => 'Flocke pleše za tebe!';
+
+  @override
+  String get shopPetHeading => 'Tvoj životinjski prijatelj';
+
+  @override
+  String get shopPetMia => 'Mia, mačka';
+
+  @override
+  String get shopPetFlocke => 'Flocke, haski';
+
+  @override
+  String get shopPetFlockeLocked => 'Flocke se otključava na razini 3.';
+
+  @override
+  String get flockeShopWorn => 'Kod Flockea';
+
+  @override
+  String get flockeShopEquip => 'Daj Flockeu';
 }

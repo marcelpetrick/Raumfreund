@@ -376,7 +376,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsStarTestModeHint =>
-      'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen und erhöhen Mias Level. Standardmäßig aus; gesammelte Sterne bleiben erhalten.';
+      'Nach 5 Sekunden im grünen Bereich gibt es einen Stern statt nach 60 Sekunden. Auch diese Sterne landen im Sternenladen und erhöhen das gemeinsame Level. Standardmäßig aus; gesammelte Sterne bleiben erhalten.';
 
   @override
   String get settingsSave => 'Speichern';
@@ -554,7 +554,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsResetBody =>
-      'Löscht alle Sterne und gekauften Sachen im Sternenladen und setzt Mias Level zurück. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.';
+      'Löscht alle Sterne und gekauften Sachen im Sternenladen und setzt das gemeinsame Level und die Tierauswahl zurück. Das passiert sofort und gehört nicht zu Speichern oder Abbrechen – auch Abbrechen macht es nicht rückgängig.';
 
   @override
   String get settingsResetButton => 'Sterne zurücksetzen';
@@ -565,14 +565,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsResetConfirmBody =>
-      'Mias Level wird ebenfalls zurückgesetzt. Das kann nicht rückgängig gemacht werden.';
+      'Das gemeinsame Level und die Tierauswahl werden ebenfalls zurückgesetzt. Das kann nicht rückgängig gemacht werden.';
 
   @override
   String get settingsResetConfirm => 'Löschen';
 
   @override
   String get settingsResetDone =>
-      'Alle Sterne und gekauften Sachen wurden gelöscht und Mias Level wurde zurückgesetzt.';
+      'Alle Sterne und gekauften Sachen wurden gelöscht, das Level und die Tierauswahl zurückgesetzt.';
 
   @override
   String get settingsResetNotReady =>
@@ -604,4 +604,74 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get languageChinese => '中文（简体）';
+
+  @override
+  String get flockeIdle => 'Flocke sitzt gemütlich da und wartet';
+
+  @override
+  String get flockeHappy => 'Flocke ist fröhlich und wedelt';
+
+  @override
+  String get flockeUneasy => 'Flocke ist unruhig, es wird zu laut';
+
+  @override
+  String get flockeScared => 'Flocke hat Angst – es ist viel zu laut';
+
+  @override
+  String get flockeSleeping => 'Flocke schläft, bis du zurückkommst';
+
+  @override
+  String get flockeAwaySign => 'Zu laut – Flocke hat sich versteckt';
+
+  @override
+  String flockeWearing(String items) {
+    return 'Bei Flocke: $items';
+  }
+
+  @override
+  String get flockeStatusSleeping => 'Flocke schläft – Messung pausiert';
+
+  @override
+  String get flockeStatusWaking => 'Flocke wacht auf …';
+
+  @override
+  String get flockeSleepingHint =>
+      'Im Hintergrund hört Raumfreund nicht zu. Sobald du die App wieder öffnest, wacht Flocke auf und misst weiter.';
+
+  @override
+  String flockeLevelUpMessage(int level) {
+    return 'Flocke erreicht Level $level!';
+  }
+
+  @override
+  String flockeShopLevel(int level) {
+    return 'Flockes Level: $level';
+  }
+
+  @override
+  String get flockeDance => 'Flocke tanzt!';
+
+  @override
+  String get flockeDanceLocked => 'Ab Level 2 tanzt Flocke für dich.';
+
+  @override
+  String get flockeDanceReduced => 'Flocke tanzt für dich!';
+
+  @override
+  String get shopPetHeading => 'Dein tierischer Freund';
+
+  @override
+  String get shopPetMia => 'Mia, die Katze';
+
+  @override
+  String get shopPetFlocke => 'Flocke, der Husky';
+
+  @override
+  String get shopPetFlockeLocked => 'Flocke wird ab Level 3 freigeschaltet.';
+
+  @override
+  String get flockeShopWorn => 'Bei Flocke';
+
+  @override
+  String get flockeShopEquip => 'Für Flocke';
 }

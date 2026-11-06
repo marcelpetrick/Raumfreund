@@ -184,9 +184,9 @@ first frame; anything unreadable means German.
 ## Star shop
 
 `lib/features/shop/` follows the settings pattern: an immutable, always-valid
-`StarWallet` (balance, earned-star total, owned and equipped items; typed `PurchaseResult`),
+`StarWallet` (balance, earned-star total, selected pet, owned and equipped items; typed `PurchaseResult`),
 a `ShopRepository` port, `SharedPreferencesShopRepository` (own `shop.`
-namespace, one JSON snapshot, schema version 2, per-field repair, corrupt
+namespace, one JSON snapshot, schema version 3, per-field repair, corrupt
 data loads an empty wallet) and `ShopController`, which applies
 changes immediately, saves them serialized and coalesced, and reports save
 failures in `saveFailed` instead of throwing. Unavailable or unreadable
@@ -199,8 +199,8 @@ teacher reset waits for the save and reports a failure.
 
 Dependency direction: shop domain, application and infrastructure depend on
 nothing but the shared `PreferencesStore` abstraction of settings. The only
-shop type the monitor feature imports is the `KittyAccessory` contract, which
-its kitty renderer draws; the shop page in turn reuses the kitty widget and
+shop types the monitor feature imports are the `KittyAccessory` and `PetKind`
+contracts, which select its companion and accessories; the shop page reuses the widgets and
 item names from the monitor presentation. Monitor domain and application
 never import shop. The monitor reports every earned quiet-minute star through the
 `StarEarnedSink` port (default no-op), and the composition root connects it
@@ -209,7 +209,7 @@ has loaded are added to it after loading.
 
 `RaumfreundApp` owns the `ShopController` (injectable `shopRepository` and
 `monitorFactory` seams for tests), calls `load()` at startup and maps
-`wallet.equipped` into `MonitorViewData.kittyAccessories`. The monitor's
+the selected pet and equipped accessories into the monitor. The monitor's
 third app-bar action opens `ShopPage` through the same `_navigate` helper as
 Settings and About, so measurement is stopped first and never restarted. The
 teacher reset is passed to `SettingsPage` as a plain callback
@@ -228,6 +228,10 @@ emit an announcement. Stars earned while loading has failed are merged after
 recovery without a belated announcement; the resulting level is visible in
 the shop. The shop shows progress and offers a silent, replayable
 dance from level 2; reduced motion replaces movement with an acknowledgement.
+Flocke unlocks at level 3 (ten lifetime earned stars), without spending stars or
+automatically changing the selection. Wallet schemas 1 and 2 migrate to Mia;
+unknown or locked selections also fall back to Mia. Reset selects Mia. Both
+companions share levels, accessories and measurement behavior.
 
 ## Composition and test seams
 

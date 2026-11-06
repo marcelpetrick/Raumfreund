@@ -10,7 +10,66 @@ is [`vision.md`](vision.md); the binding workflow is
 [`AGENTS.md`](../AGENTS.md). Every package lands as an atomic Conventional Commit,
 versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
 
-## Current handover and public debug release (2026-11-06)
+## Active: Flocke the husky (issue #17, 2026-11-06)
+
+Verdict: implement Flocke as a selectable second companion with the same
+measurement, alarm, background and accessibility behavior as Mia. The owner
+chose the name Flocke and approved the concept art in issue #17. The owner also requested a public debug release; Google Play publication remains deferred.
+
+Decisions and assumptions:
+
+- D1: Flocke unlocks for free at shared level 3 (10 earned stars); this is a
+  practical initial threshold because the owner did not specify one. Earning
+  stars never auto-switches pets. The shop explicitly selects Mia or Flocke.
+- D2: Store the selected pet with the wallet in schema 3. Migrate schema 1/2
+  to Mia without changing stars or purchases; reject newer schemas and repair
+  unknown or locked selections to Mia. Reset returns to Mia. Never overwrite
+  an unavailable wallet; merge stars earned before loading as before.
+- D3: Recreate the approved husky design in the existing vector painter style,
+  with one blue and one green eye, happy/uneasy/scared/sleeping moods, alarm
+  escape, return and wake-up. Use the same controller and motion semantics as
+  Mia; no microphone, alarm, or background-recording rules change.
+- D4: Existing levels, earned stars and shop items are shared. Pet selection
+  stops measurement like the shop already does; it never restarts implicitly.
+  Text and accessibility labels must identify the selected companion in all
+  four languages. Reduced motion and large text must remain usable.
+- D5: This request authorizes implementation on `main` and a debug release, not a Play release;
+  keep issues #9 and #17 open unless the owner explicitly requests closure.
+
+| Package | Owner | Status |
+| --- | --- | --- |
+| Plan, independent challenge and coordination | Coordinator and review agent | done; integration in progress |
+| Persistent pet selection, schema migration and domain tests | Domain agent / coordinator | recovered and integrated; independent review found no blocking defect |
+| Flocke artwork, animation and rendering tests | Art agent | integrated; 9 focused tests and independent source review passed |
+| Shop selection, monitor composition, localization and widget tests | UI agent | integrated; focused shop and delayed-load app tests passed |
+| Integrate, independent review, docs and full local gate | Coordinator/reviewer | independent review done; full local gate required before commit |
+| Commit with version bump, push, verify GitHub checks and publish debug APK | Coordinator | next after green local gate |
+| Real-device pet, accessibility and persistence checks | Owner | open after implementation |
+
+Expected checks: migration/reset and failed-load races; unlock boundary and
+restart persistence; every pet mood, red-alarm departure and return, sleep and
+wake; all languages and text sizes; no privacy or lifecycle regression. Stop
+and fix any failed gate. Rollback is a revert; older app versions must refuse
+to overwrite the newer wallet schema. Record each commit's work and current
+status here so another agent can resume without duplicating work.
+
+Independent review found and fixed the away-state toy accessibility label; the
+first Flocke frame after a delayed wallet load is tested while away or asleep.
+Real-device visual, native-language and accessibility review remain open.
+
+Independent challenge: render all five shared accessories on Flocke and
+describe only visible accessories. A saved selection can load during a
+measurement, so the first Flocke frame must reflect an already-away or asleep
+state without restarting the recorder. Monitor text, semantics and level-up
+messages must identify the selected pet in every language.
+
+## Previous handover and public debug release (2026-11-06)
+
+Update: `debug-v0.9.6-build99` was published from `2acfa67` and includes
+the settings fix. The next debug release is planned after Flocke is verified.
+Current `main` at `c1b159f` has green CI and Docker checks. The local debug
+certificate matches the previous release. Flutter 3.47.9 is the newest stable
+release in the official Linux release manifest (checked 2026-11-06).
 
 Verdict: publish the independently checked preferences fix as a public debug
 APK so the owner can retest settings on a real phone. The owner explicitly

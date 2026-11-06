@@ -376,7 +376,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsStarTestModeHint =>
-      'A star comes after 5 seconds in the green zone instead of after 60 seconds. These stars go to the star shop and raise Mia’s level too. Off by default; collected stars are kept.';
+      'A star comes after 5 seconds in the green zone instead of after 60 seconds. These stars go to the star shop and raise the shared level too. Off by default; collected stars are kept.';
 
   @override
   String get settingsSave => 'Save';
@@ -492,7 +492,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shopLoadFailed =>
-      'Your stars can\'t be loaded right now. Buying and giving things to Mia will work again once they can.';
+      'Your stars can\'t be loaded right now. Buying and giving items will work again once they can.';
 
   @override
   String get shopSaveFailed =>
@@ -554,7 +554,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsResetBody =>
-      'Deletes all stars and everything bought in the star shop and resets Mia’s level. This happens immediately and is not part of Save or Cancel – Cancel does not undo it either.';
+      'Deletes all stars and everything bought in the star shop and resets the shared level and pet selection. This happens immediately and is not part of Save or Cancel – Cancel does not undo it either.';
 
   @override
   String get settingsResetButton => 'Reset stars';
@@ -564,14 +564,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsResetConfirmBody =>
-      'Mia’s level will also be reset. This cannot be undone.';
+      'The shared level and pet selection will also be reset. This cannot be undone.';
 
   @override
   String get settingsResetConfirm => 'Delete';
 
   @override
   String get settingsResetDone =>
-      'All stars and bought items have been deleted and Mia’s level has been reset.';
+      'All stars and bought items have been deleted, and the level and pet selection reset.';
 
   @override
   String get settingsResetNotReady =>
@@ -603,4 +603,74 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageChinese => '中文（简体）';
+
+  @override
+  String get flockeIdle => 'Flocke sits comfortably and waits';
+
+  @override
+  String get flockeHappy => 'Flocke is happy and wags their tail';
+
+  @override
+  String get flockeUneasy => 'Flocke is uneasy as it gets loud';
+
+  @override
+  String get flockeScared => 'Flocke is scared – it is much too loud';
+
+  @override
+  String get flockeSleeping => 'Flocke sleeps until you return';
+
+  @override
+  String get flockeAwaySign => 'Too loud – Flocke is hiding';
+
+  @override
+  String flockeWearing(String items) {
+    return 'With Flocke: $items';
+  }
+
+  @override
+  String get flockeStatusSleeping => 'Flocke is asleep – measurement paused';
+
+  @override
+  String get flockeStatusWaking => 'Flocke is waking up …';
+
+  @override
+  String get flockeSleepingHint =>
+      'Raumfreund does not listen in the background. When you return, Flocke wakes up and continues measuring.';
+
+  @override
+  String flockeLevelUpMessage(int level) {
+    return 'Flocke reaches level $level!';
+  }
+
+  @override
+  String flockeShopLevel(int level) {
+    return 'Flocke’s level: $level';
+  }
+
+  @override
+  String get flockeDance => 'Flocke dances!';
+
+  @override
+  String get flockeDanceLocked => 'Flocke dances for you from level 2.';
+
+  @override
+  String get flockeDanceReduced => 'Flocke dances for you!';
+
+  @override
+  String get shopPetHeading => 'Your animal friend';
+
+  @override
+  String get shopPetMia => 'Mia the cat';
+
+  @override
+  String get shopPetFlocke => 'Flocke the husky';
+
+  @override
+  String get shopPetFlockeLocked => 'Flocke unlocks at level 3.';
+
+  @override
+  String get flockeShopWorn => 'With Flocke';
+
+  @override
+  String get flockeShopEquip => 'Give to Flocke';
 }

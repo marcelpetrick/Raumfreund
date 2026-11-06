@@ -10,6 +10,7 @@ import '../../../app/theme/zone_palette.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/glow_panel.dart';
 import '../../settings/domain/app_settings.dart';
+import '../../shop/domain/pet_kind.dart';
 import '../domain/zone.dart';
 import 'monitor_view_data.dart';
 import 'stable_text.dart';
@@ -54,7 +55,9 @@ class MonitorStatusPanel extends StatelessWidget {
           if (data.phase == MonitorPhase.sleeping) ...[
             const SizedBox(height: 8),
             Text(
-              l10n.sleepingHint,
+              data.pet == PetKind.flocke
+                  ? l10n.flockeSleepingHint
+                  : l10n.sleepingHint,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
@@ -243,6 +246,8 @@ class _QuietStarsState extends State<_QuietStars> {
     final progress = l10n.starsProgress(percent);
     final celebration = _celebratedLevel == null
         ? null
+        : data.pet == PetKind.flocke
+        ? l10n.flockeLevelUpMessage(_celebratedLevel!)
         : l10n.levelUpMessage(_celebratedLevel!);
     return Semantics(
       liveRegion: celebration != null,
@@ -264,6 +269,7 @@ class _QuietStarsState extends State<_QuietStars> {
                           : starText ?? ''),
                   variants: [
                     l10n.levelUpMessage(999),
+                    l10n.flockeLevelUpMessage(999),
                     l10n.starsJustEarned,
                     ?starText,
                     // Longest realistic texts: no stars yet with a 3-digit
@@ -317,6 +323,8 @@ class _StatusHeadline extends StatelessWidget {
               l10n.statusStopping,
               l10n.statusSleeping,
               l10n.statusWaking,
+              l10n.flockeStatusSleeping,
+              l10n.flockeStatusWaking,
               l10n.statusGreen,
               l10n.statusYellow,
               l10n.statusRed,
@@ -341,9 +349,16 @@ class _StatusHeadline extends StatelessWidget {
   String _status(AppLocalizations l10n) => switch (data.phase) {
     MonitorPhase.idle => l10n.statusIdle,
     MonitorPhase.starting =>
-      data.waking ? l10n.statusWaking : l10n.statusStarting,
+      data.waking
+          ? (data.pet == PetKind.flocke
+                ? l10n.flockeStatusWaking
+                : l10n.statusWaking)
+          : l10n.statusStarting,
     MonitorPhase.stopping => l10n.statusStopping,
-    MonitorPhase.sleeping => l10n.statusSleeping,
+    MonitorPhase.sleeping =>
+      data.pet == PetKind.flocke
+          ? l10n.flockeStatusSleeping
+          : l10n.statusSleeping,
     MonitorPhase.error => _errorTitle(l10n, data.error),
     MonitorPhase.measuring => switch (data.zone) {
       null => l10n.statusStarting,

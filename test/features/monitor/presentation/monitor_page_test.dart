@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:raumfreund/features/monitor/domain/level_history_point.dart';
 import 'package:raumfreund/features/monitor/domain/thresholds.dart';
 import 'package:raumfreund/features/monitor/domain/zone.dart';
+import 'package:raumfreund/features/monitor/presentation/husky/husky_character.dart';
 import 'package:raumfreund/features/monitor/presentation/kitty/kitty_character.dart';
 import 'package:raumfreund/features/monitor/presentation/level_gauge.dart';
 import 'package:raumfreund/features/monitor/presentation/level_timeline.dart';
@@ -13,6 +14,7 @@ import 'package:raumfreund/features/monitor/presentation/monitor_page.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_status_panel.dart';
 import 'package:raumfreund/features/monitor/presentation/monitor_view_data.dart';
 import 'package:raumfreund/features/shop/domain/kitty_accessory.dart';
+import 'package:raumfreund/features/shop/domain/pet_kind.dart';
 
 import '../../../shared/widgets/test_app.dart';
 
@@ -43,8 +45,10 @@ MonitorViewData _data({
   int? countdown,
   Set<KittyAccessory> accessories = const {},
   bool waking = false,
+  PetKind pet = PetKind.mia,
 }) => MonitorViewData(
   phase: phase,
+  pet: pet,
   thresholds: Thresholds.defaults,
   levelDb: zone == null ? null : 64.4,
   zone: zone,
@@ -135,7 +139,34 @@ void _sleepTest() {
   });
 }
 
+void _flockeTest() {
+  testWidgets('Flocke reflects a sleeping and already-away monitor', (
+    tester,
+  ) async {
+    await _pumpPage(
+      tester,
+      _data(pet: PetKind.flocke, phase: MonitorPhase.sleeping, zone: null),
+    );
+    expect(
+      tester.widget<HuskyCharacter>(find.byType(HuskyCharacter)).mood,
+      KittyMood.sleeping,
+    );
+    expect(find.text(l10nDe.flockeStatusSleeping), findsOneWidget);
+    expect(find.text(l10nDe.flockeSleepingHint), findsOneWidget);
+    await _pumpPage(
+      tester,
+      _data(pet: PetKind.flocke, zone: Zone.red, alarmFired: true),
+    );
+    expect(
+      tester.widget<HuskyCharacter>(find.byType(HuskyCharacter)).walkedAway,
+      isTrue,
+    );
+    expect(find.text(l10nDe.flockeAwaySign), findsOneWidget);
+  });
+}
+
 void main() {
+  _flockeTest();
   _accessoryTest();
   _noReadingsTest();
   _sleepTest();

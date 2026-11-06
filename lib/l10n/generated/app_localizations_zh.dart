@@ -357,7 +357,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsStarTestModeHint =>
-      '在绿色区域保持 5 秒就能得到一颗星星，而不是 60 秒。这些星星也会进入星星商店，并提升米娅的等级。默认关闭；已收集的星星会保留。';
+      '在绿色区域保持 5 秒就能得到一颗星星，而不是 60 秒。这些星星也会进入星星商店，并提升共同等级。默认关闭；已收集的星星会保留。';
 
   @override
   String get settingsSave => '保存';
@@ -468,7 +468,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get shopLoading => '正在加载星星…';
 
   @override
-  String get shopLoadFailed => '暂时无法加载星星。恢复后才能购买和给 Mia 物品。';
+  String get shopLoadFailed => '暂时无法加载星星。恢复后才能购买和赠送物品。';
 
   @override
   String get shopSaveFailed => '保存没有成功。你的星星会保留；下次打开应用或星星商店时，以及下次更改时会再试一次。';
@@ -527,7 +527,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsResetBody =>
-      '删除所有星星和在星星商店里买过的所有物品，并重置米娅的等级。此操作立即生效，不属于“保存”或“取消”——点“取消”也无法撤销。';
+      '删除所有星星和购买的物品，并重置共同等级和宠物选择。此操作立即生效，“取消”也无法撤销。';
 
   @override
   String get settingsResetButton => '重置星星';
@@ -536,13 +536,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsResetConfirmTitle => '删除所有星星和已购买的物品？';
 
   @override
-  String get settingsResetConfirmBody => '米娅的等级也会重置。此操作无法撤销。';
+  String get settingsResetConfirmBody => '共同等级和宠物选择也会重置。此操作无法撤销。';
 
   @override
   String get settingsResetConfirm => '删除';
 
   @override
-  String get settingsResetDone => '所有星星和已购买的物品都已删除，米娅的等级也已重置。';
+  String get settingsResetDone => '所有星星和购买的物品已删除，等级和宠物选择也已重置。';
 
   @override
   String get settingsResetNotReady => '星星还在加载中。请稍后再试。';
@@ -571,4 +571,73 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get languageChinese => '中文（简体）';
+
+  @override
+  String get flockeIdle => 'Flocke 舒适地坐着等待';
+
+  @override
+  String get flockeHappy => 'Flocke 很开心，正在摇尾巴';
+
+  @override
+  String get flockeUneasy => '声音变大了，Flocke 有点不安';
+
+  @override
+  String get flockeScared => '声音太大了，Flocke 害怕了';
+
+  @override
+  String get flockeSleeping => 'Flocke 睡着了，等你回来';
+
+  @override
+  String get flockeAwaySign => '太吵了——Flocke 躲起来了';
+
+  @override
+  String flockeWearing(String items) {
+    return 'Flocke 身边：$items';
+  }
+
+  @override
+  String get flockeStatusSleeping => 'Flocke 睡着了——测量已暂停';
+
+  @override
+  String get flockeStatusWaking => 'Flocke 正在醒来……';
+
+  @override
+  String get flockeSleepingHint => 'Raumfreund 在后台不会听声音。你回来后，Flocke 会醒来并继续测量。';
+
+  @override
+  String flockeLevelUpMessage(int level) {
+    return 'Flocke 达到 $level 级！';
+  }
+
+  @override
+  String flockeShopLevel(int level) {
+    return 'Flocke 的等级：$level';
+  }
+
+  @override
+  String get flockeDance => 'Flocke 跳舞！';
+
+  @override
+  String get flockeDanceLocked => '达到 2 级后，Flocke 会为你跳舞。';
+
+  @override
+  String get flockeDanceReduced => 'Flocke 为你跳舞！';
+
+  @override
+  String get shopPetHeading => '你的动物朋友';
+
+  @override
+  String get shopPetMia => 'Mia，小猫';
+
+  @override
+  String get shopPetFlocke => 'Flocke，哈士奇';
+
+  @override
+  String get shopPetFlockeLocked => '达到 3 级后解锁 Flocke。';
+
+  @override
+  String get flockeShopWorn => 'Flocke 正在用';
+
+  @override
+  String get flockeShopEquip => '给 Flocke';
 }
