@@ -14,9 +14,9 @@ versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
 
 Verdict: correct the confirmed detached-during-permission race and verify the
 Flocke selection flow end to end. The owner requested a review of the current
-code, focused on the new Flocke work, fixes for confirmed issues, and updates
-to this plan and AGENTS.md. Issue #17 remains open. No additional release is
-assumed from this review request.
+code, focused on the new Flocke work, fixes for confirmed issues, updates to this plan and AGENTS.md, and a public debug release. Issue #17
+remains open. The owner also asked to verify quick-star mode for testing Flocke
+on a phone.
 
 The current `0.10.0+101` debug release is `debug-v0.10.0-build101` at
 `4c93985`; local gate (696 tests, 99.75% coverage), GitHub CI and Docker passed.
@@ -35,12 +35,17 @@ Verify late results, foreground return and teardown races stay safe.
 | Fix detach/permission race and add regression tests | Lifecycle agent | integrated; 72 focused session and sleep tests passed |
 | Test Flocke selection, stopped navigation and restart persistence together | UI test agent | integrated; focused test passed |
 | Independently review critical fix and integrate | Coordinator/reviewer | independent final review found no blocking race; 73 integrated focused tests passed |
-| Full local gate, version bump, commit, push and check GitHub | Coordinator | version bumped; full gate required before commit |
+| Verify five-second quick-star mode can unlock Flocke | Test agent | passed: 50 focused tests, including 9 stars at 49.9 s and unlock at 50 s |
+| Document quick phone test and prepare release | Coordinator | documented; release follows the full gate and GitHub checks |
+| Full local gate, version bump, commit, push and check GitHub | Coordinator | fix committed and pushed as `1179db3`; follow-up gate required |
+| Publish and verify public debug APK | Coordinator | planned after exact-commit GitHub checks |
 | Real-device permissions, lifecycle and Flocke accessibility checks | Owner | open |
 
 Stop before commit if regression tests or `./localPipeline.sh` fail. Preserve
 permission-dialog handling for hidden/paused events; rollback is a revert. The
-physical-device behavior and production signing remain unverified.
+physical-device behavior and production signing remain unverified. Publish only
+through `tool/release_debug.sh`, after a dry run and green local and remote
+checks; verify the downloaded APK checksum, debug certificate and source tag.
 
 ## Active: Flocke the husky (issue #17, 2026-11-06)
 

@@ -157,6 +157,12 @@ the husky unlocks for free. The shop lets you select Mia or Flocke; the choice
 and shared accessories persist across restarts. The monitor announces a new
 level when it is reached during a measurement.
 
+For a quick phone test, turn on **Schneller Stern-Testmodus** in Settings and
+save. Start measuring in a quiet room: ten consecutive green intervals of five
+seconds unlock Flocke at level 3 (about 50 seconds after green is confirmed).
+Open the star shop, select Flocke and return to the monitor. Turn the test mode
+off again in Settings when finished.
+
 Teachers can clear all stars, levels and bought items in **Settings** under
 **Für Lehrkräfte** (**Sterne zurücksetzen**, with a confirmation). This acts
 immediately and is not part of Speichern/Abbrechen.
