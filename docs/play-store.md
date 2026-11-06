@@ -18,6 +18,9 @@ Chinese (ADR 0006). The store listing, its screenshots
 (`tool/render_screenshots.sh`) and the privacy policy still need to be
 written per listing language; German and English are the minimum.
 
+The owner's step-by-step guide through all of this is
+[`toTheMoonAkaPlaystore.md`](toTheMoonAkaPlaystore.md).
+
 Play upload is intentionally not automated until those credentials and policy
 decisions exist. The GitHub release APK remains a separate direct-download
 channel.
