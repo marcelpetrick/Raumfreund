@@ -17,8 +17,9 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 Raumfreund is a child-friendly Android noise traffic light for shared rooms.
 It estimates the current sound level locally, shows an accessible green,
-yellow or red state, and uses the cat Mia to encourage a quieter room. It is an
-offline Flutter app for Android phones and tablets: no account, advertising,
+yellow or red state, and uses Mia the cat and unlockable Flocke the husky to
+encourage a quieter room. It is an offline Flutter app for Android phones and
+tablets: no account, advertising,
 tracking, audio archive or upload.
 
 **Author:** Marcel Petrick <mail@marcelpetrick.it>
@@ -30,7 +31,8 @@ quality gates.
 
 ## Project status
 
-Current version: **`0.10.0+101` — release candidate**
+Current development version: see [`pubspec.yaml`](pubspec.yaml). The latest
+installable debug build is listed on the [releases page](https://github.com/marcelpetrick/Raumfreund/releases/latest).
 
 Raumfreund is a code-complete release candidate. The repository contains the
 Flutter UI, Kotlin `AudioRecord` implementation, lifecycle-safe controller,
@@ -40,9 +42,9 @@ owner's Android signing secrets and physical-device acceptance evidence. The
 living status and external blockers are in [`docs/plan.md`](docs/plan.md).
 
 The coverage badge shows the enforced minimum of 95% line coverage for the
-first-party Dart code; `./localPipeline.sh` prints the measured value (99.97%
-with 644 tests at `0.8.0`). Neither is a claim that every platform path or product
-requirement is already covered. Real microphone and lifecycle tests on two
+first-party Dart code; `./localPipeline.sh` prints the measured value (99.86%
+with 713 tests for `0.11.0+105`, verified 2026-11-06). Neither is a claim that
+every platform path or product requirement is already covered. Real microphone and lifecycle tests on two
 Android devices remain mandatory before a production release.
 
 ![Raumfreund ready, in green, yellow and red, Mia hiding after the alarm, asleep in the background, waking up, and an error](docs/screenshots/overview.png)
@@ -57,19 +59,14 @@ Languages: Settings with the language choice, then the app in English
 (green), Croatian (yellow) and Chinese (red). The screenshots are rendered
 from the real widgets with `tool/render_screenshots.sh`.
 
-Demo videos (4:5, 1080x1350, under 30 s, for social media): a chronological
+Earlier demo videos (4:5, 1080x1350, under 30 s, for social media): a chronological
 [walkthrough](docs/video/raumfreund_A_story_4x5.mp4) and a
 [hook-first cut](docs/video/raumfreund_B_hook_4x5.mp4). They show the real
 app with scripted noise levels instead of the microphone
 (`tool/demo/demo_main.dart`) and were recorded and cut with
 `tool/demo/record_demo.sh` and `tool/demo/cut_demo_video.py`.
 
-From left to right: quiet room (screenshot from an Android 16 emulator),
-"please be quieter" with the alarm countdown, too loud with Mia scared, and
-Mia hiding after the alarm. The emulator microphone is silent, so the three
-loud states are rendered from the app's real widgets in a widget test, not
-captured on a device. The earlier design mockups are kept in
-[`docs/mockups/`](docs/mockups/README.md).
+The earlier design mockups are kept in [`docs/mockups/`](docs/mockups/README.md).
 
 **Download:** the newest installable APK is always the
 [latest GitHub release](https://github.com/marcelpetrick/Raumfreund/releases/latest).
@@ -79,11 +76,11 @@ build.
 ## Major features
 
 - Local microphone-level estimation without recording or transmitting audio.
-- Accessible green/yellow/red feedback using text, icons, Mia's expression and
-  animation rather than colour alone.
-- Mia is happy in green, uneasy in yellow and scared in red. If it stays too
-  loud until the alarm, she runs off and hides, and comes back only once the
-  room is calm again.
+- Accessible green/yellow/red feedback using text, icons and the selected
+  companion's expression and animation rather than colour alone.
+- Mia or Flocke is happy in green, uneasy in yellow and scared in red. If it
+  stays too loud until the alarm, the companion hides until the room is calm
+  again or the measurement ends.
 - Zone hysteresis: peaks switch the light quickly, but it cools down slowly,
   so the colour does not flicker at a threshold and the text does not jump.
 - Configurable alarm delay (3–60 s, default 10 s): the alarm never comes
@@ -113,12 +110,12 @@ build.
 ## Interaction
 
 The main view provides one large start/stop action, an estimated 0–130 dB
-gauge, status text, Mia's matching expression, a 10-minute heartbeat
-timeline and quiet-minute stars. Colour is never the only state indicator.
+gauge, status text, the selected companion's matching expression, a 10-minute
+heartbeat timeline and quiet-minute stars. Colour is never the only state indicator.
 Opening another page always stops an active measurement safely; returning does
 not restart it automatically. Leaving the app (home button, app switcher,
 screen lock) pauses a running measurement instead: nothing records in the
-background, Mia falls asleep, and when the app is back she wakes up and the
+background; the companion falls asleep and wakes when the app returns, and the
 measurement continues by itself
 ([ADR 0005](docs/adr/0005-sleep-in-background.md)).
 
@@ -143,11 +140,11 @@ open-source license view. Opening and closing About follows the same stop and
 no-auto-restart rule.
 
 The **Sternenladen** button (shop icon) opens the star shop: the star balance,
-a preview of Mia with what she currently has, and five items (bow, scarf,
-party hat, cushion, toy mouse) with their prices. Buying asks for a short
+a preview of the selected companion with equipped items, and five items (bow,
+scarf, party hat, cushion, toy mouse) with their prices. Buying asks for a short
 confirmation; with too few stars the button shows how many are missing.
-Bought items can be given to Mia and taken back at any time. If the stars cannot be
-stored, the shop says so and keeps working in memory. Opening and closing the
+Bought items can be given to either companion and taken back at any time. If
+the stars cannot be stored, the shop says so and keeps working in memory. Opening and closing the
 shop follows the same stop and no-auto-restart rule.
 
 Every five earned stars the companions gain a shared level. Spending stars does
@@ -167,7 +164,8 @@ Open the star shop, select Flocke and return to the monitor. Turn the test mode
 off again in Settings when finished.
 
 Teachers can clear all stars, levels and bought items in **Settings** under
-**Für Lehrkräfte** (**Sterne zurücksetzen**, with a confirmation). This acts
+**Für Lehrkräfte** (**Sterne zurücksetzen**, with a confirmation). Reset also
+selects Mia. This acts
 immediately and is not part of Speichern/Abbrechen.
 
 ## Build and test
@@ -201,6 +199,8 @@ evidence; the presence of this script is not proof of a green result.
 
 ## Documentation
 
+- [`docs/c4-architecture.md`](docs/c4-architecture.md) — C4 views, runtime flows
+  and the build and release process
 - [`docs/architecture.md`](docs/architecture.md) — layers, data flow and state
   ownership
 - [`docs/measurement.md`](docs/measurement.md) — dBFS conversion, calibration,

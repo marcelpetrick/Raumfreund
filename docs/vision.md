@@ -29,7 +29,7 @@ Version 1 ist eine Android-App für Handy und Tablet. iOS, Desktop und Web gehö
 - Die Anzeige darf leicht geglättet sein. Verwende für die Alarmentscheidung einen separat definierten und dokumentierten Messwert; UI-Animationen dürfen die Timerlogik nicht beeinflussen.
 - Unterstütze Start/Stopp, verhindere parallele Messinstanzen und schnelle Mehrfachstarts.
 - Halte den Bildschirm nur während einer aktiven Messung eingeschaltet.
-- Stoppe die Messung beim Wechsel in den Hintergrund und beim Öffnen von Einstellungen oder About. Kehre aus Einstellungen oder About ohne automatischen Neustart zurück. Nach einem Wechsel in den Hintergrund schläft Mia; kommt die App wieder in den Vordergrund, wacht sie auf und die Messung läuft von selbst weiter (Owner-Entscheidung 2026-10-20, Issue #7, ADR 0005). Im Hintergrund wird nie aufgenommen.
+- Stoppe die Messung beim Wechsel in den Hintergrund und beim Öffnen von Einstellungen oder About. Kehre aus Einstellungen oder About ohne automatischen Neustart zurück. Nach einem Wechsel in den Hintergrund schläft die gewählte Figur; kommt die App wieder in den Vordergrund, wacht sie auf und die Messung läuft von selbst weiter (Owner-Entscheidung 2026-10-20, Issue #7, ADR 0005). Im Hintergrund wird nie aufgenommen.
 - Behandle Berechtigungsdialoge getrennt von einem echten Hintergrundwechsel. Eine Anfrage darf sich durch den eigenen Lifecycle-Handler nicht selbst abbrechen. Nach Freigabe nur im Vordergrund starten.
 - Zeige verständliche Fehler für verweigerte Berechtigung, dauerhaft verweigerten Zugriff, belegtes Mikrofon und abgebrochene Aufnahme. Biete einen passenden Weg zu den Android-App-Einstellungen, wenn erforderlich.
 
@@ -48,7 +48,8 @@ Version 1 ist eine Android-App für Handy und Tablet. iOS, Desktop und Web gehö
 - Vergib während einer Messung nach jeweils 60 Sekunden durchgehend bestätigtem Grün einen Leise-Stern. Gelb, Rot, eine Messlücke, Stopp oder Fehler beginnen nur das angebrochene Intervall neu; bereits verdiente Sterne werden dadurch niemals abgezogen oder auf null gesetzt.
 - Speichere verdiente Sterne lokal und dauerhaft in einer Wallet. Nur die ausdrücklich bestätigte Lehrkraft-Aktion „Sterne zurücksetzen“ löscht Sterne, gekaufte Gegenstände und Ausrüstung; sie muss einen Speicherfehler sichtbar melden.
 - Biete in den Einstellungen einen verständlich bezeichneten schnellen Stern-Testmodus. Er ist standardmäßig aus und verkürzt ausschließlich das Sternintervall der nächsten Messung von 60 auf 5 Sekunden. Beim Ein- oder Ausschalten bleiben alle bereits verdienten Sterne erhalten.
-- Der Sternenladen bietet Mia rein kosmetische Gegenstände: Schleife (3), Schal (5), Partyhut (8), Kissen (10) und Spielmaus (12 Sterne). Ein Gegenstand wird nur einmal gekauft und kann danach kostenlos an- und abgelegt werden. Es gibt kein Echtgeld, keine Werbung und keine Netzverbindung.
+- Der Sternenladen bietet beiden Figuren rein kosmetische Gegenstände: Schleife (3), Schal (5), Partyhut (8), Kissen (10) und Spielmaus (12 Sterne). Ein Gegenstand wird nur einmal gekauft und kann danach kostenlos an- und abgelegt werden. Es gibt kein Echtgeld, keine Werbung und keine Netzverbindung.
+- Je fünf verdiente Sterne steigt das gemeinsame Level; Ausgeben senkt es nicht. Ab Level 2 ist ein Tanz verfügbar, ab Level 3 (zehn verdiente Sterne) wird Flocke kostenlos freigeschaltet. Die Auswahl zwischen Mia und Flocke sowie Gegenstände und Fortschritt bleiben lokal gespeichert; Zurücksetzen wählt Mia.
 - Öffnen des Sternenladens stoppt die Messung wie Einstellungen/About und startet sie bei Rückkehr nicht automatisch. Solange gespeicherte Wallet-Daten nicht erfolgreich geladen wurden, bleiben Kauf-, Ausrüstungs- und Reset-Aktionen gesperrt; zwischenzeitlich verdiente Sterne werden nach erfolgreichem Laden zusammengeführt und gespeichert.
 
 ### Verbindliche Alarmregeln
@@ -58,13 +59,13 @@ Version 1 ist eine Android-App für Handy und Tablet. iOS, Desktop und Web gehö
 | Grün | Kein Alarm; Zeit und Auslösestatus zurücksetzen |
 | Eintritt in Gelb | Neue gelbe Phase, Timer startet bei null |
 | Eintritt in Rot | Neue rote Phase, Timer startet bei null |
-| Gelb oder Rot durchgehend für mindestens die eingestellte Alarmverzögerung (Standard 10 Sekunden, 3–60 Sekunden einstellbar) | Ein Alarm für diese Phase |
-| Weiterhin gleiche Phase nach Alarm | Kein wiederholter Daueralarm |
+| Bestätigte gelbe oder rote Phase erreicht auf einem lauten Sample die eingestellte Alarmverzögerung (Standard 10 Sekunden, 3–60 Sekunden) | Ein Alarm für diese Phase |
+| Weiterhin laut nach Alarm | Ton oder Vibration beendet die Phase; bei erneut anhaltendem Lärm folgt nach einer weiteren Verzögerung ein Alarm. Sind beide ausgeschaltet, bleibt der Alarm einmalig für diese Phase sichtbar. |
 | Wechsel Gelb ↔ Rot | Neuer Timer und neuer Auslösestatus |
 | Stopp, Hintergrund, Fehler oder Messlücke über 1 Sekunde | Kontinuität aufheben; keine Zeit ohne Samples mitzählen |
 | Änderung der Grenzwerte oder der Alarmverzögerung | Messung bleibt gestoppt; nächster Start beginnt eine neue Phase mit den neuen Werten |
 
-Nutze monotone Zeit und injizierbare Zeitquellen für Tests. Definiere den Startzeitpunkt als Zeitpunkt des ersten gültigen Samples einer Phase. Messintervalle und Zeitauflösung dokumentieren. Der Alarm darf nicht vor Ablauf der eingestellten Alarmverzögerung auslösen; danach spätestens mit dem nächsten gültigen Sample. Ein Sample exakt auf einer Grenze gehört zur höheren Stufe. Zonen reagieren schnell auf Lärm und kühlen langsam ab (Entscheidung des Projektinhabers vom 2026-10-04, ADR 0004): eine Zone gilt als erreicht, wenn mindestens 50 % der letzten Sekunde in ihr oder darüber lagen, und erst als verlassen, wenn es weniger als 15 % der letzten 3 Sekunden waren. Eine Phase zählt ab dem ersten Sample des zusammenhängenden lauten Abschnitts, der zur Bestätigung geführt hat, bis zum letzten Sample, das mindestens so laut wie die Zone ist: Pausen dazwischen zählen mit und setzen die Phase nicht zurück, solange die Zone gehalten wird; eine leise Nachlaufzeit zählt nicht. Mia läuft weg, sobald der Alarm einer roten Phase auslöst, und kommt erst zurück, wenn Grün bestätigt ist oder die Messung endet.
+Nutze monotone Zeit und injizierbare Zeitquellen für Tests. Definiere den Startzeitpunkt als Zeitpunkt des ersten gültigen Samples einer Phase. Messintervalle und Zeitauflösung dokumentieren. Der Alarm darf nicht vor Ablauf der eingestellten Alarmverzögerung auslösen; danach löst er auf dem nächsten gültigen Sample aus, das mindestens die Lautstärke der Phase erreicht. Ein Sample exakt auf einer Grenze gehört zur höheren Stufe. Zonen reagieren schnell auf Lärm und kühlen langsam ab (Entscheidung des Projektinhabers vom 2026-10-04, ADR 0004): eine Zone gilt als erreicht, wenn mindestens 50 % der letzten Sekunde in ihr oder darüber lagen, und erst als verlassen, wenn es weniger als 15 % der letzten 3 Sekunden waren. Eine Phase zählt ab dem ersten Sample des zusammenhängenden lauten Abschnitts, der zur Bestätigung geführt hat, bis zum letzten Sample, das mindestens so laut wie die Zone ist: Pausen dazwischen zählen mit und setzen die Phase nicht zurück, solange die Zone gehalten wird; eine leise Nachlaufzeit zählt nicht. Die gewählte Figur läuft weg, sobald der Alarm einer roten Phase auslöst, und kommt erst zurück, wenn Grün stabilisiert ist oder die Messung endet (Einzelheiten in `docs/measurement.md`).
 
 Der eigene Alarmton kann das Mikrofon beeinflussen. Definiere und teste eine Behandlung: während des Tons keine weiteren Alarme auslösen, anschließend den Timer zurücksetzen und eine neue Phase erst mit gültigen Samples nach Tonende beginnen. Dokumentiere die kurze Messunterbrechung und halte UI und Domänenzustand konsistent.
 
@@ -108,7 +109,7 @@ Entscheide anhand Wartungszustand, Lizenz und Tests zwischen gepflegtem Mikrofon
 - Vermeide globale veränderliche Zustände, versteckte Seiteneffekte, leere Catch-Blöcke und pauschale Lint-Unterdrückung.
 - Öffentliche APIs und nicht offensichtliche fachliche Entscheidungen dokumentieren. Kommentare erklären Gründe.
 - Layout funktioniert auf kleinen Handys, Tablets, im Querformat und bei großer Textskalierung; keine abgeschnittenen Bedienelemente.
-- Material 3, zugängliche Kontraste, TalkBack-Semantik, große Touchziele und reduzierte Animationen berücksichtigen. Deutsche Oberfläche; Texte zentral und für spätere Lokalisierung vorbereitet.
+- Material 3, zugängliche Kontraste, TalkBack-Semantik, große Touchziele und reduzierte Animationen berücksichtigen. Deutsch ist die Standardsprache; Englisch, Kroatisch und vereinfachtes Chinesisch sind auswählbar (ADR 0006). Alle sichtbaren Texte stehen in den Lokalisierungsdateien.
 
 ## 7. Erwartete Repository-Struktur
 
@@ -201,9 +202,9 @@ Layout-/Golden-Tests: kleines Handy, Tablet, Querformat und große Schrift. Gold
 
 Integration/native Tests: Mikrofonfreigabe und Ablehnung, dauerhaft verweigerter Zugriff, Dialog-Lifecycle, Hintergrundwechsel während Start und Messung, wiederholtes Start/Stopp, belegtes Mikrofon, Streamfehler, Cleanup, gespeicherte Einstellungen nach Neustart und Alarm ohne Vibrator.
 
-Gerätetests: mindestens zwei reale Android-Geräte unterschiedlicher Hersteller. Emulatoren prüfen UI und Plattformintegration, ersetzen keine Schallpegel-/Mikrofontests. Prüfe 30 Minuten Dauerbetrieb auf Crash, Ressourcenleck und ungewöhnliche Wärmeentwicklung.
+Gerätetests: mindestens zwei reale Android-Geräte unterschiedlicher Hersteller. Prüfe 30 Minuten Dauerbetrieb auf Crash, Ressourcenleck und ungewöhnliche Wärmeentwicklung. Owner-Entscheidung vom 2026-10-08: keine weiteren Emulator-Abnahmetests oder instrumentierten Emulator-Suites; offene Plattformfälle prüft der Owner auf realen Geräten. Emulatoren dienen nur noch der Demoaufnahme (siehe `AGENTS.md` und `docs/testing.md`).
 
-Coverage-Gates: mindestens 90 % Line-Coverage für reine Domänen-/Anwendungslogik und 80 % über den eigenen messbaren Dart-Code. Native Logik zusätzlich separat testen; kritische Szenarien sind unabhängig von Coverage verpflichtend. Keine Garantie „hohe Qualität“ allein aus Prozentzahlen ableiten.
+Coverage-Gate: mindestens 95 % Line-Coverage über den eigenen messbaren Dart-Code (siehe `AGENTS.md`). Native Logik zusätzlich separat testen; kritische Szenarien sind unabhängig von Coverage verpflichtend. Keine Garantie „hohe Qualität“ allein aus Prozentzahlen ableiten.
 
 ## 12. CI/CD auf GitHub
 

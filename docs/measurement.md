@@ -61,7 +61,8 @@ only shown and stays shown for the rest of that phase. While the alarm tone
 plays, readings are ignored:
 the displayed zone stays frozen and gauge and timeline do not show the tone.
 
-When the alarm of a red phase fires, Mia walks away. She stays away, even if
+When the alarm of a red phase fires, the selected companion walks away. The
+companion stays away, even if
 the room drops to yellow, until green is settled (confirmed by the hysteresis,
 or, right after the alarm tone, backed by at least 1.5 s with less than 15 %
 above green) or the measurement stops, resets or fails.
@@ -73,7 +74,8 @@ keeps one point per 10 s bucket (the mean of the envelope, at most 60 points);
 the open bucket is shown as a live point refreshed at most once per second.
 The gauge uses the same idea with a 100 ms attack and a 1 s release. Chart
 colour shares describe these smoothed points, not the alarm's confirmed zone.
-Quiet stars are session-local encouragement and are not an acoustic record.
+The current quiet-star interval and session counter are session-local; earned
+stars are added to the persistent local wallet. Neither is an acoustic record.
 
 ## Calibrating
 

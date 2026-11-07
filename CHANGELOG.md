@@ -108,3 +108,4 @@ these lines (see docs/releasing.md).
 * v0.10.2 Explain the five-second star test: earn 10 stars in green to unlock Flocke in about 50 seconds.
 * v0.10.3 Document the reviewed Flocke husky redesign concepts.
 * v0.11.0 Redesign Flocke with matching blue eyes and a dog-like dance.
+* v0.11.1 Refresh documentation, screenshots and C4 architecture guide.

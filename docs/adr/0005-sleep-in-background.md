@@ -47,8 +47,9 @@ privacy promise is "the microphone is only used while the app is visible".
   an explicit stop (Settings, About, star shop, applying settings,
   `detached`) arrived meanwhile: that stop wins and the controller ends in
   `stopped`.
-- `detached` (no activity any more) stops as before; a sleeping controller
-  becomes `stopped`.
+- `detached` (no activity any more) stops even while a permission request is
+  pending; a late permission result cannot restart or put that session to
+  sleep. A sleeping controller becomes `stopped`.
 - Explicit user actions are unchanged: stop, opening Settings, About or the
   star shop, applying settings, errors and the no-reading watchdog end in
   `stopped`/`error` without an automatic restart. Stop while `sleeping`

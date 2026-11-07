@@ -25,6 +25,9 @@ The design follows these rules:
 - Cleanup is idempotent, and late events are rejected by session id.
 - Audio samples are transient input, never application data.
 
+For C4 views, runtime sequences and the build and release flow, see
+[`c4-architecture.md`](c4-architecture.md).
+
 ADR 0002 records the layer and state-management choice. ADR 0001 chooses the
 native recorder, and ADR 0003 fixes lifecycle and alarm semantics.
 
@@ -60,7 +63,7 @@ must never import it.
 | `lib/features/monitor/domain/` | Zones, zone hysteresis, validated thresholds, peak envelope, history and alarm rules | Implemented and unit-tested |
 | `lib/features/monitor/application/` | Permission/start/stop/session controller and platform ports | Implemented and unit-tested |
 | `lib/features/monitor/infrastructure/` | Channel adapters | Implemented with protocol tests |
-| `lib/features/monitor/presentation/` | Main monitor, gauge, Mia and timeline | Implemented for phone/tablet layouts |
+| `lib/features/monitor/presentation/` | Main monitor, gauge, companions and timeline | Implemented for phone/tablet layouts |
 | `lib/features/settings/` | Valid settings, persistence and Settings view | Implemented with schema validation |
 | `lib/features/shop/` | Kitty accessory catalog, star wallet and inventory, persistence, shop controller and shop page | Implemented with schema validation |
 | `lib/features/about/` | App information and About view | Implemented |
@@ -90,7 +93,7 @@ Android AudioRecord
        -> zone hysteresis: raw zone per sample -> confirmed zone
        -> phases, countdown and at most one alarm per phase
   -> peak envelope -> calmer gauge value and 10-minute timeline
-  -> immutable monitor state (confirmed zone drives UI, stars and Mia)
+  -> immutable monitor state (confirmed zone drives UI, stars and the selected companion)
   -> Flutter widgets
 ```
 
@@ -115,8 +118,8 @@ to Settings or About, stream failure and disposal all converge on the same
 idempotent stop path. Returning to the monitor never starts a new session
 without a fresh user action. Backgrounding is the one exception
 ([ADR 0005](adr/0005-sleep-in-background.md)): a starting or running
-measurement ends in the `sleeping` state (Mia sleeps), and when the app is
-visible again a new session starts by itself and Mia wakes up. Nothing
+measurement ends in the `sleeping` state (the selected companion sleeps), and
+when the app is visible again a new session starts and the companion wakes up. Nothing
 records while the app is in the background.
 
 Android temporarily pauses the activity while its own permission dialog is
@@ -142,7 +145,7 @@ first passes every raw zone through the zone hysteresis
 ([ADR 0004](adr/0004-zone-hysteresis.md)): a zone is entered when at least
 50 % of the last second is at or above it and left only when it falls below
 15 % of the last 3 s. Only this confirmed zone is exposed, so the traffic
-light, quiet stars and Mia never disagree with the alarm phase.
+light, quiet stars and the companion never disagree with the alarm phase.
 
 A phase starts at the first sample of the loud run that led to its confirmed
 zone. Dips inside the phase count, a quiet tail does not, and the alarm fires
@@ -157,8 +160,9 @@ long stretches of too few samples and session termination reset continuity.
 While the app's own tone/vibration is active, readings are dropped entirely:
 they neither advance the alarm nor reach the gauge, timeline or stars.
 Completion resets continuity, and a new phase can begin only on a later valid
-sample. This keeps the alarm from retriggering on its own sound. Mia leaves
-when a red phase alarms and returns only on a settled green zone.
+sample. This keeps the alarm from retriggering on its own sound. The selected
+companion leaves when a red phase alarms and returns on settled green, or when
+the measurement ends.
 
 ## Settings and persistence
 
@@ -219,7 +223,7 @@ the wallet has loaded successfully, shop actions are disabled even if stars
 were earned in memory, so a button never offers an operation the controller
 must refuse.
 
-Five earned stars raise Mia's level by one, starting at level 1; purchases
+Five earned stars raise the shared level by one, starting at level 1; purchases
 never reduce the stored earned-star total. Schema 1 wallets migrate using their
 balance and the original prices of the one-time owned items. The teacher reset
 clears levels along with the wallet. A live crossing after a successful load

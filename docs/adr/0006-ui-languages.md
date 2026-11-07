@@ -60,6 +60,6 @@ default.
 - Every new user-visible string needs an entry in all four ARB files; the
   pipeline fails otherwise.
 - A fifth language means one ARB file and one `AppLanguage` value.
-- The app name "Raumfreund" and the cat's name "Mia" are not translated.
+- The app name "Raumfreund" and companion names "Mia" and "Flocke" are not translated.
 - Native error messages from the platform channel are developer
   diagnostics; the UI maps their codes to localized texts.

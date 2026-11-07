@@ -13,12 +13,13 @@ Persisted data is limited to the user's thresholds, calibration correction,
 alarm delay, alarm-sound choice, vibration choice and a settings schema
 version. This includes the off-by-default five-second star test flag. The
 chosen UI language is stored as its code (for example `en`). The star shop
-additionally stores the star balance and the names of the bought and worn
-Kitty accessories (for example `bow`), only on the device, as one snapshot
-with a schema version; the teacher can delete it with "Sterne
-zurücksetzen". Numeric history and the level readings disappear when the
-process exits. Logs contain neither audio
-content nor personal data.
+additionally stores the balance, lifetime earned-star total, selected companion
+and names of bought and equipped accessories (for example `bow`), only on the
+device, as one versioned snapshot. The teacher can reset it with "Sterne
+zurücksetzen". Android also stores a local flag indicating whether microphone
+permission has previously been requested. Numeric history and level readings
+disappear when the process exits. Logs contain neither audio content nor
+personal data.
 
 Android microphone permission is requested only when measurement starts. A
 denial leaves the app usable; a permanent denial offers a shortcut to Android's

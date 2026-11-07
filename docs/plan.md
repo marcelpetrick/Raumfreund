@@ -10,7 +10,31 @@ is [`vision.md`](vision.md); the binding workflow is
 [`AGENTS.md`](../AGENTS.md). Every package lands as an atomic Conventional Commit,
 versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
 
-## Active: Flocke redesign and public debug release (2026-11-06)
+## Active: documentation audit and architecture guide (2026-11-07)
+
+Verdict: bring current documentation into line with the shipped app and add a
+C4 guide explaining its structure, runtime flows and build process. Preserve
+dated historical evidence and explicitly identify untested device behaviour.
+
+| Work | Owner | Status |
+| --- | --- | --- |
+| Audit README and remaining documentation against code and release | Review agents | done; findings reconciled |
+| Create C4 architecture views, flows and build explanation | Architecture agent | done; independently reviewed |
+| Reconcile README, product documentation and this plan | Coordinator | done; screenshots regenerated and inspected |
+| Review, bump patch version, run full gate, commit, push and verify CI | Coordinator | `0.11.1+106`; full gate passed (713 tests, 99.86% coverage); commit, push and monitor CI next |
+| Real-device acceptance | Owner | open |
+
+Baseline: clean `main` at `12162e6`, version `0.11.0+105` and published
+`debug-v0.11.0-build105`. Its full local gate passed (713 tests, 99.86%
+coverage), as did CI and Docker; downloaded APK checksum and debug signing
+certificate were verified. This documentation-only change does not authorize
+another debug release. Stop on failed checks; rollback by reverting the commit.
+The screenshot rendering test and documentation lint passed. Independent
+review corrected the companion return rule and a diagram arrow. Official
+Flutter Linux release metadata on 2026-11-07 still lists stable Flutter 3.47.9
+with Dart 3.13.7, matching the pin.
+
+## Completed: Flocke redesign and public debug release (2026-11-06)
 
 Verdict: make Flocke unmistakably a cute husky, with matching natural blue
 eyes and dog-specific movements, while preserving Mia's cuddly character and
@@ -30,8 +54,8 @@ can naturally have blue or brown eyes; matching blue eyes are the chosen design.
 | Generate, compare and review new design ideas | Coordinator and reviewer | done; mood sheet selected, play sheet informs movement |
 | Save concepts and decisions in the repository and commit | Coordinator | done, `a9b0617` |
 | Implement selected appearance, dog behavior and dance with tests | Art/UI agents and coordinator | integrated; focused tests passed |
-| Independent review, full gate, minor version bump, push and verify CI | Coordinator/reviewer | independent visual and code review passed; full gate next |
-| Publish and verify public debug APK from the checked commit | Coordinator | planned |
+| Independent review, full gate, minor version bump, push and verify CI | Coordinator/reviewer | done, `12162e6`; 713 tests, 99.86% coverage, CI and Docker passed |
+| Publish and verify public debug APK from the checked commit | Coordinator | done, `debug-v0.11.0-build105`; checksum, certificate and source tag verified |
 | Check visual design, dance, accessibility and persistence on a real device | Owner | open after release |
 
 Design decision after independent review: use the first sheet's broad nose,
@@ -53,7 +77,7 @@ verify the downloaded APK, checksum, signing certificate and source commit.
 Stop and fix failures. Rollback is a revert; the previous debug release remains
 available. Real-device checks remain open and no production signing is implied.
 
-## Active: post-release review and lifecycle fix (2026-11-06)
+## Completed: post-release review and lifecycle fix (2026-11-06)
 
 Verdict: correct the confirmed detached-during-permission race and verify the
 Flocke selection flow end to end. The owner requested a review of the current
@@ -61,7 +85,7 @@ code, focused on the new Flocke work, fixes for confirmed issues, updates to thi
 remains open. The owner also asked to verify quick-star mode for testing Flocke
 on a phone.
 
-The current `0.10.0+101` debug release is `debug-v0.10.0-build101` at
+At that review, the `0.10.0+101` debug release was `debug-v0.10.0-build101` at
 `4c93985`; local gate (696 tests, 99.75% coverage), GitHub CI and Docker passed.
 Review found that `detached` is ignored while permission is pending: a later
 permission grant can put the session to sleep and resume recording on return,
@@ -74,14 +98,14 @@ Verify late results, foreground return and teardown races stay safe.
 | Work | Owner | Status |
 | --- | --- | --- |
 | Review Flocke persistence, UI, animation and localization | Independent reviewers | done; no confirmed feature defect |
-| Update review guidance and restart-safe plan | Coordinator | integrated; full gate required before commit |
+| Update review guidance and restart-safe plan | Coordinator | done |
 | Fix detach/permission race and add regression tests | Lifecycle agent | integrated; 72 focused session and sleep tests passed |
 | Test Flocke selection, stopped navigation and restart persistence together | UI test agent | integrated; focused test passed |
 | Independently review critical fix and integrate | Coordinator/reviewer | independent final review found no blocking race; 73 integrated focused tests passed |
 | Verify five-second quick-star mode can unlock Flocke | Test agent | passed: 50 focused tests, including 9 stars at 49.9 s and unlock at 50 s |
-| Document quick phone test and prepare release | Coordinator | documented; release follows the full gate and GitHub checks |
-| Full local gate, version bump, commit, push and check GitHub | Coordinator | fix committed and pushed as `1179db3`; follow-up gate required |
-| Publish and verify public debug APK | Coordinator | planned after exact-commit GitHub checks |
+| Document quick phone test and prepare release | Coordinator | done |
+| Full local gate, version bump, commit, push and check GitHub | Coordinator | done; fix `1179db3`, later release commit `12162e6` |
+| Publish and verify public debug APK | Coordinator | done in `debug-v0.11.0-build105` |
 | Real-device permissions, lifecycle and Flocke accessibility checks | Owner | open |
 
 Stop before commit if regression tests or `./localPipeline.sh` fail. Preserve
@@ -90,7 +114,7 @@ physical-device behavior and production signing remain unverified. Publish only
 through `tool/release_debug.sh`, after a dry run and green local and remote
 checks; verify the downloaded APK checksum, debug certificate and source tag.
 
-## Active: Flocke the husky (issue #17, 2026-11-06)
+## Completed: Flocke the husky (issue #17, 2026-11-06)
 
 Verdict: implement Flocke as a selectable second companion with the same
 measurement, alarm, background and accessibility behavior as Mia. The owner
@@ -118,12 +142,12 @@ Decisions and assumptions:
 
 | Package | Owner | Status |
 | --- | --- | --- |
-| Plan, independent challenge and coordination | Coordinator and review agent | done; integration in progress |
+| Plan, independent challenge and coordination | Coordinator and review agent | done |
 | Persistent pet selection, schema migration and domain tests | Domain agent / coordinator | recovered and integrated; independent review found no blocking defect |
 | Flocke artwork, animation and rendering tests | Art agent | integrated; 9 focused tests and independent source review passed |
 | Shop selection, monitor composition, localization and widget tests | UI agent | integrated; focused shop and delayed-load app tests passed |
-| Integrate, independent review, docs and full local gate | Coordinator/reviewer | independent review done; full local gate required before commit |
-| Commit with version bump, push, verify GitHub checks and publish debug APK | Coordinator | next after green local gate |
+| Integrate, independent review, docs and full local gate | Coordinator/reviewer | done |
+| Commit with version bump, push, verify GitHub checks and publish debug APK | Coordinator | done; latest follow-up release `debug-v0.11.0-build105` |
 | Real-device pet, accessibility and persistence checks | Owner | open after implementation |
 
 Expected checks: migration/reset and failed-load races; unlock boundary and
@@ -145,9 +169,8 @@ messages must identify the selected pet in every language.
 
 ## Previous handover and public debug release (2026-11-06)
 
-Update: `debug-v0.9.6-build99` was published from `2acfa67` and includes
-the settings fix. The next debug release is planned after Flocke is verified.
-Current `main` at `c1b159f` has green CI and Docker checks. The local debug
+Historical update: `debug-v0.9.6-build99` was published from `2acfa67` and includes
+the settings fix. At that time `main` at `c1b159f` had green CI and Docker checks. The local debug
 certificate matches the previous release. Flutter 3.47.9 is the newest stable
 release in the official Linux release manifest (checked 2026-11-06).
 
@@ -170,10 +193,10 @@ requested this release. It is not a production or Google Play release.
 | Work | Owner | Status |
 | --- | --- | --- |
 | Reconcile this plan and require an update in every commit | Coordinator | included in this commit |
-| Run full local gate, commit and push plan update | Coordinator | next |
-| Verify CI and Docker on the exact pushed commit | Coordinator | planned |
-| Preview and publish the matching debug release using `tool/release_debug.sh` | Coordinator | planned |
-| Verify release assets, checksum, signature and source commit | Coordinator | planned |
+| Run full local gate, commit and push plan update | Coordinator | done |
+| Verify CI and Docker on the exact pushed commit | Coordinator | done |
+| Preview and publish the matching debug release using `tool/release_debug.sh` | Coordinator | done |
+| Verify release assets, checksum, signature and source commit | Coordinator | done |
 | Retest settings save and restart on a physical Android device | Owner | open after release |
 
 Continue after a restart by checking `git status`, the current version,
@@ -228,7 +251,7 @@ at the next legitimate change rather than by an endless chain of status commits.
   caches already existed.
 - [x] Dependabot PRs #1–#3 and #6 are closed; the pinned tooling was updated
   by hand.
-- [x] Debug release `debug-v0.1.2-build14` is GitHub's latest release. Its APK
+- [x] Debug release `debug-v0.1.2-build14` was GitHub's latest release then. Its APK
   checksum matches, the signature is Android Debug
   (`C5:55:29:…:4F:49`, this machine's debug keystore), it requests only
   `RECORD_AUDIO` and `VIBRATE`, and it installs and launches without crashes
@@ -264,7 +287,7 @@ integrates, bumps the version, runs the full pipeline and commits.
 | S | Configurable alarm delay in Settings (3–60 s, default 10 s) | Opus | done in `0.4.0` |
 | R | Independent review of A (4 rounds) and T | Opus | done; no blocking findings |
 | P | README with real screenshots, vision/docs sync | Coordinator | done in `0.3.1` |
-| Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.4.5-build32` is the latest release |
+| Q | Publish the next debug release with `tool/release_debug.sh` | Coordinator | done: `debug-v0.4.5-build32` was the latest release then |
 | — | Run `/reviewBranch` over all changes since `c40ec1a` and fix findings | Coordinator | done: 3 findings plus 4 reviewer notes fixed (`9a490b9`, `cf5e1f0`, `b386f3c`, `605e688`) |
 | — | `/updateDependencies` | Coordinator | done: Docker base digests updated (`e7b4533`); everything else current or held on purpose |
 
@@ -294,9 +317,9 @@ Four review rounds with probe tests shaped the rule; details are in
 - Pauses of up to about 2.5 s inside a loud phase count towards the delay.
 - The countdown may wait just above zero until the next loud sample.
 
-### Latest release check (2026-10-21)
+### Historical release check (2026-10-21)
 
-`debug-v0.8.0-build87` (commit `604aee0`) is GitHub's latest release,
+`debug-v0.8.0-build87` (commit `604aee0`) was GitHub's latest release then,
 published with `tool/release_debug.sh` after green local pipeline, CI and
 Docker runs for that exact commit; the downloaded APK matches `SHA256SUMS`.
 It adds English, Croatian and Mandarin with the live language switch, the
