@@ -74,7 +74,7 @@ void loadTests() {
       expect(await loadFrom(validData()), validSettings);
     });
 
-    test('unavailable storage gives defaults and allows a retry', () async {
+    test('unavailable storage fails safely and allows a retry', () async {
       var attempts = 0;
       final repo = Repo(
         openStore: () async {
@@ -83,7 +83,7 @@ void loadTests() {
           return FakePreferencesStore(validData());
         },
       );
-      expect(await repo.load(), AppSettings.defaults);
+      await expectLater(repo.load(), throwsA(isA<SettingsStorageException>()));
       expect(await repo.load(), validSettings);
       expect(await repo.load(), validSettings);
       expect(attempts, 2);
@@ -198,18 +198,32 @@ void versionTests() {
       );
     });
 
-    test('a newer version loads defaults', () async {
-      expect(
-        await loadFrom(validData()..[Repo.versionKey] = Repo.schemaVersion + 1),
-        AppSettings.defaults,
+    test('a newer version cannot be loaded or overwritten', () async {
+      final snapshot = jsonEncode({
+        ...validData(),
+        Repo.versionKey: Repo.schemaVersion + 1,
+        'futureField': 'preserve',
+      });
+      final store = FakePreferencesStore({Repo.snapshotKey: snapshot});
+      final repo = Repo(openStore: () async => store);
+      await expectLater(repo.load(), throwsA(isA<SettingsStorageException>()));
+      await expectLater(
+        repo.save(AppSettings.defaults),
+        throwsA(isA<SettingsStorageException>()),
       );
+      expect(store.values[Repo.snapshotKey], snapshot);
     });
 
-    test('an older version without migration loads defaults', () async {
-      expect(
-        await loadFrom(validData()..[Repo.versionKey] = 0),
-        AppSettings.defaults,
+    test('an older version without migration cannot be overwritten', () async {
+      final snapshot = jsonEncode(validData()..[Repo.versionKey] = 0);
+      final store = FakePreferencesStore({Repo.snapshotKey: snapshot});
+      final repo = Repo(openStore: () async => store);
+      await expectLater(repo.load(), throwsA(isA<SettingsStorageException>()));
+      await expectLater(
+        repo.save(AppSettings.defaults),
+        throwsA(isA<SettingsStorageException>()),
       );
+      expect(store.values[Repo.snapshotKey], snapshot);
     });
 
     test('an older version is migrated step by step', () async {
@@ -371,11 +385,28 @@ void saveTests() {
       expect(storageError.toString(), contains(Repo.snapshotKey));
     });
 
-    test('a malformed snapshot never exposes stale legacy fields', () async {
-      final store = FakePreferencesStore(validData())
-        ..values[Repo.snapshotKey] = '{incomplete';
-      final repo = Repo(openStore: () async => store);
-      expect(await repo.load(), AppSettings.defaults);
+    test('malformed snapshots cannot expose or overwrite stale data', () async {
+      final invalid = <Object>[
+        42,
+        '{incomplete',
+        '[]',
+        '{}',
+        jsonEncode({Repo.versionKey: '3'}),
+      ];
+      for (final raw in invalid) {
+        final store = FakePreferencesStore(validData())
+          ..values[Repo.snapshotKey] = raw;
+        final repo = Repo(openStore: () async => store);
+        await expectLater(
+          repo.load(),
+          throwsA(isA<SettingsStorageException>()),
+        );
+        await expectLater(
+          repo.save(AppSettings.defaults),
+          throwsA(isA<SettingsStorageException>()),
+        );
+        expect(store.values[Repo.snapshotKey], raw);
+      }
     });
 
     test('unavailable storage throws', () async {

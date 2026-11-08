@@ -105,6 +105,29 @@ void _settingsTests() {
     expect(await page.onSave(edited), isFalse);
     expect(app.monitor.controller.settings, AppSettings.defaults);
   });
+
+  testWidgets('unread settings are protected and can be recovered', (
+    tester,
+  ) async {
+    final app = _App();
+    app.settings
+      ..stored = edited
+      ..loadException = Exception('temporarily unavailable');
+    await app.pump(tester);
+    expect(find.text(l10nDe.settingsLoadWarning), findsOneWidget);
+    final page = await _openSettings(tester);
+    expect(find.text(l10nDe.settingsLoadError), findsOneWidget);
+    expect(find.text(l10nDe.settingsSave), findsNothing);
+    expect(await page.onSave(AppSettings.defaults), isFalse);
+    expect(app.settings.stored, edited);
+    app.settings.loadException = null;
+    await tester.tap(find.text(l10nDe.settingsRetryLoad));
+    await _settle(tester);
+    expect(find.text(l10nDe.settingsLoadError), findsNothing);
+    expect(app.monitor.controller.settings, edited);
+    expect(find.text(l10nDe.settingsSave), findsOneWidget);
+    expect(app.settings.stored, edited);
+  });
 }
 
 void _starResetTests() {

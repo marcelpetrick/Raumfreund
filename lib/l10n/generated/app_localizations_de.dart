@@ -382,6 +382,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSave => 'Speichern';
 
   @override
+  String get settingsLoadWarning =>
+      'Die Einstellungen konnten nicht geladen werden. Bis zur Wiederherstellung gelten die Standardwerte. Öffne die Einstellungen für weitere Hinweise.';
+
+  @override
+  String get settingsLoadError =>
+      'Gespeicherte Einstellungen sind nicht lesbar oder stammen aus einer neueren App-Version. Deine Daten bleiben erhalten. Versuche es erneut; bei einer neueren Version aktualisiere die App.';
+
+  @override
+  String get settingsRetryLoad => 'Erneut laden';
+
+  @override
   String get settingsRetrySave => 'Erneut speichern';
 
   @override

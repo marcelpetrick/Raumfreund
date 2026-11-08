@@ -18,12 +18,12 @@ baseline; the list is not padded to twenty. Device-only behaviour remains open.
    A store-open failure returns defaults as a successful load, which the
    controller caches; after recovery, saving those defaults can replace the
    unread settings. Preserve the failed-load state and recover without writing
-   over unknown data. **Status: fix in progress.**
+   over unknown data. **Status: fixed, independently reviewed and locally gated.**
 2. **MEDIUM · Architecture · Newer settings schema can be overwritten** —
    `lib/features/settings/infrastructure/shared_preferences_settings_repository.dart:140`.
    An older app treats a newer schema as defaults and can write its own snapshot
    over it, discarding newer fields. Refuse writes until the schema can be read.
-   **Status: fix in progress.**
+   **Status: fixed, independently reviewed and locally gated.**
 3. **MEDIUM · Code · Failed preference write can pollute the process cache** —
    `lib/features/settings/infrastructure/preferences_store.dart:50`. The pinned
    `shared_preferences` implementation updates its shared cache before the

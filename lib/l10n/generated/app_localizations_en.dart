@@ -382,6 +382,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSave => 'Save';
 
   @override
+  String get settingsLoadWarning =>
+      'Settings could not be loaded. Defaults are in use until they are restored. Open Settings for details.';
+
+  @override
+  String get settingsLoadError =>
+      'Saved settings cannot be read or were written by a newer app version. Your data is preserved. Try again; if they are from a newer version, update the app.';
+
+  @override
+  String get settingsRetryLoad => 'Try loading again';
+
+  @override
   String get settingsRetrySave => 'Save again';
 
   @override

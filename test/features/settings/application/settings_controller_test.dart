@@ -58,6 +58,7 @@ void main() {
   });
 
   test('save stores and exposes the new settings', () async {
+    await controller.load();
     final changes = <bool>[];
     controller.addListener(() => changes.add(controller.isSaving));
     expect(await controller.save(custom), isTrue);
@@ -92,6 +93,7 @@ void main() {
   });
 
   test('saves are serialized in call order', () async {
+    await controller.load();
     repository.gate = Completer<void>();
     final first = controller.save(custom);
     final second = controller.save(AppSettings.defaults);
@@ -104,8 +106,18 @@ void main() {
     expect(controller.settings, AppSettings.defaults);
   });
 
+  _loadRecoveryTest();
+
+  _disposeTest();
+}
+
+void _disposeTest() {
   test('dispose is idempotent and silences late completions', () async {
-    repository.gate = Completer<void>();
+    final repository = InMemorySettingsRepository(custom)
+      ..gate = Completer<void>();
+    final controller = SettingsController(repository);
+    var notifications = 0;
+    controller.addListener(() => notifications++);
     final loading = controller.load();
     controller
       ..dispose()
@@ -114,5 +126,24 @@ void main() {
     await loading;
     expect(notifications, 0);
     expect(controller.settings, custom);
+  });
+}
+
+void _loadRecoveryTest() {
+  test('failed load blocks writes until a fresh successful load', () async {
+    final repository = InMemorySettingsRepository(custom)
+      ..loadException = const FormatException('unavailable');
+    final controller = SettingsController(repository);
+    await controller.load();
+    expect(controller.loadFailed, isTrue);
+    expect(await controller.save(AppSettings.defaults), isFalse);
+    expect(repository.saveCalls, 0);
+    expect(repository.stored, custom);
+    repository.loadException = null;
+    await controller.load();
+    expect(controller.loadFailed, isFalse);
+    expect(controller.settings, custom);
+    expect(await controller.save(custom), isTrue);
+    controller.dispose();
   });
 }

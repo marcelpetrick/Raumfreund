@@ -73,6 +73,7 @@ class RaumfreundApp extends StatefulWidget {
 class _RaumfreundAppState extends State<RaumfreundApp>
     with WidgetsBindingObserver {
   final _navigatorKey = GlobalKey<NavigatorState>();
+  final _messengerKey = GlobalKey<ScaffoldMessengerState>();
   late final SettingsController _settings;
   late final LanguageController _language;
   late final MonitorController _monitor;
@@ -142,6 +143,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     listenable: _language,
     builder: (context, _) => MaterialApp(
       navigatorKey: _navigatorKey,
+      scaffoldMessengerKey: _messengerKey,
       title: 'Raumfreund',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
@@ -180,6 +182,15 @@ class _RaumfreundAppState extends State<RaumfreundApp>
     await _monitor.applySettings(_settings.settings);
     if (!mounted) return;
     setState(() => _initialSettingsReady = true);
+    if (_settings.loadFailed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_settings.loadFailed) return;
+        final l10n = lookupAppLocalizations(Locale(_language.language.code));
+        _messengerKey.currentState?.showSnackBar(
+          SnackBar(content: Text(l10n.settingsLoadWarning)),
+        );
+      });
+    }
     try {
       final info = await _appInfoPort.load();
       if (mounted) setState(() => _appInfo = info);
@@ -189,7 +200,7 @@ class _RaumfreundAppState extends State<RaumfreundApp>
   }
 
   Future<void> _openSettings() => _navigate((navigator) async {
-    await _settings.load();
+    await _retrySettings();
     if (!mounted) return;
     await navigator.push<void>(
       MaterialPageRoute(
@@ -198,10 +209,19 @@ class _RaumfreundAppState extends State<RaumfreundApp>
           onSave: _saveSettings,
           onResetStars: _resetStars,
           languageController: _language,
+          initialLoadFailed: _settings.loadFailed,
+          onRetryLoad: _retrySettings,
         ),
       ),
     );
   });
+
+  Future<AppSettings?> _retrySettings() async {
+    await _settings.load();
+    if (_settings.loadFailed || !mounted) return null;
+    await _monitor.applySettings(_settings.settings);
+    return _settings.settings;
+  }
 
   Future<void> _openAbout() => _navigate((navigator) async {
     await navigator.push<void>(

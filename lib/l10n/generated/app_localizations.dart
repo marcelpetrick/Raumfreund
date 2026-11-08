@@ -696,6 +696,24 @@ abstract class AppLocalizations {
   /// **'Speichern'**
   String get settingsSave;
 
+  /// Startup notice that saved settings could not be loaded and defaults are active.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Einstellungen konnten nicht geladen werden. Bis zur Wiederherstellung gelten die Standardwerte. Öffne die Einstellungen für weitere Hinweise.'**
+  String get settingsLoadWarning;
+
+  /// Explains that settings are protected until storage or app version is fixed.
+  ///
+  /// In de, this message translates to:
+  /// **'Gespeicherte Einstellungen sind nicht lesbar oder stammen aus einer neueren App-Version. Deine Daten bleiben erhalten. Versuche es erneut; bei einer neueren Version aktualisiere die App.'**
+  String get settingsLoadError;
+
+  /// Retries loading saved settings without overwriting them.
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut laden'**
+  String get settingsRetryLoad;
+
   /// Retries a failed settings save.
   ///
   /// In de, this message translates to:

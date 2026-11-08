@@ -23,6 +23,7 @@ final class SettingsController extends ChangeNotifier {
   bool _isSaving = false;
   bool _saveFailed = false;
   bool _disposed = false;
+  bool _loaded = false;
   Future<void>? _loading;
   Future<void> _saveQueue = Future<void>.value();
 
@@ -41,7 +42,8 @@ final class SettingsController extends ChangeNotifier {
   /// Whether the most recent save failed.
   bool get saveFailed => _saveFailed;
 
-  /// Loads the stored settings. Repeated calls share the first load.
+  /// Loads the stored settings. Calls share a pending or successful load;
+  /// a failed load can be retried.
   Future<void> load() => _loading ??= _load();
 
   /// Persists [settings]; returns whether it worked. On failure
@@ -69,16 +71,20 @@ final class SettingsController extends ChangeNotifier {
   Future<void> _load() async {
     try {
       _settings = await _repository.load();
+      _loaded = true;
+      _loadFailed = false;
     } on Exception {
       // The repository already falls back per field; this covers an
       // unexpected failure of the storage itself.
       _loadFailed = true;
+      _loading = null;
     }
     _isLoading = false;
     _notify();
   }
 
   Future<bool> _save(AppSettings settings) async {
+    if (!_loaded) return false;
     _isSaving = true;
     _saveFailed = false;
     _notify();

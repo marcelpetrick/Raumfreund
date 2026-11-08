@@ -35,6 +35,8 @@ class SettingsPage extends StatefulWidget {
     required this.onSave,
     this.onResetStars,
     this.languageController,
+    this.initialLoadFailed = false,
+    this.onRetryLoad,
     super.key,
   });
 
@@ -57,6 +59,12 @@ class SettingsPage extends StatefulWidget {
   /// picked, so the teacher sees the result before deciding anything else.
   final LanguageController? languageController;
 
+  /// Whether the stored settings could not be safely loaded.
+  final bool initialLoadFailed;
+
+  /// Reloads stored settings, or returns null if they remain unavailable.
+  final Future<AppSettings?> Function()? onRetryLoad;
+
   @override
   State<SettingsPage> createState() => _SettingsPageState();
 }
@@ -66,12 +74,14 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _defaultsApplied = false;
   bool _isSaving = false;
   bool _saveFailed = false;
+  late bool _loadFailed = widget.initialLoadFailed;
+  bool _retrying = false;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return PopScope(
-      canPop: !_isSaving,
+      canPop: !_isSaving && !_retrying,
       child: NightSkyBackground(
         child: Scaffold(
           appBar: AppBar(title: Text(l10n.settingsTitle)),
@@ -87,25 +97,30 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        if (widget.languageController case final language?) ...[
-                          _LanguageSection(controller: language),
+                        if (_loadFailed) ...[
+                          _loadError(l10n),
+                        ] else ...[
+                          if (widget.languageController
+                              case final language?) ...[
+                            _LanguageSection(controller: language),
+                            const SizedBox(height: 16),
+                          ],
+                          _thresholdsSection(l10n),
                           const SizedBox(height: 16),
-                        ],
-                        _thresholdsSection(l10n),
-                        const SizedBox(height: 16),
-                        _calibrationSection(l10n),
-                        const SizedBox(height: 16),
-                        _alarmSection(l10n),
-                        const SizedBox(height: 16),
-                        _starTestSection(l10n),
-                        if (widget.onResetStars != null) ...[
+                          _calibrationSection(l10n),
                           const SizedBox(height: 16),
-                          _StarResetSection(onReset: widget.onResetStars!),
+                          _alarmSection(l10n),
+                          const SizedBox(height: 16),
+                          _starTestSection(l10n),
+                          if (widget.onResetStars != null) ...[
+                            const SizedBox(height: 16),
+                            _StarResetSection(onReset: widget.onResetStars!),
+                          ],
+                          const SizedBox(height: 20),
+                          if (_defaultsApplied) _defaultsHint(l10n),
+                          if (_saveFailed) _saveError(l10n),
+                          _actions(l10n),
                         ],
-                        const SizedBox(height: 20),
-                        if (_defaultsApplied) _defaultsHint(l10n),
-                        if (_saveFailed) _saveError(l10n),
-                        _actions(l10n),
                       ],
                     ),
                   ),
@@ -116,6 +131,41 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
+  }
+
+  Widget _loadError(AppLocalizations l10n) => Semantics(
+    liveRegion: true,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.settingsLoadError),
+        const SizedBox(height: 16),
+        FilledButton.icon(
+          onPressed: _retrying || widget.onRetryLoad == null
+              ? null
+              : _retryLoad,
+          icon: const Icon(Icons.refresh_rounded),
+          label: Text(l10n.settingsRetryLoad),
+        ),
+        TextButton(
+          onPressed: _retrying ? null : () => Navigator.pop(context),
+          child: Text(l10n.settingsCancel),
+        ),
+      ],
+    ),
+  );
+
+  Future<void> _retryLoad() async {
+    setState(() => _retrying = true);
+    final settings = await widget.onRetryLoad!();
+    if (!mounted) return;
+    setState(() {
+      _retrying = false;
+      if (settings != null) {
+        _draft = settings;
+        _loadFailed = false;
+      }
+    });
   }
 
   Widget _thresholdsSection(AppLocalizations l10n) => _SettingsSection(

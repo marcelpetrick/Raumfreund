@@ -5,8 +5,9 @@ import 'app_settings.dart';
 
 /// Persistent storage of [AppSettings].
 abstract interface class SettingsRepository {
-  /// Loads validated settings. Invalid or missing stored values fall back to
-  /// [AppSettings.defaults] per field; never throws for bad data.
+  /// Loads validated settings. Missing or invalid fields in a readable schema
+  /// fall back to [AppSettings.defaults]; unreadable or unsupported data and
+  /// storage failures throw, so callers can avoid overwriting unknown data.
   Future<AppSettings> load();
 
   /// Persists [settings]. Throws on storage failure.

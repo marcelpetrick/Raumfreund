@@ -110,3 +110,4 @@ these lines (see docs/releasing.md).
 * v0.11.0 Redesign Flocke with matching blue eyes and a dog-like dance.
 * v0.11.1 Refresh documentation, screenshots and C4 architecture guide.
 * v0.11.2 Record whole-project review and clarify release guidance.
+* v0.11.3 Protect unread and newer settings from being overwritten.

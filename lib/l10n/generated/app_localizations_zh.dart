@@ -363,6 +363,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSave => '保存';
 
   @override
+  String get settingsLoadWarning => '无法加载设置。在恢复之前将使用默认值。请打开设置了解详情。';
+
+  @override
+  String get settingsLoadError =>
+      '无法读取已保存的设置，或者设置来自较新版本的应用。你的数据会保留。请重试；如果设置来自较新版本，请更新应用。';
+
+  @override
+  String get settingsRetryLoad => '重新加载';
+
+  @override
   String get settingsRetrySave => '重新保存';
 
   @override

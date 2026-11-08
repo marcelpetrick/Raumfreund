@@ -22,11 +22,11 @@ does not limit the review. Do not invent findings to fill the list.
 | --- | --- | --- |
 | Monitor domain, session lifecycle and alarms | Domain reviewer | reviewed; teardown fix and regression tests in progress |
 | Android recorder, permissions, channels and alarm | Native reviewer | reviewed; one permission finding |
-| UI, settings, shop and persistence | UI reviewer | reviewed; settings protection fix in progress |
+| UI, settings, shop and persistence | UI reviewer | reviewed; settings protection independently reviewed and locally gated (715 tests, 99.75% coverage) |
 | Tooling, CI, documentation, architecture and integration | Coordinator and reviewers | reviewed; Docker notice implemented and reviewed, documentation corrected |
 | Verify, rank and document findings | Coordinator | twenty ranked findings plus two additional documentation corrections in `docs/reviews/2026-11-07-current-state.md` |
-| Fix confirmed findings, test, independently review critical logic | Coordinator and reviewers | settings protection and teardown fixes implemented; teardown independently reviewed, final settings review and remaining findings open |
-| Full gate, atomic versioned commits, push and verify CI | Coordinator | review and Docker notice pass full gate (713 tests, 99.86%); commit and push next |
+| Fix confirmed findings, test, independently review critical logic | Coordinator and reviewers | settings protection and teardown fixes independently reviewed; remaining findings open |
+| Full gate, atomic versioned commits, push and verify CI | Coordinator | review and Docker notice `4d3c345` has green CI; settings full gate passed, commit next; teardown and remaining findings follow |
 | Physical device behaviour and production acceptance | Owner | open |
 
 Baseline: `main` and `origin/main` at `7241b91`, `0.11.1+106`; CI and Docker

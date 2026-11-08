@@ -169,6 +169,11 @@ the measurement ends.
 `AppSettings` is always valid in memory. Infrastructure must validate every
 persisted field independently, carry a schema version and fall back safely for
 missing or invalid values. Future migrations are explicit and tested.
+If settings storage cannot be read, a snapshot is malformed, or its schema is
+unsupported, the app warns that it is using defaults for the current session.
+Settings editing and saving remain blocked until a retry reads the stored data;
+the repository also checks the stored schema before writing, so a downgrade
+cannot overwrite a newer snapshot.
 
 The Settings view edits a draft. Save validates and writes atomically; cancel
 does not mutate active or persisted settings. Threshold changes never affect a

@@ -32,7 +32,8 @@ final class SettingsStorageException implements Exception {
 
 /// Versioned, validating persistence of [AppSettings] in SharedPreferences.
 ///
-/// Loading never throws: every field is validated on its own, and a
+/// Loading throws when storage is unavailable or a snapshot cannot be read or
+/// migrated. Each readable field is validated on its own, and a
 /// missing, mistyped or out-of-range value falls back to its default. An
 /// invalid yellow/red pair falls back to the default thresholds.
 ///
@@ -48,15 +49,14 @@ final class SettingsStorageException implements Exception {
 ///   default (10 s), because the fixed delay of version 1 was 10 s.
 /// * Version 3 ([schemaVersion]) adds [quickStarModeKey]. Existing installs
 ///   migrate with the teacher-facing test mode disabled.
-/// * Missing or non-integer version: treated as the current layout (fields
-///   are validated individually anyway, a missing delay falls back to its
-///   default).
+/// * Legacy individual keys without an integer version are treated as the
+///   current layout; a snapshot must have a valid integer version.
 /// * Older versions are upgraded step by step through [migrations]
 ///   (`migrations[n]` turns version n into n + 1). A version without a
-///   migration path loads defaults.
+///   migration path fails safely instead of replacing the snapshot.
 /// * A *newer* version (written by a later app release, e.g. after a
-///   downgrade) cannot be interpreted safely and loads defaults. The stored
-///   data is left untouched until the user saves.
+///   downgrade) cannot be interpreted safely. Loading and saving fail until
+///   a compatible version is used, preserving the stored snapshot.
 final class SharedPreferencesSettingsRepository implements SettingsRepository {
   /// Creates the repository. [openStore] defaults to the real
   /// SharedPreferences; [migrations] defaults to [defaultMigrations].
@@ -130,19 +130,39 @@ final class SharedPreferencesSettingsRepository implements SettingsRepository {
     final PreferencesStore store;
     try {
       store = await _storeOnce();
-    } on Exception {
-      // Storage unavailable: the app must still work, with defaults.
-      return AppSettings.defaults;
+    } on Exception catch (error) {
+      throw SettingsStorageException('storage unavailable', error);
     }
-    final snapshot = store.read(snapshotKey);
-    final source = snapshot == null ? store.read : _snapshotReader(snapshot);
-    if (source == null) return AppSettings.defaults;
-    final reader = _upgrade(source);
-    return reader == null ? AppSettings.defaults : decode(reader);
+    try {
+      final snapshot = store.read(snapshotKey);
+      final source = snapshot == null ? store.read : _snapshotReader(snapshot);
+      if (source == null) {
+        throw const SettingsStorageException('invalid settings snapshot');
+      }
+      final version = source(versionKey);
+      if (snapshot != null && version is! int) {
+        throw const SettingsStorageException('invalid settings schema');
+      }
+      if (version is int && version > schemaVersion) {
+        throw const SettingsStorageException('settings schema is newer');
+      }
+      final reader = _upgrade(source);
+      if (reader == null) {
+        throw const SettingsStorageException('settings migration unavailable');
+      }
+      return decode(reader);
+    } on SettingsStorageException {
+      rethrow;
+    } on Exception catch (error) {
+      throw SettingsStorageException('reading settings failed', error);
+    }
   }
 
   @override
   Future<void> save(AppSettings settings) async {
+    // Recheck before replacing the snapshot: an unread or newer version
+    // must never be mistaken for factory defaults and overwritten.
+    await load();
     final PreferencesStore store;
     try {
       store = await _storeOnce();

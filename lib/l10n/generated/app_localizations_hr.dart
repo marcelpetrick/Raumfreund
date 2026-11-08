@@ -399,6 +399,17 @@ class AppLocalizationsHr extends AppLocalizations {
   String get settingsSave => 'Spremi';
 
   @override
+  String get settingsLoadWarning =>
+      'Postavke se nisu mogle učitati. Do oporavka se koriste zadane vrijednosti. Otvori Postavke za više informacija.';
+
+  @override
+  String get settingsLoadError =>
+      'Spremljene postavke nije moguće pročitati ili su spremljene u novijoj verziji aplikacije. Tvoji podaci ostaju sačuvani. Pokušaj ponovno ili ažuriraj aplikaciju.';
+
+  @override
+  String get settingsRetryLoad => 'Pokušaj ponovno učitati';
+
+  @override
   String get settingsRetrySave => 'Ponovno spremi';
 
   @override
