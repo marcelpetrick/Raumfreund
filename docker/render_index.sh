@@ -7,7 +7,8 @@
 # Usage:   docker/render_index.sh <dist-dir> <template> <output.html>
 #
 # Picks the single *.apk in <dist-dir>, reads its checksum from SHA256SUMS and
-# the version from VERSION, and substitutes __VERSION__, __APK__ and __SHA256__.
+# the version from VERSION, and substitutes version, APK, checksum and a
+# signing notice based on the artifact name from tool/build_apk.sh.
 # Exit codes: 0 success, 1 missing/ambiguous APK or checksum, 2 usage error.
 set -eu
 
@@ -27,4 +28,13 @@ sha="$(grep " ${apk}\$" "${dist}/SHA256SUMS" | cut -d' ' -f1)"
 	exit 1
 }
 version="$(cat "${dist}/VERSION")"
-sed -e "s|__VERSION__|${version}|g" -e "s|__APK__|${apk}|g" -e "s|__SHA256__|${sha}|g" "$2" >"$3"
+case "${apk}" in
+*-debugsigned.apk)
+	notice='Debug-signierte Testversion. Nicht für Google Play oder den Produktionseinsatz. Separat gebaute Debug-Versionen können verschiedene Schlüssel verwenden und sich daher möglicherweise nicht als Update installieren lassen.'
+	;;
+*)
+	notice='Diese APK ist nicht als Debug-Version gekennzeichnet. Signatur und Herkunft vor der Installation prüfen.'
+	;;
+esac
+sed -e "s|__VERSION__|${version}|g" -e "s|__APK__|${apk}|g" \
+	-e "s|__SHA256__|${sha}|g" -e "s|__SIGNING_NOTICE__|${notice}|g" "$2" >"$3"

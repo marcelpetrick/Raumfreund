@@ -75,7 +75,8 @@ build.
 
 ## Major features
 
-- Local microphone-level estimation without recording or transmitting audio.
+- Local microphone-level estimation: audio is processed briefly in RAM and
+  never saved or transmitted.
 - Accessible green/yellow/red feedback using text, icons and the selected
   companion's expression and animation rather than colour alone.
 - Mia or Flocke is happy in green, uneasy in yellow and scared in red. If it

@@ -39,6 +39,7 @@
   <p class="lights" aria-hidden="true"><span class="g"></span><span class="y"></span><span class="r"></span></p>
   <h1>Raumfreund</h1>
   <p>Die freundliche Lautstärkeampel mit Katze Mia – Version <strong>__VERSION__</strong>.</p>
+  <p>__SIGNING_NOTICE__</p>
   <a class="button" href="__APK__" download>APK herunterladen</a>
   <p><small>SHA-256:</small><br><code>__SHA256__</code></p>
   <p><small>Installation: Datei auf dem Android-Gerät öffnen und „Installation aus dieser Quelle“ erlauben.

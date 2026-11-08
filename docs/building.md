@@ -5,9 +5,10 @@ Copyright (C) 2026 Marcel Petrick <mail@marcelpetrick.it>
 
 # Building
 
-Linux needs Bash, Git, curl, xz, JDK 21 and Android SDK API 36. The repository
-downloads the pinned Flutter SDK and auxiliary tools into ignored `.toolchain/`
-directories.
+The full local pipeline supports Linux x86-64 and needs Bash, Git, curl, xz,
+system Python 3, Node.js 24 with npm, JDK 21, Android SDK API 36 and a working
+Docker daemon. The repository downloads the pinned Flutter SDK and auxiliary
+tools into ignored `.toolchain/` directories.
 
 ```sh
 ./localPipeline.sh

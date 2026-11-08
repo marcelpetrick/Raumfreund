@@ -10,7 +10,32 @@ is [`vision.md`](vision.md); the binding workflow is
 [`AGENTS.md`](../AGENTS.md). Every package lands as an atomic Conventional Commit,
 versioned with `tool/bump_version.sh`, after a green `./localPipeline.sh`.
 
-## Active: documentation audit and architecture guide (2026-11-07)
+## Active: whole-project review and fixes (2026-11-07)
+
+Verdict: review the complete current app, native host, tooling, CI,
+documentation and architecture at `7241b91`, rank up to twenty independently
+verified findings, document evidence and fix confirmed issues in priority
+order. The owner explicitly requested current state, so an empty branch diff
+does not limit the review. Do not invent findings to fill the list.
+
+| Package | Owner | Status |
+| --- | --- | --- |
+| Monitor domain, session lifecycle and alarms | Domain reviewer | reviewed; teardown fix and regression tests in progress |
+| Android recorder, permissions, channels and alarm | Native reviewer | reviewed; one permission finding |
+| UI, settings, shop and persistence | UI reviewer | reviewed; settings protection fix in progress |
+| Tooling, CI, documentation, architecture and integration | Coordinator and reviewers | reviewed; Docker notice implemented and reviewed, documentation corrected |
+| Verify, rank and document findings | Coordinator | twenty ranked findings plus two additional documentation corrections in `docs/reviews/2026-11-07-current-state.md` |
+| Fix confirmed findings, test, independently review critical logic | Coordinator and reviewers | settings protection and teardown fixes implemented; teardown independently reviewed, final settings review and remaining findings open |
+| Full gate, atomic versioned commits, push and verify CI | Coordinator | review and Docker notice pass full gate (713 tests, 99.86%); commit and push next |
+| Physical device behaviour and production acceptance | Owner | open |
+
+Baseline: `main` and `origin/main` at `7241b91`, `0.11.1+106`; CI and Docker
+passed. Four old Git worktree records are marked prunable; do not remove them
+without a reason. Document each finding with a reproducible cause and fix
+status, preserve the review baseline, and keep real-device tests explicitly
+open. Stop before committing if the full local gate fails; rollback is a revert.
+
+## Completed: documentation audit and architecture guide (2026-11-07)
 
 Verdict: bring current documentation into line with the shipped app and add a
 C4 guide explaining its structure, runtime flows and build process. Preserve
@@ -21,7 +46,7 @@ dated historical evidence and explicitly identify untested device behaviour.
 | Audit README and remaining documentation against code and release | Review agents | done; findings reconciled |
 | Create C4 architecture views, flows and build explanation | Architecture agent | done; independently reviewed |
 | Reconcile README, product documentation and this plan | Coordinator | done; screenshots regenerated and inspected |
-| Review, bump patch version, run full gate, commit, push and verify CI | Coordinator | `0.11.1+106`; full gate passed (713 tests, 99.86% coverage); commit, push and monitor CI next |
+| Review, bump patch version, run full gate, commit, push and verify CI | Coordinator | done, `7241b91`; full gate, CI and Docker passed |
 | Real-device acceptance | Owner | open |
 
 Baseline: clean `main` at `12162e6`, version `0.11.0+105` and published

@@ -61,8 +61,9 @@ Never commit the keystore. `*.jks` and `android/key.properties` are git-ignored.
 The Release workflow has never run with real secrets, so test it before Play
 depends on it.
 
-- [ ] 🤖 Bump the version on `main`, update the changelog and run
-  `./localPipeline.sh` (see `releasing.md`, "Production release").
+- [ ] 🤖 Bump the version on `main`, update the changelog, run
+  `./localPipeline.sh`, commit and push, then verify CI on that exact commit
+  (see `releasing.md`, "Production release").
 - [ ] 🧑 Create and push the tag: `git tag -s vX.Y.Z -m "Raumfreund X.Y.Z"`
   and `git push origin vX.Y.Z`. The tag must match the version in
   `pubspec.yaml`.
@@ -110,8 +111,9 @@ Chinese are optional, since the app already speaks them):
   calibrated sound-level meter.
 - [ ] 🤖 App icon, 512 × 512 PNG, derived from `ic_launcher`.
 - [ ] 🤖 Feature graphic, 1024 × 500 PNG or JPEG.
-- [ ] 🤖 Phone screenshots (2 to 8) and 7" and 10" tablet screenshots from
-  `tool/render_screenshots.sh`.
+- [ ] 🤖 Prepare 2 to 8 phone screenshots; `tool/render_screenshots.sh` renders
+  phone-sized widget fixtures only. 🧑 Capture and check 7" and 10" tablet
+  screenshots on actual devices; tablet assets remain open.
 - [ ] 🧑 Category (likely **Tools** or **Education**), contact email
   `mail@marcelpetrick.it`, optional website (the GitHub repository).
 - [ ] 🧑 Paste and upload everything, then save.

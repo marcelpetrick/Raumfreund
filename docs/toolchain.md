@@ -1,7 +1,8 @@
 # Toolchain
 
-Verified on **2026-10-06**. Versions are pinned; updates arrive as reviewed,
-green commits (see the weekly maintenance workflow).
+The pinned Flutter stable release was checked against the official release
+manifest on **2026-11-07**. Updates arrive as reviewed, green commits (see the
+weekly maintenance workflow).
 
 ## Versions
 
@@ -42,8 +43,9 @@ build-tools 36.0.0 instead of whichever SDK directory sorts newest.
 The Docker base images and downloaded Android command-line-tools are fixed by
 digests/checksums. Ubuntu packages installed inside the already digest-pinned
 base remain repository-resolved security packages; pinning their versions would
-block patched rebuilds. Docker does not install the floating `platform-tools`
-package because APK builds and verification do not need `adb`.
+block patched rebuilds. Gradle currently installs platform-tools and Android
+Platform 35 on demand during the image build. These SDK components are not yet
+fully pinned; this reproducibility gap is tracked in the current-state review.
 
 ## Why a project-local Flutter SDK
 
@@ -70,7 +72,6 @@ cd Raumfreund
 ./localPipeline.sh            # installs the pinned SDK on first run
 ```
 
-Requirements: bash, curl, xz, git, a JDK 21 and an Android SDK (platform 36,
-build-tools) with `ANDROID_HOME` set or `~/Android/Sdk`. macOS and Windows:
-see `docs/building.md`; the Docker image provides a fully reproducible
-alternative on every OS.
+Requirements and host support are listed in `docs/building.md`. The Docker
+image can build without a host Android SDK, subject to the SDK reproducibility
+gap noted above.
